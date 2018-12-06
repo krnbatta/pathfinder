@@ -1,0 +1,2 @@
+let StatsComponent = $.extend(Component, () => {
+});
