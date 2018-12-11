@@ -1,5 +1,6 @@
-let Component = new StateMachine({
-  init: 'none',
+import StateMachine from "javascript-state-machine";
+
+let BaseComponent = new StateMachine({
   tranisitions: [
     {
       name: 'init',
@@ -13,3 +14,4 @@ let Component = new StateMachine({
     }
   ]
 });
+export default BaseComponent;
