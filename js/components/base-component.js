@@ -1,7 +1,5 @@
-import StateMachine from "javascript-state-machine";
-
-let BaseComponent = new StateMachine({
-  tranisitions: [
+let BaseComponent = {
+  transitions: [
     {
       name: 'init',
       from: 'none',
@@ -13,5 +11,6 @@ let BaseComponent = new StateMachine({
       to: 'rendered'
     }
   ]
-});
+};
+
 export default BaseComponent;

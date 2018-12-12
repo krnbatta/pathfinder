@@ -1,5 +1,0 @@
-$.extend(Controller, () => {
-  onleavenone: () => {
-    
-  }
-})

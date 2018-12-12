@@ -1,10 +1,13 @@
-import template from './template'
-import mapParser from './mapParser'
-import mapBuilder from './mapParser'
-import Raphael from 'raphael'
-import Map from './models/Map';
+import StateMachine from "javascript-state-machine";
 
-let DebuggerComponent = $.extend(Component, {
+import template from './template';
+import mapParser from '../../utils/map-parser';
+import mapBuilder from '../../utils/map-builder';
+import Map from '../../models/Map';
+import $ from 'jquery';
+import BaseComponent from '../base-component';
+
+let DebuggerComponent = new StateMachine($.extend(BaseComponent, {
 
   methods: {
     onLeaveNone() {
@@ -18,4 +21,6 @@ let DebuggerComponent = $.extend(Component, {
       });
     }
   }
-});
+}));
+
+export default DebuggerComponent;

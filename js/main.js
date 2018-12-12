@@ -1,7 +1,6 @@
-import Components from './components';
+import Controller from './controller';
+
 document.addEventListener('DOMContentLoaded', init, false);
 function init(){
-  Components.forEach((component) => {
-    component.render();
-  });
+  Controller.init("adsdf");
 };

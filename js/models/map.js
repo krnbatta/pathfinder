@@ -1,29 +1,38 @@
+import mapParser from '../utils/map-parser';
+import mapBuilder from '../utils/map-builder';
+
 class Map {
   constructor(mapFile) {
-    this.mapfile = mapFile;
-    this._mapStr = null;
+    this.mapFile = mapFile;
+    this._mapData = null;
     this._mapNodes = null;
   }
 
-  get mapStr(){
-    if(!this._mapStr){
-      this._mapStr = new Promise((resolve, reject) => {
+  get mapData(){
+    if(!this._mapData){
+      let that = this;
+      this._mapData = new Promise((resolve, reject) => {
         try{
-          mapParser(e.target.files[0], resolve);
+          mapParser(that.mapFile, resolve);
         }
         catch(e){
           reject(e);
         }
       });
     }
-    return this._mapStr;
+    return this._mapData;
   }
 
   get mapNodes(){
     if(!this._mapNodes){
-      this._mapNodes = this.mapStr.then((str) => {
-        return mapBuilder(mapdata);
+      this._mapNodes = this.mapData.then((mapData) => {
+        return new Promise((resolve, reject) => {
+          mapBuilder(mapData, resolve);
+        });
       });
     }
+    return this._mapNodes;
   }
 }
+
+export default Map;
