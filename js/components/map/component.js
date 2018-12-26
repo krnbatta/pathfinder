@@ -9,7 +9,7 @@ import errorNotifier from '../../utils/error-notifier';
 let MapComponent = new StateMachine($.extend(BaseComponent, {
   methods: {
     onBeforeInit() {
-      $("#pathfinder").html("<div id='map-component'></div>");
+      $("#pathfinder").append("<div id='map-component'></div>");
     },
     onLeaveNone() {
       $("#map-component").html(template);

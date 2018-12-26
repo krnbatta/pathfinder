@@ -5,7 +5,7 @@ import models from '../models';
 let getModel = function(modelName) {
     let referredModel;
     models().forEach((model) => {
-        if (model.modelName == modelName) {
+        if (model.name == modelName) {
             referredModel = model;
             return;
         }
@@ -18,7 +18,7 @@ let getModel = function(modelName) {
 }
 
 let instance = null;
-class Store {
+class StoreSingleton {
     constructor() {
         if (!instance) {
             instance = this;
@@ -30,9 +30,13 @@ class Store {
         this.data[modelName] = this.data[modelName] || {};
         let model = getModel(modelName);
         let record = new model(attributes);
-        this.data[modelName][record.id] = record;
+        this.data[modelName][record._id] = record;
         return record;
     }
+    find(modelName){
+      return this.data[modelName][0];
+    }
 }
-let store = new Store();
-export default store;
+let Store = new StoreSingleton();
+window.store = Store;
+export default Store;

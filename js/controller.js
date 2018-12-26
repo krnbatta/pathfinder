@@ -1,5 +1,8 @@
 import StateMachine from "javascript-state-machine";
 import Components from './components';
+import Playback from './services/playback';
+import Store from './services/Store';
+import $ from 'jquery';
 
 let Controller = new StateMachine({
   transitions: [{
@@ -72,6 +75,21 @@ let Controller = new StateMachine({
       onAfterInit() {
         console.log(`onAfterInit => ${this.state}`);
         console.log(arguments);
+      },
+      onBeforeStart() {
+        let tracer = Store.find('Tracer');
+        tracer.steps.then((steps) => {
+          let id = 1;
+          let int = setInterval(() => {
+            if(id >= Object.keys(steps).length){
+              clearInterval(int);
+              return;
+            }
+            let step = steps[id];
+            $('#tracer-canvas').html(step.htmlStr);
+            id++;
+          }, 0);
+        });
       }
     }
 });

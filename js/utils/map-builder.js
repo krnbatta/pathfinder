@@ -1,10 +1,10 @@
-var async = require('async');
-var xmlns = "http://www.w3.org/2000/svg";
+import config from '../config'
+
 let rects = [];
 let width = null;
 let height = null;
 let mapStr = null;
-let nodeSize = 30;
+
 let mapBuilder = (mapData, callback) => {
   console.log(mapData);
   mapStr = mapData.mapStr;
@@ -17,9 +17,9 @@ let mapBuilder = (mapData, callback) => {
 
   Promise.all(tasks).then(() => {
     let tmp = document.createElement("div");
-    let svg = document.createElementNS(xmlns, "svg");
-    svg.setAttributeNS(null, "width", nodeSize*width);
-    svg.setAttributeNS(null, "height", nodeSize*height);
+    let svg = document.createElementNS(config.xmlns, "svg");
+    svg.setAttributeNS(null, "width", config.nodeSize*width);
+    svg.setAttributeNS(null, "height", config.nodeSize*height);
     rects.flat().forEach((rect) => {
       svg.appendChild(rect);
     });
@@ -32,19 +32,19 @@ let createRowTask = (rowId) => {
   return new Promise((resolve, reject) => {
     rects[rowId] = [];
     for (let colId = 0; colId < width; ++colId) {
-      let x = colId * nodeSize;
-      let y = rowId * nodeSize;
+      let x = colId * config.nodeSize;
+      let y = rowId * config.nodeSize;
       let stringIndex = rowId * width + colId;
       let fillColor = 'white';
       if (mapStr[stringIndex]=='@'){
         fillColor='grey';
       }
-      let elem = document.createElementNS(xmlns, "rect");
+      let elem = document.createElementNS(config.xmlns, "rect");
 
       elem.setAttributeNS(null, "x", x);
       elem.setAttributeNS(null, "y", y);
-      elem.setAttributeNS(null, "width", nodeSize);
-      elem.setAttributeNS(null, "height", nodeSize);
+      elem.setAttributeNS(null, "width", config.nodeSize);
+      elem.setAttributeNS(null, "height", config.nodeSize);
       elem.setAttributeNS(null, "fill", fillColor);
       elem.setAttributeNS(null, "stroke", "black");
       elem.setAttributeNS(null, "stroke-width", 0.1);

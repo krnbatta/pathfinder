@@ -4,20 +4,28 @@ import template from './template';
 import mapParser from '../../utils/map-parser';
 import mapBuilder from '../../utils/map-builder';
 import Map from '../../models/Map';
+import Tracer from '../../models/Tracer';
+import Store from '../../services/Store';
 import $ from 'jquery';
 import BaseComponent from '../base-component';
+import Controller from '../../controller';
 
 let DebuggerComponent = new StateMachine($.extend(BaseComponent, {
 
   methods: {
+    onBeforeInit() {
+      $("#pathfinder").append("<div id='debug-component'></div>");
+    },
     onLeaveNone() {
-      $("#path-component").html(template);
+      $("#debug-component").html(template);
       this.bindEvents();
     },
     bindEvents() {
-      $(".path_component__load_algo").on('change', (e) => {
+      $("#load-algo").on('change', (e) => {
         let debugFile = e.target.files[0];
-        this.debugger = new Debugger(debugFile);
+        Store.createRecord('Tracer', debugFile);
+        this.tracer = Store.find('Tracer');
+        Controller.start();
       });
     }
   }
