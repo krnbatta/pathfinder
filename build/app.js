@@ -86,9 +86,13 @@
 	
 	var _playback2 = _interopRequireDefault(_playback);
 	
-	var _Store = __webpack_require__(12);
+	var _Store = __webpack_require__(13);
 	
 	var _Store2 = _interopRequireDefault(_Store);
+	
+	var _config = __webpack_require__(10);
+	
+	var _config2 = _interopRequireDefault(_config);
 	
 	var _jquery = __webpack_require__(19);
 	
@@ -163,19 +167,47 @@
 	      console.log(arguments);
 	    },
 	    onBeforeStart: function onBeforeStart() {
-	      var tracer = _Store2.default.find('Tracer');
-	      tracer.steps.then(function (steps) {
-	        var id = 1;
-	        var int = setInterval(function () {
-	          if (id >= Object.keys(steps).length) {
-	            clearInterval(int);
-	            return;
-	          }
-	          var step = steps[id];
-	          (0, _jquery2.default)('#tracer-canvas').html(step.htmlStr);
-	          id++;
-	        }, 0);
+	      this.tracer = _Store2.default.find('Tracer');
+	      var that = this;
+	      this.tracer.steps.then(function (steps) {
+	        if (_config2.default.renderType == 'svg') {
+	          that.svgRunner(steps);
+	        } else {
+	          that.canvasRunner(steps);
+	        }
 	      });
+	    },
+	    svgRunner: function svgRunner(steps) {
+	      var _this = this;
+	
+	      var svgNode = this.tracer.svgNode;
+	      (0, _jquery2.default)('#tracer-canvas').append(svgNode);
+	      var runner = function runner(id) {
+	        if (id >= Object.keys(steps).length) {
+	          return;
+	        }
+	        svgNode.append(steps[id].node.domElement);
+	        window.requestAnimationFrame(runner.bind(_this, ++id));
+	      };
+	      window.requestAnimationFrame(runner.bind(this, 1));
+	    },
+	    canvasRunner: function canvasRunner(steps) {
+	      var _this2 = this;
+	
+	      var canvas = this.tracer.canvas;
+	      var ctx = canvas.getContext('2d');
+	      var runner = function runner(id) {
+	        if (id >= Object.keys(steps).length) {
+	          return;
+	        }
+	        var attrs = steps[id].node.domElement;
+	        ctx.fillStyle = attrs.fillStyle;
+	        ctx.strokeStyle = attrs.strokeStyle;
+	        ctx.fillRect(attrs.x, attrs.y, attrs.width, attrs.height);
+	        ctx.strokeRect(attrs.x, attrs.y, attrs.width, attrs.height);
+	        window.requestAnimationFrame(runner.bind(_this2, ++id));
+	      };
+	      window.requestAnimationFrame(runner.bind(this, 1));
 	    }
 	  }
 	});
@@ -925,23 +957,7 @@
 	
 	var _template2 = _interopRequireDefault(_template);
 	
-	var _mapParser = __webpack_require__(8);
-	
-	var _mapParser2 = _interopRequireDefault(_mapParser);
-	
-	var _mapBuilder = __webpack_require__(9);
-	
-	var _mapBuilder2 = _interopRequireDefault(_mapBuilder);
-	
-	var _Map = __webpack_require__(10);
-	
-	var _Map2 = _interopRequireDefault(_Map);
-	
-	var _Tracer = __webpack_require__(11);
-	
-	var _Tracer2 = _interopRequireDefault(_Tracer);
-	
-	var _Store = __webpack_require__(12);
+	var _Store = __webpack_require__(13);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
@@ -986,16 +1002,30 @@
 
 /***/ }),
 /* 7 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	
+	var _config = __webpack_require__(10);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
 	var template = function template() {
-	  return "\n  <input type = 'file' id='load-algo' />\n  <div id='tracer-canvas'></div>\n";
+	  var temp = "<input type = 'file' id='load-algo' />";
+	  if (_config2.default.renderType == "svg") {
+	    temp += "<div id='tracer-canvas'></div>";
+	  } else {
+	    temp += "<canvas id='tracer-canvas'></canvas>";
+	  }
+	  return temp;
 	};
+	
 	exports.default = template;
 
 /***/ }),
@@ -1034,79 +1064,46 @@
 	};
 
 /***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 9 */,
+/* 10 */
+/***/ (function(module, exports) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	
-	var _config = __webpack_require__(15);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var rects = [];
-	var width = null;
-	var height = null;
-	var mapStr = null;
-	
-	var mapBuilder = function mapBuilder(mapData, callback) {
-	  console.log(mapData);
-	  mapStr = mapData.mapStr;
-	  width = mapData.width;
-	  height = mapData.height;
-	  var tasks = [];
-	  for (var i = 0; i < width; ++i) {
-	    tasks.push(createRowTask(i));
-	  }
-	
-	  Promise.all(tasks).then(function () {
-	    var tmp = document.createElement("div");
-	    var svg = document.createElementNS(_config2.default.xmlns, "svg");
-	    svg.setAttributeNS(null, "width", _config2.default.nodeSize * width);
-	    svg.setAttributeNS(null, "height", _config2.default.nodeSize * height);
-	    rects.flat().forEach(function (rect) {
-	      svg.appendChild(rect);
-	    });
-	    tmp.append(svg);
-	    var domString = tmp.innerHTML;
-	    callback(domString);
-	  });
-	};
-	var createRowTask = function createRowTask(rowId) {
-	  return new Promise(function (resolve, reject) {
-	    rects[rowId] = [];
-	    for (var colId = 0; colId < width; ++colId) {
-	      var x = colId * _config2.default.nodeSize;
-	      var y = rowId * _config2.default.nodeSize;
-	      var stringIndex = rowId * width + colId;
-	      var fillColor = 'white';
-	      if (mapStr[stringIndex] == '@') {
-	        fillColor = 'grey';
-	      }
-	      var elem = document.createElementNS(_config2.default.xmlns, "rect");
-	
-	      elem.setAttributeNS(null, "x", x);
-	      elem.setAttributeNS(null, "y", y);
-	      elem.setAttributeNS(null, "width", _config2.default.nodeSize);
-	      elem.setAttributeNS(null, "height", _config2.default.nodeSize);
-	      elem.setAttributeNS(null, "fill", fillColor);
-	      elem.setAttributeNS(null, "stroke", "black");
-	      elem.setAttributeNS(null, "stroke-width", 0.1);
-	      rects[rowId].push(elem);
+	var config = {
+	  renderType: 'canvas',
+	  xmlns: "http://www.w3.org/2000/svg",
+	  operationsPerSecond: 300,
+	  nodeSize: 30,
+	  nodeAttrs: {
+	    source: {
+	      fillColor: '#0d0' //green :) 43
+	    },
+	    destination: {
+	      fillColor: '#e40' //red :) 47
+	    },
+	    opened: {
+	      fillColor: '#afeeee' //blue :) 80
+	    },
+	    frontier: {
+	      fillColor: '#ffff00' //yellow :) 50
+	    },
+	    current: {
+	      fillColor: '#ff6600' //orange :) 50
+	    },
+	    closed: {
+	      fillColor: '#8800cc' //violet :) 40
 	    }
-	    resolve();
-	  });
+	  }
 	};
 	
-	exports.default = mapBuilder;
+	exports.default = config;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1117,13 +1114,21 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _config = __webpack_require__(10);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
 	var _mapParser = __webpack_require__(8);
 	
 	var _mapParser2 = _interopRequireDefault(_mapParser);
 	
-	var _mapBuilder = __webpack_require__(9);
+	var _mapBuilder = __webpack_require__(27);
 	
 	var _mapBuilder2 = _interopRequireDefault(_mapBuilder);
+	
+	var _mapBuilder3 = __webpack_require__(28);
+	
+	var _mapBuilder4 = _interopRequireDefault(_mapBuilder3);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1159,7 +1164,11 @@
 	      if (!this._mapNodes) {
 	        this._mapNodes = this.mapData.then(function (mapData) {
 	          return new Promise(function (resolve, reject) {
-	            (0, _mapBuilder2.default)(mapData, resolve);
+	            if (_config2.default.renderType == 'svg') {
+	              (0, _mapBuilder2.default)(mapData, resolve);
+	            } else {
+	              (0, _mapBuilder4.default)(mapData, resolve);
+	            }
 	          });
 	        });
 	      }
@@ -1173,7 +1182,7 @@
 	exports.default = Map;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1184,9 +1193,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Store = __webpack_require__(12);
+	var _Store = __webpack_require__(13);
 	
 	var _Store2 = _interopRequireDefault(_Store);
+	
+	var _config = __webpack_require__(10);
+	
+	var _config2 = _interopRequireDefault(_config);
 	
 	var _tracerParser = __webpack_require__(18);
 	
@@ -1219,7 +1232,11 @@
 	        var that = this;
 	        this._debugJson = new Promise(function (resolve, reject) {
 	          try {
-	            (0, _tracerParser2.default)(that.debugFile, resolve);
+	            if (_config2.default.renderType == 'svg') {
+	              (0, _tracerParser2.default)(that.debugFile, resolve);
+	            } else {
+	              (0, _tracerParser2.default)(that.debugFile, resolve);
+	            }
 	          } catch (e) {
 	            reject(e);
 	          }
@@ -1252,6 +1269,22 @@
 	        return this._steps;
 	      }
 	    }
+	  }, {
+	    key: 'svgNode',
+	    get: function get() {
+	      var svg = document.createElementNS(_config2.default.xmlns, "svg");
+	      svg.setAttributeNS(null, "width", _config2.default.nodeSize * this.maxX);
+	      svg.setAttributeNS(null, "height", _config2.default.nodeSize * this.maxY);
+	      return svg;
+	    }
+	  }, {
+	    key: 'canvas',
+	    get: function get() {
+	      var canvas = document.getElementById('tracer-canvas');
+	      canvas.height = this.maxY * _config2.default.nodeSize;
+	      canvas.width = this.maxX * _config2.default.nodeSize;
+	      return canvas;
+	    }
 	  }]);
 	
 	  return Tracer;
@@ -1260,7 +1293,7 @@
 	exports.default = Tracer;
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1273,7 +1306,7 @@
 	//the values are stored in data. and it has common functions like createRecord, findAll, findBy, find, getRecord, relationships(hasMany, belongsTo)
 	
 	
-	var _models = __webpack_require__(13);
+	var _models = __webpack_require__(14);
 	
 	var _models2 = _interopRequireDefault(_models);
 	
@@ -1333,7 +1366,7 @@
 	exports.default = Store;
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1342,15 +1375,15 @@
 	  value: true
 	});
 	
-	var _Tracer = __webpack_require__(11);
+	var _Tracer = __webpack_require__(12);
 	
 	var _Tracer2 = _interopRequireDefault(_Tracer);
 	
-	var _Map = __webpack_require__(10);
+	var _Map = __webpack_require__(11);
 	
 	var _Map2 = _interopRequireDefault(_Map);
 	
-	var _Node = __webpack_require__(14);
+	var _Node = __webpack_require__(15);
 	
 	var _Node2 = _interopRequireDefault(_Node);
 	
@@ -1367,7 +1400,7 @@
 	exports.default = models;
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1380,11 +1413,11 @@
 	// import {nodeSize, nodeAttrs, xmlns} from '../config'
 	
 	
-	var _Store = __webpack_require__(12);
+	var _Store = __webpack_require__(13);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
-	var _config = __webpack_require__(15);
+	var _config = __webpack_require__(10);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -1413,7 +1446,6 @@
 	      var x = void 0,
 	          y = void 0;
 	      if (!this._domElement) {
-	        var elem = document.createElementNS(_config2.default.xmlns, "rect");
 	        var attrs = _config2.default.nodeAttrs[_nodeColor2.default[this.type]];
 	        if (["expanding", "updating", "closing", "end"].indexOf(this.type) != -1) {
 	          for (var nodeId in this.step.nodes) {
@@ -1428,14 +1460,26 @@
 	          x = _config2.default.nodeSize * this.x;
 	          y = _config2.default.nodeSize * this.y;
 	        }
-	        elem.setAttributeNS(null, "width", _config2.default.nodeSize);
-	        elem.setAttributeNS(null, "height", _config2.default.nodeSize);
-	        elem.setAttributeNS(null, "fill", attrs.fillColor);
-	        elem.setAttributeNS(null, "x", x);
-	        elem.setAttributeNS(null, "y", y);
-	        elem.setAttributeNS(null, "stroke", "black");
-	        elem.setAttributeNS(null, "stroke-width", 0.1);
-	        this._domElement = elem;
+	        if (_config2.default.renderType == 'svg') {
+	          var elem = document.createElementNS(_config2.default.xmlns, "rect");
+	          elem.setAttributeNS(null, "width", _config2.default.nodeSize);
+	          elem.setAttributeNS(null, "height", _config2.default.nodeSize);
+	          elem.setAttributeNS(null, "fill", attrs.fillColor);
+	          elem.setAttributeNS(null, "x", x);
+	          elem.setAttributeNS(null, "y", y);
+	          elem.setAttributeNS(null, "stroke", "black");
+	          elem.setAttributeNS(null, "stroke-width", 0.1);
+	          this._domElement = elem;
+	        } else {
+	          this._domElement = {
+	            x: x,
+	            y: y,
+	            width: _config2.default.nodeSize,
+	            height: _config2.default.nodeSize,
+	            fillStyle: attrs.fillColor,
+	            strokeStyle: 'black'
+	          };
+	        }
 	      }
 	      return this._domElement;
 	    }
@@ -1462,43 +1506,6 @@
 	}();
 	
 	exports.default = Node;
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var config = {
-	  xmlns: "http://www.w3.org/2000/svg",
-	  operationsPerSecond: 300,
-	  nodeSize: 30,
-	  nodeAttrs: {
-	    source: {
-	      fillColor: '#0d0' //green :) 43
-	    },
-	    destination: {
-	      fillColor: '#e40' //red :) 47
-	    },
-	    opened: {
-	      fillColor: '#afeeee' //blue :) 80
-	    },
-	    frontier: {
-	      fillColor: '#ffff00' //yellow :) 50
-	    },
-	    current: {
-	      fillColor: '#ff6600' //orange :) 50
-	    },
-	    closed: {
-	      fillColor: '#8800cc' //violet :) 40
-	    }
-	  }
-	};
-	
-	exports.default = config;
 
 /***/ }),
 /* 16 */
@@ -1531,11 +1538,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Store = __webpack_require__(12);
+	var _Store = __webpack_require__(13);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
-	var _config = __webpack_require__(15);
+	var _config = __webpack_require__(10);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -11631,7 +11638,7 @@
 	
 	var _template2 = _interopRequireDefault(_template);
 	
-	var _Map = __webpack_require__(10);
+	var _Map = __webpack_require__(11);
 	
 	var _Map2 = _interopRequireDefault(_Map);
 	
@@ -11646,6 +11653,10 @@
 	var _errorNotifier = __webpack_require__(23);
 	
 	var _errorNotifier2 = _interopRequireDefault(_errorNotifier);
+	
+	var _config = __webpack_require__(10);
+	
+	var _config2 = _interopRequireDefault(_config);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -11668,8 +11679,25 @@
 	      });
 	    },
 	    drawMap: function drawMap() {
-	      this.map.mapNodes.then(function (nodesStr) {
-	        (0, _jquery2.default)('#map-canvas').html(nodesStr);
+	      var _this2 = this;
+	
+	      this.map.mapNodes.then(function (mapNodes) {
+	        if (_config2.default.renderType == 'svg') {
+	          (0, _jquery2.default)('#map-canvas').html(mapNodes);
+	        } else {
+	          var canvas = document.getElementById('map-canvas');
+	          var ctx = canvas.getContext('2d');
+	          _this2.map.mapData.then(function (mapData) {
+	            canvas.height = mapData.height * _config2.default.nodeSize;
+	            canvas.width = mapData.width * _config2.default.nodeSize;
+	            mapNodes.forEach(function (node) {
+	              ctx.fillStyle = node.fillStyle;
+	              ctx.strokeStyle = node.strokeStyle;
+	              ctx.fillRect(node.x, node.y, node.width, node.height);
+	              ctx.strokeRect(node.x, node.y, node.width, node.height);
+	            });
+	          });
+	        }
 	      }, function (err) {
 	        (0, _errorNotifier2.default)(err);
 	      });
@@ -11681,16 +11709,30 @@
 
 /***/ }),
 /* 22 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	
+	var _config = __webpack_require__(10);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
 	var template = function template() {
-	  return "\n  <input type='file' id='load-map' />\n  <div id='map-canvas'></div>\n";
+	  var temp = "<input type='file' id='load-map' />";
+	  if (_config2.default.renderType == "svg") {
+	    temp += "<div id='map-canvas'></div>";
+	  } else {
+	    temp += "<canvas id='map-canvas'></canvas>";
+	  }
+	  return temp;
 	};
+	
 	exports.default = template;
 
 /***/ }),
@@ -11762,7 +11804,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _config = __webpack_require__(15);
+	var _config = __webpack_require__(10);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -11848,6 +11890,139 @@
 
 	  return Playback;
 	}();
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _config = __webpack_require__(10);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var rects = [];
+	var width = null;
+	var height = null;
+	var mapStr = null;
+	
+	var mapBuilder = function mapBuilder(mapData, callback) {
+	  console.log(mapData);
+	  mapStr = mapData.mapStr;
+	  width = mapData.width;
+	  height = mapData.height;
+	  var tasks = [];
+	  for (var i = 0; i < width; ++i) {
+	    tasks.push(createRowTask(i));
+	  }
+	
+	  Promise.all(tasks).then(function () {
+	    var tmp = document.createElement("div");
+	    var svg = document.createElementNS(_config2.default.xmlns, "svg");
+	    svg.setAttributeNS(null, "width", _config2.default.nodeSize * width);
+	    svg.setAttributeNS(null, "height", _config2.default.nodeSize * height);
+	    rects.flat().forEach(function (rect) {
+	      svg.appendChild(rect);
+	    });
+	    tmp.append(svg);
+	    var domString = tmp.innerHTML;
+	    callback(domString);
+	  });
+	};
+	var createRowTask = function createRowTask(rowId) {
+	  return new Promise(function (resolve, reject) {
+	    rects[rowId] = [];
+	    for (var colId = 0; colId < width; ++colId) {
+	      var x = colId * _config2.default.nodeSize;
+	      var y = rowId * _config2.default.nodeSize;
+	      var stringIndex = rowId * width + colId;
+	      var fillColor = 'white';
+	      if (mapStr[stringIndex] == '@') {
+	        fillColor = 'grey';
+	      }
+	      var elem = document.createElementNS(_config2.default.xmlns, "rect");
+	
+	      elem.setAttributeNS(null, "x", x);
+	      elem.setAttributeNS(null, "y", y);
+	      elem.setAttributeNS(null, "width", _config2.default.nodeSize);
+	      elem.setAttributeNS(null, "height", _config2.default.nodeSize);
+	      elem.setAttributeNS(null, "fill", fillColor);
+	      elem.setAttributeNS(null, "stroke", "black");
+	      elem.setAttributeNS(null, "stroke-width", 0.1);
+	      rects[rowId].push(elem);
+	    }
+	    resolve();
+	  });
+	};
+	
+	exports.default = mapBuilder;
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _config = __webpack_require__(10);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var rects = [];
+	var width = null;
+	var height = null;
+	var mapStr = null;
+	
+	var mapBuilder = function mapBuilder(mapData, callback) {
+	  console.log(mapData);
+	  mapStr = mapData.mapStr;
+	  width = mapData.width;
+	  height = mapData.height;
+	  var tasks = [];
+	  for (var i = 0; i < width; ++i) {
+	    tasks.push(createRowTask(i));
+	  }
+	  Promise.all(tasks).then(function () {
+	    callback(rects.flat());
+	  });
+	};
+	var createRowTask = function createRowTask(rowId) {
+	  return new Promise(function (resolve, reject) {
+	    rects[rowId] = [];
+	    for (var colId = 0; colId < width; ++colId) {
+	      var x = colId * _config2.default.nodeSize;
+	      var y = rowId * _config2.default.nodeSize;
+	      var stringIndex = rowId * width + colId;
+	      var fillColor = 'white';
+	      if (mapStr[stringIndex] == '@') {
+	        fillColor = 'grey';
+	      }
+	      var attrs = {
+	        x: x,
+	        y: y,
+	        width: _config2.default.nodeSize,
+	        height: _config2.default.nodeSize,
+	        fillStyle: fillColor,
+	        strokeStyle: 'black'
+	      };
+	      rects[rowId].push(attrs);
+	    }
+	    resolve();
+	  });
+	};
+	
+	exports.default = mapBuilder;
 
 /***/ })
 /******/ ]);

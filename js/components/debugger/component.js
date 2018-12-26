@@ -1,10 +1,6 @@
 import StateMachine from "javascript-state-machine";
 
 import template from './template';
-import mapParser from '../../utils/map-parser';
-import mapBuilder from '../../utils/map-builder';
-import Map from '../../models/Map';
-import Tracer from '../../models/Tracer';
 import Store from '../../services/Store';
 import $ from 'jquery';
 import BaseComponent from '../base-component';

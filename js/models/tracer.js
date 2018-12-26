@@ -1,5 +1,7 @@
 import Store from '../services/Store';
-import tracerParser from '../utils/tracer-parser';
+import config from '../config';
+import svgTracerParser from '../utils/tracer-parser';
+import canvasTracerParser from '../utils/tracer-parser';
 import $ from 'jquery';
 
 class Tracer {
@@ -17,7 +19,12 @@ class Tracer {
       let that = this;
       this._debugJson = new Promise((resolve, reject) => {
         try{
-          tracerParser(that.debugFile, resolve);
+          if(config.renderType=='svg'){
+            svgTracerParser(that.debugFile, resolve);
+          }
+          else{
+            canvasTracerParser(that.debugFile, resolve);
+          }
         }
         catch(e){
           reject(e);
@@ -46,6 +53,20 @@ class Tracer {
       return this._steps;
     }
   }
+  get svgNode() {
+    let svg = document.createElementNS(config.xmlns, "svg");
+    svg.setAttributeNS(null, "width", config.nodeSize*this.maxX);
+    svg.setAttributeNS(null, "height", config.nodeSize*this.maxY);
+    return svg;
+  }
+
+  get canvas(){
+    let canvas = document.getElementById('tracer-canvas');
+    canvas.height = this.maxY*config.nodeSize;
+    canvas.width = this.maxX*config.nodeSize;
+    return canvas;
+  }
+
 }
 
 export default Tracer;

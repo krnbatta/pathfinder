@@ -1,4 +1,5 @@
 const config = {
+  renderType: 'canvas',
   xmlns: "http://www.w3.org/2000/svg",
   operationsPerSecond: 300,
   nodeSize: 30,

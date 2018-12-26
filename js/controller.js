@@ -2,6 +2,7 @@ import StateMachine from "javascript-state-machine";
 import Components from './components';
 import Playback from './services/playback';
 import Store from './services/Store';
+import config from './config';
 import $ from 'jquery';
 
 let Controller = new StateMachine({
@@ -77,19 +78,44 @@ let Controller = new StateMachine({
         console.log(arguments);
       },
       onBeforeStart() {
-        let tracer = Store.find('Tracer');
-        tracer.steps.then((steps) => {
-          let id = 1;
-          let int = setInterval(() => {
-            if(id >= Object.keys(steps).length){
-              clearInterval(int);
-              return;
-            }
-            let step = steps[id];
-            $('#tracer-canvas').html(step.htmlStr);
-            id++;
-          }, 0);
+        this.tracer = Store.find('Tracer');
+        let that = this;
+        this.tracer.steps.then((steps) => {
+          if(config.renderType=='svg'){
+            that.svgRunner(steps);
+          }
+          else{
+            that.canvasRunner(steps);
+          }
         });
+      },
+      svgRunner(steps) {
+        let svgNode = this.tracer.svgNode;
+        $('#tracer-canvas').append(svgNode);
+        let runner = ((id) => {
+          if(id >= Object.keys(steps).length){
+            return;
+          }
+          svgNode.append(steps[id].node.domElement);
+          window.requestAnimationFrame(runner.bind(this, ++id));
+        });
+        window.requestAnimationFrame(runner.bind(this, 1));
+      },
+      canvasRunner(steps) {
+        let canvas = this.tracer.canvas;
+        let ctx = canvas.getContext('2d');
+        let runner = ((id) => {
+          if(id >= Object.keys(steps).length){
+            return;
+          }
+          let attrs = steps[id].node.domElement;
+          ctx.fillStyle = attrs.fillStyle;
+          ctx.strokeStyle = attrs.strokeStyle;
+          ctx.fillRect(attrs.x, attrs.y, attrs.width, attrs.height);
+          ctx.strokeRect(attrs.x, attrs.y, attrs.width, attrs.height);
+          window.requestAnimationFrame(runner.bind(this, ++id));
+        });
+        window.requestAnimationFrame(runner.bind(this, 1));
       }
     }
 });

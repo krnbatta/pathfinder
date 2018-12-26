@@ -5,6 +5,7 @@ import Map from '../../models/Map';
 import $ from 'jquery';
 import BaseComponent from '../base-component';
 import errorNotifier from '../../utils/error-notifier';
+import config from '../../config';
 
 let MapComponent = new StateMachine($.extend(BaseComponent, {
   methods: {
@@ -23,8 +24,24 @@ let MapComponent = new StateMachine($.extend(BaseComponent, {
       });
     },
     drawMap() {
-      this.map.mapNodes.then((nodesStr) => {
-        $('#map-canvas').html(nodesStr);
+      this.map.mapNodes.then((mapNodes) => {
+        if(config.renderType == 'svg'){
+          $('#map-canvas').html(mapNodes);
+        }
+        else{
+          let canvas = document.getElementById('map-canvas');
+          let ctx = canvas.getContext('2d');
+          this.map.mapData.then((mapData) => {
+            canvas.height = mapData.height*config.nodeSize;
+            canvas.width = mapData.width*config.nodeSize;
+            mapNodes.forEach((node) => {
+              ctx.fillStyle = node.fillStyle;
+              ctx.strokeStyle = node.strokeStyle;
+              ctx.fillRect(node.x, node.y, node.width, node.height);
+              ctx.strokeRect(node.x, node.y, node.width, node.height);
+            });
+          });
+        }
       }, (err) => {
         errorNotifier(err);
       });

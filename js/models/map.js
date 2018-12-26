@@ -1,5 +1,7 @@
+import config from '../config';
 import mapParser from '../utils/map-parser';
-import mapBuilder from '../utils/map-builder';
+import svgMapBuilder from '../utils/svg/map-builder';
+import canvasMapBuilder from '../utils/canvas/map-builder';
 
 class Map {
   constructor(mapFile) {
@@ -27,7 +29,12 @@ class Map {
     if(!this._mapNodes){
       this._mapNodes = this.mapData.then((mapData) => {
         return new Promise((resolve, reject) => {
-          mapBuilder(mapData, resolve);
+          if(config.renderType=='svg'){
+            svgMapBuilder(mapData, resolve);
+          }
+          else{
+            canvasMapBuilder(mapData, resolve);
+          }
         });
       });
     }
