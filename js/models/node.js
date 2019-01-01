@@ -9,6 +9,7 @@ class Node {
   constructor(options) {
     this._id = _id;
     Object.assign(this, options);
+    this._linePoints = null;
     _id++;
   }
 
@@ -16,20 +17,22 @@ class Node {
     let x, y;
     if (!this._domElement){
       let attrs = config.nodeAttrs[nodeColor[this.type]];
-      if(["expanding", "updating", "closing", "end"].indexOf(this.type)!=-1){
-        for(let nodeId in this.step.nodes){
-          let node = this.step.nodes[nodeId];
-          if(node.id==this.id && ["expanding", "updating", "closing", "end"].indexOf(node.type)==-1){
-            x = config.nodeSize*node.x;
-            y = config.nodeSize*node.y;
-            break;
-          }
-        }
-      }
-      else{
-        x = config.nodeSize*this.x;
-        y = config.nodeSize*this.y;
-      }
+      x = config.nodeSize*this.x;
+      y = config.nodeSize*this.y;
+      // if(["expanding", "updating", "closing", "end"].indexOf(this.type)!=-1){
+      //   for(let nodeId in this.step.nodes){
+      //     let node = this.step.nodes[nodeId];
+      //     if(node.id==this.id && ["expanding", "updating", "closing", "end"].indexOf(node.type)==-1){
+      //       x = config.nodeSize*node.x;
+      //       y = config.nodeSize*node.y;
+      //       break;
+      //     }
+      //   }
+      // }
+      // else{
+      //   x = config.nodeSize*this.x;
+      //   y = config.nodeSize*this.y;
+      // }
       if(config.renderType=='svg'){
         let elem = document.createElementNS(config.xmlns, "rect");
         elem.setAttributeNS(null, "width", config.nodeSize);
@@ -63,12 +66,32 @@ class Node {
     if(!this.pId){
       return null;
     }
-    for(id in Store.data.Node){
-      if(Store.data.Node[id]['id'] == this.pid){
-        return Store.data.Node[id];
+    let pNode = null;
+    Object.values(Store.data.Node).forEach((node) => {
+      if(node.id == this.pId){
+        pNode = node;
+        return;
       }
-    }
+    });
+    return pNode;
   }
+
+  get center(){
+    return {x: config.nodeSize*(this.x+0.5), y: config.nodeSize*(this.y+0.5)};
+  }
+
+  get linePoints(){
+    if(!this._linePoints){
+      if(!this.parentNode){
+        return [this.center];
+      }
+      let points = this.parentNode.linePoints.slice();
+      points.push(this.center);
+      this._linePoints = points;
+    }
+    return this._linePoints;
+  }
+
 }
 
 export default Node;

@@ -2,25 +2,26 @@ const config = {
   renderType: 'canvas',
   xmlns: "http://www.w3.org/2000/svg",
   operationsPerSecond: 300,
-  nodeSize: 30,
+  lineColor: 0xFFFFFF,
+  nodeSize: 10,
   nodeAttrs: {
     source: {
-      fillColor: '#0d0' //green :) 43
+      fillColor: 0x00DD00 //green :) 43
     },
     destination: {
-      fillColor: '#e40' //red :) 47
+      fillColor: 0xE40E40 //red :) 47
     },
     opened: {
-      fillColor: '#afeeee' //blue :) 80
+      fillColor: 0xAFEEEE //blue :) 80
     },
     frontier: {
-      fillColor: '#ffff00' //yellow :) 50
+      fillColor: 0xFFFF00 //yellow :) 50
     },
     current: {
-      fillColor: '#ff6600' //orange :) 50
+      fillColor: 0xFF6600 //orange :) 50
     },
     closed: {
-      fillColor: '#8800cc' //violet :) 40
+      fillColor: 0x8800CC //violet :) 40
     }
   }
 }

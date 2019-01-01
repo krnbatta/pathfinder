@@ -1,7 +1,7 @@
 export default {
   'source': 'source',
   'destination': 'destination',
-  'generating': 'frontier',
+  'generating': 'opened',
   'expanding': 'current',
   'closing': 'closed',
   'updating': 'frontier',

@@ -82,21 +82,25 @@
 	
 	var _components2 = _interopRequireDefault(_components);
 	
-	var _playback = __webpack_require__(26);
+	var _playback = __webpack_require__(27);
 	
 	var _playback2 = _interopRequireDefault(_playback);
 	
-	var _Store = __webpack_require__(13);
+	var _Store = __webpack_require__(9);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
-	var _config = __webpack_require__(10);
+	var _config = __webpack_require__(8);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _jquery = __webpack_require__(19);
+	var _jquery = __webpack_require__(13);
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var _drawLine = __webpack_require__(28);
+	
+	var _drawLine2 = _interopRequireDefault(_drawLine);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -126,6 +130,10 @@
 	    from: '*',
 	    to: 'ready'
 	  }],
+	  data: {
+	    frontierNodes: [],
+	    line: null
+	  },
 	  methods: {
 	    onBeforeTransition: function onBeforeTransition() {
 	      console.log('onBeforeTransition => ' + this.state);
@@ -173,17 +181,20 @@
 	        if (_config2.default.renderType == 'svg') {
 	          that.svgRunner(steps);
 	        } else {
-	          that.canvasRunner(steps);
+	          that.webGLRunner(steps);
 	        }
 	      });
 	    },
 	    svgRunner: function svgRunner(steps) {
 	      var _this = this;
 	
+	      var startTime = new Date();
 	      var svgNode = this.tracer.svgNode;
 	      (0, _jquery2.default)('#tracer-canvas').append(svgNode);
 	      var runner = function runner(id) {
 	        if (id >= Object.keys(steps).length) {
+	          var endTime = new Date();
+	          alert(endTime - startTime);
 	          return;
 	        }
 	        svgNode.append(steps[id].node.domElement);
@@ -194,10 +205,14 @@
 	    canvasRunner: function canvasRunner(steps) {
 	      var _this2 = this;
 	
+	      var startTime = new Date();
 	      var canvas = this.tracer.canvas;
 	      var ctx = canvas.getContext('2d');
+	      var totalSteps = Object.keys(steps).length;
 	      var runner = function runner(id) {
-	        if (id >= Object.keys(steps).length) {
+	        if (id >= totalSteps) {
+	          var endTime = new Date();
+	          alert(endTime - startTime);
 	          return;
 	        }
 	        var attrs = steps[id].node.domElement;
@@ -206,6 +221,67 @@
 	        ctx.fillRect(attrs.x, attrs.y, attrs.width, attrs.height);
 	        ctx.strokeRect(attrs.x, attrs.y, attrs.width, attrs.height);
 	        window.requestAnimationFrame(runner.bind(_this2, ++id));
+	      };
+	      window.requestAnimationFrame(runner.bind(this, 1));
+	    },
+	    webGLRunner: function webGLRunner(steps) {
+	      var _this3 = this;
+	
+	      var startTime = new Date();
+	      var app = new PIXI.Application({ width: this.tracer.maxX * _config2.default.nodeSize, height: this.tracer.maxY * _config2.default.nodeSize, view: document.getElementById("tracer-canvas"), transparent: true });
+	      var renderer = app.renderer;
+	      renderer.backgroundColor = "#fff";
+	      var stage = app.stage;
+	      renderer.render(stage);
+	      var runner = function runner(id) {
+	        if (id > Object.keys(steps).length) {
+	          var endTime = new Date();
+	          alert(endTime - startTime);
+	          return;
+	        }
+	        var step = steps[id];
+	        var node = step.node;
+	        var attrs = node.domElement;
+	        var fillStyle = attrs.fillStyle;
+	        if (step.type == 'source') {
+	          _this3.source = node;
+	        }
+	        if (step.type == 'destination') {
+	          _this3.destination = node;
+	        }
+	        if (step.type == 'generating' || step.type == 'updating') {
+	          if (!(_this3.source && node.id == _this3.source.id) && !(_this3.destination && node.id == _this3.destination.id)) {
+	            _this3.frontierNodes.push(node);
+	            fillStyle = _config2.default.nodeAttrs.frontier.fillColor;
+	          }
+	        }
+	        if (_this3.source && node.id == _this3.source.id) {
+	          fillStyle = _config2.default.nodeAttrs.source.fillColor;
+	        }
+	        if (_this3.destination && node.id == _this3.destination.id) {
+	          fillStyle = _config2.default.nodeAttrs.destination.fillColor;
+	        }
+	        if (step.type == 'closing') {
+	          _this3.frontierNodes.forEach(function (fNode) {
+	            var fAttrs = fNode.domElement;
+	            var rectangle = new PIXI.Graphics();
+	            rectangle.lineStyle(1, fAttrs.strokeStyle);
+	            rectangle.beginFill(fAttrs.fillStyle);
+	            rectangle.drawRect(fAttrs.x, fAttrs.y, fAttrs.width, fAttrs.height);
+	            rectangle.endFill();
+	            stage.addChild(rectangle);
+	          });
+	          _this3.frontierNodes = [];
+	        }
+	        var rectangle = new PIXI.Graphics();
+	        rectangle.lineStyle(1, attrs.strokeStyle);
+	        rectangle.beginFill(fillStyle);
+	        rectangle.drawRect(attrs.x, attrs.y, attrs.width, attrs.height);
+	        rectangle.endFill();
+	        stage.addChild(rectangle);
+	        stage.removeChild(_this3.line);
+	        _this3.line = (0, _drawLine2.default)(node, stage);
+	        window.requestAnimationFrame(runner.bind(_this3, ++id));
 	      };
 	      window.requestAnimationFrame(runner.bind(this, 1));
 	    }
@@ -925,11 +1001,11 @@
 	
 	var _component2 = _interopRequireDefault(_component);
 	
-	var _component3 = __webpack_require__(21);
+	var _component3 = __webpack_require__(22);
 	
 	var _component4 = _interopRequireDefault(_component3);
 	
-	var _component5 = __webpack_require__(24);
+	var _component5 = __webpack_require__(25);
 	
 	var _component6 = _interopRequireDefault(_component5);
 	
@@ -957,15 +1033,15 @@
 	
 	var _template2 = _interopRequireDefault(_template);
 	
-	var _Store = __webpack_require__(13);
+	var _Store = __webpack_require__(9);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
-	var _jquery = __webpack_require__(19);
+	var _jquery = __webpack_require__(13);
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _baseComponent = __webpack_require__(20);
+	var _baseComponent = __webpack_require__(21);
 	
 	var _baseComponent2 = _interopRequireDefault(_baseComponent);
 	
@@ -1010,7 +1086,7 @@
 	  value: true
 	});
 	
-	var _config = __webpack_require__(10);
+	var _config = __webpack_require__(8);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -1032,43 +1108,7 @@
 /* 8 */
 /***/ (function(module, exports) {
 
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	exports.default = function (file, callback) {
-	    var mapReader = new FileReader();
-	
-	    mapReader.addEventListener("load", function (event) {
-	        var textFile = event.target;
-	        var data = textFile.result.split(/\n|\r\n/);
-	
-	        data.shift();
-	
-	        var height = Number(data.shift().split(' ').pop());
-	        var width = Number(data.shift().split(' ').pop());
-	        data.shift();
-	        var mapStr = data.reduce(function (f, e) {
-	            return f + e;
-	        }, '');
-	        console.log("mapData", width, height, mapStr);
-	
-	        var mapData = { height: height, width: width, mapStr: mapStr };
-	        callback(mapData);
-	    });
-	
-	    //Read the text file
-	    mapReader.readAsText(file);
-	};
-
-/***/ }),
-/* 9 */,
-/* 10 */
-/***/ (function(module, exports) {
-
-	'use strict';
+	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -1077,30 +1117,138 @@
 	  renderType: 'canvas',
 	  xmlns: "http://www.w3.org/2000/svg",
 	  operationsPerSecond: 300,
-	  nodeSize: 30,
+	  lineColor: 0xFFFFFF,
+	  nodeSize: 10,
 	  nodeAttrs: {
 	    source: {
-	      fillColor: '#0d0' //green :) 43
+	      fillColor: 0x00DD00 //green :) 43
 	    },
 	    destination: {
-	      fillColor: '#e40' //red :) 47
+	      fillColor: 0xE40E40 //red :) 47
 	    },
 	    opened: {
-	      fillColor: '#afeeee' //blue :) 80
+	      fillColor: 0xAFEEEE //blue :) 80
 	    },
 	    frontier: {
-	      fillColor: '#ffff00' //yellow :) 50
+	      fillColor: 0xFFFF00 //yellow :) 50
 	    },
 	    current: {
-	      fillColor: '#ff6600' //orange :) 50
+	      fillColor: 0xFF6600 //orange :) 50
 	    },
 	    closed: {
-	      fillColor: '#8800cc' //violet :) 40
+	      fillColor: 0x8800CC //violet :) 40
 	    }
 	  }
 	};
 	
 	exports.default = config;
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //this is data store implementation. Store is a singleton class
+	//the values are stored in data. and it has common functions like createRecord, findAll, findBy, find, getRecord, relationships(hasMany, belongsTo)
+	
+	
+	var _models = __webpack_require__(10);
+	
+	var _models2 = _interopRequireDefault(_models);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var getModel = function getModel(modelName) {
+	    var referredModel = void 0;
+	    (0, _models2.default)().forEach(function (model) {
+	        if (model.name == modelName) {
+	            referredModel = model;
+	            return;
+	        }
+	    });
+	    if (referredModel) {
+	        return referredModel;
+	    } else {
+	        //throw error saying wrong model name passed
+	    }
+	};
+	
+	var instance = null;
+	
+	var StoreSingleton = function () {
+	    function StoreSingleton() {
+	        _classCallCheck(this, StoreSingleton);
+	
+	        if (!instance) {
+	            instance = this;
+	            this.data = {};
+	        }
+	        return instance;
+	    }
+	
+	    _createClass(StoreSingleton, [{
+	        key: 'createRecord',
+	        value: function createRecord(modelName, attributes) {
+	            this.data[modelName] = this.data[modelName] || {};
+	            var model = getModel(modelName);
+	            var record = new model(attributes);
+	            this.data[modelName][record._id] = record;
+	            return record;
+	        }
+	    }, {
+	        key: 'find',
+	        value: function find(modelName) {
+	            return this.data[modelName][0];
+	        }
+	    }]);
+	
+	    return StoreSingleton;
+	}();
+	
+	var Store = new StoreSingleton();
+	window.store = Store;
+	exports.default = Store;
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _Tracer = __webpack_require__(11);
+	
+	var _Tracer2 = _interopRequireDefault(_Tracer);
+	
+	var _Map = __webpack_require__(14);
+	
+	var _Map2 = _interopRequireDefault(_Map);
+	
+	var _Node = __webpack_require__(18);
+	
+	var _Node2 = _interopRequireDefault(_Node);
+	
+	var _Step = __webpack_require__(20);
+	
+	var _Step2 = _interopRequireDefault(_Step);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var models = function models() {
+	  return [_Tracer2.default, _Map2.default, _Node2.default, _Step2.default];
+	};
+	
+	exports.default = models;
 
 /***/ }),
 /* 11 */
@@ -1114,98 +1262,19 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _config = __webpack_require__(10);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	var _mapParser = __webpack_require__(8);
-	
-	var _mapParser2 = _interopRequireDefault(_mapParser);
-	
-	var _mapBuilder = __webpack_require__(27);
-	
-	var _mapBuilder2 = _interopRequireDefault(_mapBuilder);
-	
-	var _mapBuilder3 = __webpack_require__(28);
-	
-	var _mapBuilder4 = _interopRequireDefault(_mapBuilder3);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Map = function () {
-	  function Map(mapFile) {
-	    _classCallCheck(this, Map);
-	
-	    this.mapFile = mapFile;
-	    this._mapData = null;
-	    this._mapNodes = null;
-	  }
-	
-	  _createClass(Map, [{
-	    key: 'mapData',
-	    get: function get() {
-	      if (!this._mapData) {
-	        var that = this;
-	        this._mapData = new Promise(function (resolve, reject) {
-	          try {
-	            (0, _mapParser2.default)(that.mapFile, resolve);
-	          } catch (e) {
-	            reject(e);
-	          }
-	        });
-	      }
-	      return this._mapData;
-	    }
-	  }, {
-	    key: 'mapNodes',
-	    get: function get() {
-	      if (!this._mapNodes) {
-	        this._mapNodes = this.mapData.then(function (mapData) {
-	          return new Promise(function (resolve, reject) {
-	            if (_config2.default.renderType == 'svg') {
-	              (0, _mapBuilder2.default)(mapData, resolve);
-	            } else {
-	              (0, _mapBuilder4.default)(mapData, resolve);
-	            }
-	          });
-	        });
-	      }
-	      return this._mapNodes;
-	    }
-	  }]);
-	
-	  return Map;
-	}();
-	
-	exports.default = Map;
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _Store = __webpack_require__(13);
+	var _Store = __webpack_require__(9);
 	
 	var _Store2 = _interopRequireDefault(_Store);
 	
-	var _config = __webpack_require__(10);
+	var _config = __webpack_require__(8);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _tracerParser = __webpack_require__(18);
+	var _tracerParser = __webpack_require__(12);
 	
 	var _tracerParser2 = _interopRequireDefault(_tracerParser);
 	
-	var _jquery = __webpack_require__(19);
+	var _jquery = __webpack_require__(13);
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
@@ -1293,362 +1362,7 @@
 	exports.default = Tracer;
 
 /***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //this is data store implementation. Store is a singleton class
-	//the values are stored in data. and it has common functions like createRecord, findAll, findBy, find, getRecord, relationships(hasMany, belongsTo)
-	
-	
-	var _models = __webpack_require__(14);
-	
-	var _models2 = _interopRequireDefault(_models);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var getModel = function getModel(modelName) {
-	    var referredModel = void 0;
-	    (0, _models2.default)().forEach(function (model) {
-	        if (model.name == modelName) {
-	            referredModel = model;
-	            return;
-	        }
-	    });
-	    if (referredModel) {
-	        return referredModel;
-	    } else {
-	        //throw error saying wrong model name passed
-	    }
-	};
-	
-	var instance = null;
-	
-	var StoreSingleton = function () {
-	    function StoreSingleton() {
-	        _classCallCheck(this, StoreSingleton);
-	
-	        if (!instance) {
-	            instance = this;
-	            this.data = {};
-	        }
-	        return instance;
-	    }
-	
-	    _createClass(StoreSingleton, [{
-	        key: 'createRecord',
-	        value: function createRecord(modelName, attributes) {
-	            this.data[modelName] = this.data[modelName] || {};
-	            var model = getModel(modelName);
-	            var record = new model(attributes);
-	            this.data[modelName][record._id] = record;
-	            return record;
-	        }
-	    }, {
-	        key: 'find',
-	        value: function find(modelName) {
-	            return this.data[modelName][0];
-	        }
-	    }]);
-	
-	    return StoreSingleton;
-	}();
-	
-	var Store = new StoreSingleton();
-	window.store = Store;
-	exports.default = Store;
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _Tracer = __webpack_require__(12);
-	
-	var _Tracer2 = _interopRequireDefault(_Tracer);
-	
-	var _Map = __webpack_require__(11);
-	
-	var _Map2 = _interopRequireDefault(_Map);
-	
-	var _Node = __webpack_require__(15);
-	
-	var _Node2 = _interopRequireDefault(_Node);
-	
-	var _Step = __webpack_require__(17);
-	
-	var _Step2 = _interopRequireDefault(_Step);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var models = function models() {
-	  return [_Tracer2.default, _Map2.default, _Node2.default, _Step2.default];
-	};
-	
-	exports.default = models;
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	// import {nodeSize, nodeAttrs, xmlns} from '../config'
-	
-	
-	var _Store = __webpack_require__(13);
-	
-	var _Store2 = _interopRequireDefault(_Store);
-	
-	var _config = __webpack_require__(10);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	var _nodeColor = __webpack_require__(16);
-	
-	var _nodeColor2 = _interopRequireDefault(_nodeColor);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var _id = 1;
-	
-	var Node = function () {
-	  function Node(options) {
-	    _classCallCheck(this, Node);
-	
-	    this._id = _id;
-	    Object.assign(this, options);
-	    _id++;
-	  }
-	
-	  _createClass(Node, [{
-	    key: 'domElement',
-	    get: function get() {
-	      var x = void 0,
-	          y = void 0;
-	      if (!this._domElement) {
-	        var attrs = _config2.default.nodeAttrs[_nodeColor2.default[this.type]];
-	        if (["expanding", "updating", "closing", "end"].indexOf(this.type) != -1) {
-	          for (var nodeId in this.step.nodes) {
-	            var node = this.step.nodes[nodeId];
-	            if (node.id == this.id && ["expanding", "updating", "closing", "end"].indexOf(node.type) == -1) {
-	              x = _config2.default.nodeSize * node.x;
-	              y = _config2.default.nodeSize * node.y;
-	              break;
-	            }
-	          }
-	        } else {
-	          x = _config2.default.nodeSize * this.x;
-	          y = _config2.default.nodeSize * this.y;
-	        }
-	        if (_config2.default.renderType == 'svg') {
-	          var elem = document.createElementNS(_config2.default.xmlns, "rect");
-	          elem.setAttributeNS(null, "width", _config2.default.nodeSize);
-	          elem.setAttributeNS(null, "height", _config2.default.nodeSize);
-	          elem.setAttributeNS(null, "fill", attrs.fillColor);
-	          elem.setAttributeNS(null, "x", x);
-	          elem.setAttributeNS(null, "y", y);
-	          elem.setAttributeNS(null, "stroke", "black");
-	          elem.setAttributeNS(null, "stroke-width", 0.1);
-	          this._domElement = elem;
-	        } else {
-	          this._domElement = {
-	            x: x,
-	            y: y,
-	            width: _config2.default.nodeSize,
-	            height: _config2.default.nodeSize,
-	            fillStyle: attrs.fillColor,
-	            strokeStyle: 'black'
-	          };
-	        }
-	      }
-	      return this._domElement;
-	    }
-	  }, {
-	    key: 'step',
-	    get: function get() {
-	      return _Store2.default.data.Step[this.stepId];
-	    }
-	  }, {
-	    key: 'parentNode',
-	    get: function get() {
-	      if (!this.pId) {
-	        return null;
-	      }
-	      for (id in _Store2.default.data.Node) {
-	        if (_Store2.default.data.Node[id]['id'] == this.pid) {
-	          return _Store2.default.data.Node[id];
-	        }
-	      }
-	    }
-	  }]);
-	
-	  return Node;
-	}();
-	
-	exports.default = Node;
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = {
-	  'source': 'source',
-	  'destination': 'destination',
-	  'generating': 'frontier',
-	  'expanding': 'current',
-	  'closing': 'closed',
-	  'updating': 'frontier',
-	  'end': 'destination'
-	};
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _Store = __webpack_require__(13);
-	
-	var _Store2 = _interopRequireDefault(_Store);
-	
-	var _config = __webpack_require__(10);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var _id = 1;
-	
-	var Step = function () {
-	  function Step(options) {
-	    _classCallCheck(this, Step);
-	
-	    this._id = _id;
-	    this.type = options.type;
-	    options['stepId'] = _id;
-	    this.node = _Store2.default.createRecord('Node', options);
-	    _id++;
-	  }
-	
-	  _createClass(Step, [{
-	    key: 'nodes',
-	    get: function get() {
-	      var prevNodes = [];
-	      if (this.previousStep) {
-	        prevNodes = this.previousStep.nodes;
-	      }
-	      prevNodes.push(this.node);
-	      return prevNodes;
-	    }
-	  }, {
-	    key: 'closedNodes',
-	    get: function get() {
-	      return this.nodes.filter(function (node) {
-	        return node.type == "closing";
-	      });
-	    }
-	  }, {
-	    key: 'openedNodes',
-	    get: function get() {
-	      var _this = this;
-	
-	      return this.nodes.filter(function (node) {
-	        return !_this.closedNodes.includes(node);
-	      }).filter(function (node) {
-	        return !_this.frontierNodes.includes(node);
-	      });
-	    }
-	  }, {
-	    key: 'frontierNodes',
-	    get: function get() {
-	      if (this.isFrontier) {
-	        var cIndex = this.nodes.indexOf(this.currentNode);
-	        return this.nodes.slice(cIndex + 1);
-	      }
-	      return [];
-	    }
-	  }, {
-	    key: 'isFrontier',
-	    get: function get() {
-	      return ["generating", "updating"].indexOf(this.type) != -1;
-	    }
-	  }, {
-	    key: 'currentNode',
-	    get: function get() {
-	      return this.nodes.slice().reverse().find(function (node) {
-	        return node.type == "expanding";
-	      });
-	    }
-	  }, {
-	    key: 'isFirstStep',
-	    get: function get() {
-	      return this._id == 1;
-	    }
-	  }, {
-	    key: 'previousStep',
-	    get: function get() {
-	      if (!this.isFirstStep) {
-	        return _Store2.default.data.Step[this._id - 1];
-	      }
-	      return null;
-	    }
-	  }, {
-	    key: 'htmlStr',
-	    get: function get() {
-	      var tmp = document.createElement("div");
-	      var svg = document.createElementNS(_config2.default.xmlns, "svg");
-	      var tracer = _Store2.default.find("Tracer");
-	      svg.setAttributeNS(null, "width", _config2.default.nodeSize * tracer.maxX);
-	      svg.setAttributeNS(null, "height", _config2.default.nodeSize * tracer.maxY);
-	      this.nodes.forEach(function (node) {
-	        svg.appendChild(node.domElement);
-	      });
-	      tmp.append(svg);
-	      var domString = tmp.innerHTML;
-	      return domString;
-	    }
-	  }]);
-	
-	  return Step;
-	}();
-	
-	exports.default = Step;
-
-/***/ }),
-/* 18 */
+/* 12 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1671,7 +1385,7 @@
 	};
 
 /***/ }),
-/* 19 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module) {"use strict";
@@ -11598,7 +11312,529 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
 
 /***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _mapParser = __webpack_require__(15);
+	
+	var _mapParser2 = _interopRequireDefault(_mapParser);
+	
+	var _mapBuilder = __webpack_require__(16);
+	
+	var _mapBuilder2 = _interopRequireDefault(_mapBuilder);
+	
+	var _mapBuilder3 = __webpack_require__(17);
+	
+	var _mapBuilder4 = _interopRequireDefault(_mapBuilder3);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Map = function () {
+	  function Map(mapFile) {
+	    _classCallCheck(this, Map);
+	
+	    this.mapFile = mapFile;
+	    this._mapData = null;
+	    this._mapNodes = null;
+	  }
+	
+	  _createClass(Map, [{
+	    key: 'mapData',
+	    get: function get() {
+	      if (!this._mapData) {
+	        var that = this;
+	        this._mapData = new Promise(function (resolve, reject) {
+	          try {
+	            (0, _mapParser2.default)(that.mapFile, resolve);
+	          } catch (e) {
+	            reject(e);
+	          }
+	        });
+	      }
+	      return this._mapData;
+	    }
+	  }, {
+	    key: 'mapNodes',
+	    get: function get() {
+	      if (!this._mapNodes) {
+	        this._mapNodes = this.mapData.then(function (mapData) {
+	          return new Promise(function (resolve, reject) {
+	            if (_config2.default.renderType == 'svg') {
+	              (0, _mapBuilder2.default)(mapData, resolve);
+	            } else {
+	              (0, _mapBuilder4.default)(mapData, resolve);
+	            }
+	          });
+	        });
+	      }
+	      return this._mapNodes;
+	    }
+	  }]);
+	
+	  return Map;
+	}();
+	
+	exports.default = Map;
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	exports.default = function (file, callback) {
+	    var mapReader = new FileReader();
+	
+	    mapReader.addEventListener("load", function (event) {
+	        var textFile = event.target;
+	        var data = textFile.result.split(/\n|\r\n/);
+	
+	        data.shift();
+	
+	        var height = Number(data.shift().split(' ').pop());
+	        var width = Number(data.shift().split(' ').pop());
+	        data.shift();
+	        var mapStr = data.reduce(function (f, e) {
+	            return f + e;
+	        }, '');
+	        console.log("mapData", width, height, mapStr);
+	
+	        var mapData = { height: height, width: width, mapStr: mapStr };
+	        callback(mapData);
+	    });
+	
+	    //Read the text file
+	    mapReader.readAsText(file);
+	};
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var rects = [];
+	var width = null;
+	var height = null;
+	var mapStr = null;
+	
+	var mapBuilder = function mapBuilder(mapData, callback) {
+	  console.log(mapData);
+	  mapStr = mapData.mapStr;
+	  width = mapData.width;
+	  height = mapData.height;
+	  var tasks = [];
+	  for (var i = 0; i < width; ++i) {
+	    tasks.push(createRowTask(i));
+	  }
+	
+	  Promise.all(tasks).then(function () {
+	    var tmp = document.createElement("div");
+	    var svg = document.createElementNS(_config2.default.xmlns, "svg");
+	    svg.setAttributeNS(null, "width", _config2.default.nodeSize * width);
+	    svg.setAttributeNS(null, "height", _config2.default.nodeSize * height);
+	    rects.flat().forEach(function (rect) {
+	      svg.appendChild(rect);
+	    });
+	    tmp.append(svg);
+	    var domString = tmp.innerHTML;
+	    callback(domString);
+	  });
+	};
+	var createRowTask = function createRowTask(rowId) {
+	  return new Promise(function (resolve, reject) {
+	    rects[rowId] = [];
+	    for (var colId = 0; colId < width; ++colId) {
+	      var x = colId * _config2.default.nodeSize;
+	      var y = rowId * _config2.default.nodeSize;
+	      var stringIndex = rowId * width + colId;
+	      var fillColor = 'white';
+	      if (mapStr[stringIndex] == '@') {
+	        fillColor = 'grey';
+	      }
+	      var elem = document.createElementNS(_config2.default.xmlns, "rect");
+	
+	      elem.setAttributeNS(null, "x", x);
+	      elem.setAttributeNS(null, "y", y);
+	      elem.setAttributeNS(null, "width", _config2.default.nodeSize);
+	      elem.setAttributeNS(null, "height", _config2.default.nodeSize);
+	      elem.setAttributeNS(null, "fill", fillColor);
+	      elem.setAttributeNS(null, "stroke", "black");
+	      elem.setAttributeNS(null, "stroke-width", 0.1);
+	      rects[rowId].push(elem);
+	    }
+	    resolve();
+	  });
+	};
+	
+	exports.default = mapBuilder;
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var rects = [];
+	var width = null;
+	var height = null;
+	var mapStr = null;
+	
+	var mapBuilder = function mapBuilder(mapData, callback) {
+	  console.log(mapData);
+	  mapStr = mapData.mapStr;
+	  width = mapData.width;
+	  height = mapData.height;
+	  var tasks = [];
+	  for (var i = 0; i < width; ++i) {
+	    tasks.push(createRowTask(i));
+	  }
+	  Promise.all(tasks).then(function () {
+	    callback(rects.flat());
+	  });
+	};
+	var createRowTask = function createRowTask(rowId) {
+	  return new Promise(function (resolve, reject) {
+	    rects[rowId] = [];
+	    for (var colId = 0; colId < width; ++colId) {
+	      var x = colId * _config2.default.nodeSize;
+	      var y = rowId * _config2.default.nodeSize;
+	      var stringIndex = rowId * width + colId;
+	      var fillColor = 'white';
+	      if (mapStr[stringIndex] == '@') {
+	        fillColor = 'grey';
+	      }
+	      var attrs = {
+	        x: x,
+	        y: y,
+	        width: _config2.default.nodeSize,
+	        height: _config2.default.nodeSize,
+	        fillStyle: fillColor,
+	        strokeStyle: 'black'
+	      };
+	      rects[rowId].push(attrs);
+	    }
+	    resolve();
+	  });
+	};
+	
+	exports.default = mapBuilder;
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	// import {nodeSize, nodeAttrs, xmlns} from '../config'
+	
+	
+	var _Store = __webpack_require__(9);
+	
+	var _Store2 = _interopRequireDefault(_Store);
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _nodeColor = __webpack_require__(19);
+	
+	var _nodeColor2 = _interopRequireDefault(_nodeColor);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _id = 1;
+	
+	var Node = function () {
+	  function Node(options) {
+	    _classCallCheck(this, Node);
+	
+	    this._id = _id;
+	    Object.assign(this, options);
+	    this._linePoints = null;
+	    _id++;
+	  }
+	
+	  _createClass(Node, [{
+	    key: 'domElement',
+	    get: function get() {
+	      var x = void 0,
+	          y = void 0;
+	      if (!this._domElement) {
+	        var attrs = _config2.default.nodeAttrs[_nodeColor2.default[this.type]];
+	        x = _config2.default.nodeSize * this.x;
+	        y = _config2.default.nodeSize * this.y;
+	        // if(["expanding", "updating", "closing", "end"].indexOf(this.type)!=-1){
+	        //   for(let nodeId in this.step.nodes){
+	        //     let node = this.step.nodes[nodeId];
+	        //     if(node.id==this.id && ["expanding", "updating", "closing", "end"].indexOf(node.type)==-1){
+	        //       x = config.nodeSize*node.x;
+	        //       y = config.nodeSize*node.y;
+	        //       break;
+	        //     }
+	        //   }
+	        // }
+	        // else{
+	        //   x = config.nodeSize*this.x;
+	        //   y = config.nodeSize*this.y;
+	        // }
+	        if (_config2.default.renderType == 'svg') {
+	          var elem = document.createElementNS(_config2.default.xmlns, "rect");
+	          elem.setAttributeNS(null, "width", _config2.default.nodeSize);
+	          elem.setAttributeNS(null, "height", _config2.default.nodeSize);
+	          elem.setAttributeNS(null, "fill", attrs.fillColor);
+	          elem.setAttributeNS(null, "x", x);
+	          elem.setAttributeNS(null, "y", y);
+	          elem.setAttributeNS(null, "stroke", "black");
+	          elem.setAttributeNS(null, "stroke-width", 0.1);
+	          this._domElement = elem;
+	        } else {
+	          this._domElement = {
+	            x: x,
+	            y: y,
+	            width: _config2.default.nodeSize,
+	            height: _config2.default.nodeSize,
+	            fillStyle: attrs.fillColor,
+	            strokeStyle: 'black'
+	          };
+	        }
+	      }
+	      return this._domElement;
+	    }
+	  }, {
+	    key: 'step',
+	    get: function get() {
+	      return _Store2.default.data.Step[this.stepId];
+	    }
+	  }, {
+	    key: 'parentNode',
+	    get: function get() {
+	      var _this = this;
+	
+	      if (!this.pId) {
+	        return null;
+	      }
+	      var pNode = null;
+	      Object.values(_Store2.default.data.Node).forEach(function (node) {
+	        if (node.id == _this.pId) {
+	          pNode = node;
+	          return;
+	        }
+	      });
+	      return pNode;
+	    }
+	  }, {
+	    key: 'center',
+	    get: function get() {
+	      return { x: _config2.default.nodeSize * (this.x + 0.5), y: _config2.default.nodeSize * (this.y + 0.5) };
+	    }
+	  }, {
+	    key: 'linePoints',
+	    get: function get() {
+	      if (!this._linePoints) {
+	        if (!this.parentNode) {
+	          return [this.center];
+	        }
+	        var points = this.parentNode.linePoints.slice();
+	        points.push(this.center);
+	        this._linePoints = points;
+	      }
+	      return this._linePoints;
+	    }
+	  }]);
+	
+	  return Node;
+	}();
+	
+	exports.default = Node;
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  'source': 'source',
+	  'destination': 'destination',
+	  'generating': 'opened',
+	  'expanding': 'current',
+	  'closing': 'closed',
+	  'updating': 'frontier',
+	  'end': 'destination'
+	};
+
+/***/ }),
 /* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _Store = __webpack_require__(9);
+	
+	var _Store2 = _interopRequireDefault(_Store);
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var _id = 1;
+	
+	var Step = function () {
+	  function Step(options) {
+	    _classCallCheck(this, Step);
+	
+	    this._id = _id;
+	    this.type = options.type;
+	    options['stepId'] = _id;
+	    this.node = _Store2.default.createRecord('Node', options);
+	    _id++;
+	  }
+	
+	  _createClass(Step, [{
+	    key: 'nodes',
+	    get: function get() {
+	      var prevNodes = [];
+	      if (this.previousStep) {
+	        prevNodes = this.previousStep.nodes;
+	      }
+	      prevNodes.push(this.node);
+	      return prevNodes;
+	    }
+	  }, {
+	    key: 'closedNodes',
+	    get: function get() {
+	      return this.nodes.filter(function (node) {
+	        return node.type == "closing";
+	      });
+	    }
+	  }, {
+	    key: 'openedNodes',
+	    get: function get() {
+	      var _this = this;
+	
+	      return this.nodes.filter(function (node) {
+	        return !_this.closedNodes.includes(node);
+	      }).filter(function (node) {
+	        return !_this.frontierNodes.includes(node);
+	      });
+	    }
+	  }, {
+	    key: 'frontierNodes',
+	    get: function get() {
+	      if (this.isFrontier) {
+	        var cIndex = this.nodes.indexOf(this.currentNode);
+	        return this.nodes.slice(cIndex + 1);
+	      }
+	      return [];
+	    }
+	  }, {
+	    key: 'isFrontier',
+	    get: function get() {
+	      return ["generating", "updating"].indexOf(this.type) != -1;
+	    }
+	  }, {
+	    key: 'currentNode',
+	    get: function get() {
+	      return this.nodes.slice().reverse().find(function (node) {
+	        return node.type == "expanding";
+	      });
+	    }
+	  }, {
+	    key: 'isFirstStep',
+	    get: function get() {
+	      return this._id == 1;
+	    }
+	  }, {
+	    key: 'previousStep',
+	    get: function get() {
+	      if (!this.isFirstStep) {
+	        return _Store2.default.data.Step[this._id - 1];
+	      }
+	      return null;
+	    }
+	  }, {
+	    key: 'htmlStr',
+	    get: function get() {
+	      var tmp = document.createElement("div");
+	      var svg = document.createElementNS(_config2.default.xmlns, "svg");
+	      var tracer = _Store2.default.find("Tracer");
+	      svg.setAttributeNS(null, "width", _config2.default.nodeSize * tracer.maxX);
+	      svg.setAttributeNS(null, "height", _config2.default.nodeSize * tracer.maxY);
+	      this.nodes.forEach(function (node) {
+	        svg.appendChild(node.domElement);
+	      });
+	      tmp.append(svg);
+	      var domString = tmp.innerHTML;
+	      return domString;
+	    }
+	  }]);
+	
+	  return Step;
+	}();
+	
+	exports.default = Step;
+
+/***/ }),
+/* 21 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -11621,7 +11857,7 @@
 	exports.default = BaseComponent;
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -11634,27 +11870,27 @@
 	
 	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
 	
-	var _template = __webpack_require__(22);
+	var _template = __webpack_require__(23);
 	
 	var _template2 = _interopRequireDefault(_template);
 	
-	var _Map = __webpack_require__(11);
+	var _Map = __webpack_require__(14);
 	
 	var _Map2 = _interopRequireDefault(_Map);
 	
-	var _jquery = __webpack_require__(19);
+	var _jquery = __webpack_require__(13);
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _baseComponent = __webpack_require__(20);
+	var _baseComponent = __webpack_require__(21);
 	
 	var _baseComponent2 = _interopRequireDefault(_baseComponent);
 	
-	var _errorNotifier = __webpack_require__(23);
+	var _errorNotifier = __webpack_require__(24);
 	
 	var _errorNotifier2 = _interopRequireDefault(_errorNotifier);
 	
-	var _config = __webpack_require__(10);
+	var _config = __webpack_require__(8);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -11708,7 +11944,7 @@
 	exports.default = MapComponent;
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -11717,7 +11953,7 @@
 	  value: true
 	});
 	
-	var _config = __webpack_require__(10);
+	var _config = __webpack_require__(8);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -11736,7 +11972,7 @@
 	exports.default = template;
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -11751,7 +11987,7 @@
 	exports.default = errorNotifier;
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -11764,15 +12000,15 @@
 	
 	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
 	
-	var _template = __webpack_require__(25);
+	var _template = __webpack_require__(26);
 	
 	var _template2 = _interopRequireDefault(_template);
 	
-	var _jquery = __webpack_require__(19);
+	var _jquery = __webpack_require__(13);
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _baseComponent = __webpack_require__(20);
+	var _baseComponent = __webpack_require__(21);
 	
 	var _baseComponent2 = _interopRequireDefault(_baseComponent);
 	
@@ -11783,7 +12019,7 @@
 	exports.default = StatsComponent;
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -11797,14 +12033,14 @@
 	exports.default = template;
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _config = __webpack_require__(10);
+	var _config = __webpack_require__(8);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
@@ -11892,78 +12128,6 @@
 	}();
 
 /***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _config = __webpack_require__(10);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var rects = [];
-	var width = null;
-	var height = null;
-	var mapStr = null;
-	
-	var mapBuilder = function mapBuilder(mapData, callback) {
-	  console.log(mapData);
-	  mapStr = mapData.mapStr;
-	  width = mapData.width;
-	  height = mapData.height;
-	  var tasks = [];
-	  for (var i = 0; i < width; ++i) {
-	    tasks.push(createRowTask(i));
-	  }
-	
-	  Promise.all(tasks).then(function () {
-	    var tmp = document.createElement("div");
-	    var svg = document.createElementNS(_config2.default.xmlns, "svg");
-	    svg.setAttributeNS(null, "width", _config2.default.nodeSize * width);
-	    svg.setAttributeNS(null, "height", _config2.default.nodeSize * height);
-	    rects.flat().forEach(function (rect) {
-	      svg.appendChild(rect);
-	    });
-	    tmp.append(svg);
-	    var domString = tmp.innerHTML;
-	    callback(domString);
-	  });
-	};
-	var createRowTask = function createRowTask(rowId) {
-	  return new Promise(function (resolve, reject) {
-	    rects[rowId] = [];
-	    for (var colId = 0; colId < width; ++colId) {
-	      var x = colId * _config2.default.nodeSize;
-	      var y = rowId * _config2.default.nodeSize;
-	      var stringIndex = rowId * width + colId;
-	      var fillColor = 'white';
-	      if (mapStr[stringIndex] == '@') {
-	        fillColor = 'grey';
-	      }
-	      var elem = document.createElementNS(_config2.default.xmlns, "rect");
-	
-	      elem.setAttributeNS(null, "x", x);
-	      elem.setAttributeNS(null, "y", y);
-	      elem.setAttributeNS(null, "width", _config2.default.nodeSize);
-	      elem.setAttributeNS(null, "height", _config2.default.nodeSize);
-	      elem.setAttributeNS(null, "fill", fillColor);
-	      elem.setAttributeNS(null, "stroke", "black");
-	      elem.setAttributeNS(null, "stroke-width", 0.1);
-	      rects[rowId].push(elem);
-	    }
-	    resolve();
-	  });
-	};
-	
-	exports.default = mapBuilder;
-
-/***/ }),
 /* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11973,56 +12137,25 @@
 	  value: true
 	});
 	
-	var _config = __webpack_require__(10);
+	exports.default = function (node, stage) {
+	  var line = new PIXI.Graphics();
+	  line.lineStyle(1, _config2.default.lineColor);
+	  node.linePoints.forEach(function (point, index) {
+	    if (index == 0) {
+	      line.moveTo(point.x, point.y);
+	    } else {
+	      line.lineTo(point.x, point.y);
+	    }
+	  });
+	  stage.addChild(line);
+	  return line;
+	};
+	
+	var _config = __webpack_require__(8);
 	
 	var _config2 = _interopRequireDefault(_config);
-	
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var rects = [];
-	var width = null;
-	var height = null;
-	var mapStr = null;
-	
-	var mapBuilder = function mapBuilder(mapData, callback) {
-	  console.log(mapData);
-	  mapStr = mapData.mapStr;
-	  width = mapData.width;
-	  height = mapData.height;
-	  var tasks = [];
-	  for (var i = 0; i < width; ++i) {
-	    tasks.push(createRowTask(i));
-	  }
-	  Promise.all(tasks).then(function () {
-	    callback(rects.flat());
-	  });
-	};
-	var createRowTask = function createRowTask(rowId) {
-	  return new Promise(function (resolve, reject) {
-	    rects[rowId] = [];
-	    for (var colId = 0; colId < width; ++colId) {
-	      var x = colId * _config2.default.nodeSize;
-	      var y = rowId * _config2.default.nodeSize;
-	      var stringIndex = rowId * width + colId;
-	      var fillColor = 'white';
-	      if (mapStr[stringIndex] == '@') {
-	        fillColor = 'grey';
-	      }
-	      var attrs = {
-	        x: x,
-	        y: y,
-	        width: _config2.default.nodeSize,
-	        height: _config2.default.nodeSize,
-	        fillStyle: fillColor,
-	        strokeStyle: 'black'
-	      };
-	      rects[rowId].push(attrs);
-	    }
-	    resolve();
-	  });
-	};
-	
-	exports.default = mapBuilder;
 
 /***/ })
 /******/ ]);
