@@ -7,7 +7,7 @@ import BaseComponent from '../base-component';
 import errorNotifier from '../../utils/error-notifier';
 import config from '../../config';
 
-let MapComponent = new StateMachine($.extend(BaseComponent, {
+let MapComponent = new StateMachine($.extend({}, BaseComponent, {
   methods: {
     onBeforeInit() {
       $("#pathfinder").append("<div id='map-component'></div>");

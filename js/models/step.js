@@ -73,6 +73,16 @@ class Step {
     return domString;
   }
 
+  get text() {
+    let node = this.node;
+    if(this.type == "source" || this.type == "destination"){
+      return `${this.type.toUpperCase()} Node(id: ${node.id}, x: ${node.x}, y: ${node.y}`;
+    }
+    else{
+      return `${this.type.toUpperCase()} Node(id: ${node.id}, x: ${node.x}, y: ${node.y}, f: ${node.f}, g: ${node.g}, pId: ${node.pId})`;
+    }
+  }
+
 }
 
 export default Step;

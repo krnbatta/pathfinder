@@ -6,7 +6,7 @@ import $ from 'jquery';
 import BaseComponent from '../base-component';
 import Controller from '../../controller';
 
-let DebuggerComponent = new StateMachine($.extend(BaseComponent, {
+let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
 
   methods: {
     onBeforeInit() {

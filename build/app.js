@@ -82,7 +82,11 @@
 	
 	var _components2 = _interopRequireDefault(_components);
 	
-	var _playback = __webpack_require__(27);
+	var _component = __webpack_require__(22);
+	
+	var _component2 = _interopRequireDefault(_component);
+	
+	var _playback = __webpack_require__(29);
 	
 	var _playback2 = _interopRequireDefault(_playback);
 	
@@ -98,9 +102,13 @@
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _drawLine = __webpack_require__(28);
+	var _drawLine = __webpack_require__(32);
 	
 	var _drawLine2 = _interopRequireDefault(_drawLine);
+	
+	var _runner = __webpack_require__(33);
+	
+	var _runner2 = _interopRequireDefault(_runner);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -112,178 +120,86 @@
 	  }, {
 	    name: 'start',
 	    from: 'ready',
-	    to: 'starting'
-	  }, {
-	    name: 'search',
-	    from: 'starting',
-	    to: 'searching'
-	  }, {
-	    name: 'pause',
-	    from: 'searching',
-	    to: 'paused'
-	  }, {
-	    name: 'resume',
-	    from: 'paused',
-	    to: 'searching'
-	  }, {
-	    name: 'reset',
-	    from: '*',
-	    to: 'ready'
+	    to: 'running'
 	  }],
 	  data: {
 	    frontierNodes: [],
-	    line: null
+	    line: null,
+	    runner: null,
+	    currentId: 1,
+	    history: [],
+	    lines: []
 	  },
 	  methods: {
-	    onBeforeTransition: function onBeforeTransition() {
-	      console.log('onBeforeTransition => ' + this.state);
-	      console.log(arguments);
-	    },
-	    onBeforeNone: function onBeforeNone() {
-	      console.log('onBeforeNone => ' + this.state);
-	      console.log(arguments);
-	    },
-	    onLeaveState: function onLeaveState() {
-	      console.log('onLeaveState => ' + this.state);
-	      console.log(arguments);
-	    },
-	    onLeaveNone: function onLeaveNone() {
-	      console.log('onLeaveNone => ' + this.state);
+	    onInit: function onInit() {
 	      _components2.default.forEach(function (component) {
 	        component.init();
 	      });
-	      console.log(arguments);
 	    },
-	    onTransition: function onTransition() {
-	      console.log('onTransition => ' + this.state);
-	      console.log(arguments);
+	    onReady: function onReady() {
+	      _playback2.default.addCallback('play', this.loop.bind(this));
+	      _playback2.default.addCallback('reset', this.reset.bind(this));
 	    },
-	    onEnterState: function onEnterState() {
-	      console.log('onEnterState => ' + this.state);
-	      console.log(arguments);
-	    },
-	    onEnterReady: function onEnterReady() {
-	      console.log('onEnterReady => ' + this.state);
-	      console.log(arguments);
-	    },
-	    onAfterTransition: function onAfterTransition() {
-	      console.log('onAfterTransition => ' + this.state);
-	      console.log(arguments);
-	    },
-	    onAfterInit: function onAfterInit() {
-	      console.log('onAfterInit => ' + this.state);
-	      console.log(arguments);
-	    },
-	    onBeforeStart: function onBeforeStart() {
+	    onStart: function onStart() {
+	      var _this = this;
+	
 	      this.tracer = _Store2.default.find('Tracer');
 	      var that = this;
 	      this.tracer.steps.then(function (steps) {
-	        if (_config2.default.renderType == 'svg') {
-	          that.svgRunner(steps);
-	        } else {
-	          that.webGLRunner(steps);
-	        }
+	        _this.steps = steps;
+	        var runnerFactory = _runner2.default.call(that, steps);
+	        that.setupRenderer();
+	        that.runner = runnerFactory();
+	        _playback2.default.init();
 	      });
 	    },
-	    svgRunner: function svgRunner(steps) {
-	      var _this = this;
-	
-	      var startTime = new Date();
-	      var svgNode = this.tracer.svgNode;
-	      (0, _jquery2.default)('#tracer-canvas').append(svgNode);
-	      var runner = function runner(id) {
-	        if (id >= Object.keys(steps).length) {
-	          var endTime = new Date();
-	          alert(endTime - startTime);
+	    setupRenderer: function setupRenderer() {
+	      this.app = new PIXI.Application({
+	        width: this.tracer.maxX * _config2.default.nodeSize,
+	        height: this.tracer.maxY * _config2.default.nodeSize,
+	        view: document.getElementById("tracer-canvas"),
+	        transparent: true
+	      });
+	      this.renderer = this.app.renderer;
+	      this.stage = this.app.stage;
+	      this.totalSteps = Object.keys(this.steps).length;
+	      this.renderer.render(this.stage);
+	    },
+	    loop: function loop() {
+	      var self = this;
+	      (function loop() {
+	        if (!_playback2.default.is("running")) {
 	          return;
 	        }
-	        svgNode.append(steps[id].node.domElement);
-	        window.requestAnimationFrame(runner.bind(_this, ++id));
-	      };
-	      window.requestAnimationFrame(runner.bind(this, 1));
+	        self.stepForward();
+	        window.requestAnimationFrame(loop);
+	      })();
 	    },
-	    canvasRunner: function canvasRunner(steps) {
+	    stepForward: function stepForward() {
+	      var currentStep = this.steps[this.currentId];
+	      this.runner();
+	      _component2.default.addEvent(currentStep);
+	    },
+	    reset: function reset() {
+	      this.currentId = 1;
+	      this.renderer.clear();
+	      this.setupRenderer();
+	    },
+	    stepBackward: function stepBackward() {
 	      var _this2 = this;
 	
-	      var startTime = new Date();
-	      var canvas = this.tracer.canvas;
-	      var ctx = canvas.getContext('2d');
-	      var totalSteps = Object.keys(steps).length;
-	      var runner = function runner(id) {
-	        if (id >= totalSteps) {
-	          var endTime = new Date();
-	          alert(endTime - startTime);
-	          return;
-	        }
-	        var attrs = steps[id].node.domElement;
-	        ctx.fillStyle = attrs.fillStyle;
-	        ctx.strokeStyle = attrs.strokeStyle;
-	        ctx.fillRect(attrs.x, attrs.y, attrs.width, attrs.height);
-	        ctx.strokeRect(attrs.x, attrs.y, attrs.width, attrs.height);
-	        window.requestAnimationFrame(runner.bind(_this2, ++id));
-	      };
-	      window.requestAnimationFrame(runner.bind(this, 1));
-	    },
-	    webGLRunner: function webGLRunner(steps) {
-	      var _this3 = this;
-	
-	      var startTime = new Date();
-	      var app = new PIXI.Application({ width: this.tracer.maxX * _config2.default.nodeSize, height: this.tracer.maxY * _config2.default.nodeSize, view: document.getElementById("tracer-canvas"), transparent: true });
-	      var renderer = app.renderer;
-	      renderer.backgroundColor = "#fff";
-	      var stage = app.stage;
-	      renderer.render(stage);
-	      var runner = function runner(id) {
-	        if (id > Object.keys(steps).length) {
-	          var endTime = new Date();
-	          alert(endTime - startTime);
-	          return;
-	        }
-	        var step = steps[id];
-	        var node = step.node;
-	        var attrs = node.domElement;
-	        var fillStyle = attrs.fillStyle;
-	        if (step.type == 'source') {
-	          _this3.source = node;
-	        }
-	        if (step.type == 'destination') {
-	          _this3.destination = node;
-	        }
-	        if (step.type == 'generating' || step.type == 'updating') {
-	          if (!(_this3.source && node.id == _this3.source.id) && !(_this3.destination && node.id == _this3.destination.id)) {
-	            _this3.frontierNodes.push(node);
-	            fillStyle = _config2.default.nodeAttrs.frontier.fillColor;
-	          }
-	        }
-	        if (_this3.source && node.id == _this3.source.id) {
-	          fillStyle = _config2.default.nodeAttrs.source.fillColor;
-	        }
-	        if (_this3.destination && node.id == _this3.destination.id) {
-	          fillStyle = _config2.default.nodeAttrs.destination.fillColor;
-	        }
-	        if (step.type == 'closing') {
-	          _this3.frontierNodes.forEach(function (fNode) {
-	            var fAttrs = fNode.domElement;
-	            var rectangle = new PIXI.Graphics();
-	            rectangle.lineStyle(1, fAttrs.strokeStyle);
-	            rectangle.beginFill(fAttrs.fillStyle);
-	            rectangle.drawRect(fAttrs.x, fAttrs.y, fAttrs.width, fAttrs.height);
-	            rectangle.endFill();
-	            stage.addChild(rectangle);
-	          });
-	          _this3.frontierNodes = [];
-	        }
-	        var rectangle = new PIXI.Graphics();
-	        rectangle.lineStyle(1, attrs.strokeStyle);
-	        rectangle.beginFill(fillStyle);
-	        rectangle.drawRect(attrs.x, attrs.y, attrs.width, attrs.height);
-	        rectangle.endFill();
-	        stage.addChild(rectangle);
-	        stage.removeChild(_this3.line);
-	        _this3.line = (0, _drawLine2.default)(node, stage);
-	        window.requestAnimationFrame(runner.bind(_this3, ++id));
-	      };
-	      window.requestAnimationFrame(runner.bind(this, 1));
+	      if (this.currentId == 1) {
+	        return;
+	      }
+	      this.currentId -= 1;
+	      var rectangles = this.history.pop();
+	      rectangles.forEach(function (rectange) {
+	        _this2.stage.removeChild(rectange);
+	      });
+	      var line = this.lines.pop();
+	      this.stage.removeChild(line);
+	      this.stage.addChild(this.lines[this.lines.length - 1]);
+	      _component2.default.removeEvent();
 	    }
 	  }
 	});
@@ -1005,13 +921,21 @@
 	
 	var _component4 = _interopRequireDefault(_component3);
 	
-	var _component5 = __webpack_require__(25);
+	var _component5 = __webpack_require__(24);
 	
 	var _component6 = _interopRequireDefault(_component5);
 	
+	var _component7 = __webpack_require__(27);
+	
+	var _component8 = _interopRequireDefault(_component7);
+	
+	var _component9 = __webpack_require__(30);
+	
+	var _component10 = _interopRequireDefault(_component9);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Components = [_component2.default, _component4.default, _component6.default];
+	var Components = [_component2.default, _component4.default, _component6.default, _component8.default, _component10.default];
 	
 	exports.default = Components;
 
@@ -1051,7 +975,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var DebuggerComponent = new _javascriptStateMachine2.default(_jquery2.default.extend(_baseComponent2.default, {
+	var DebuggerComponent = new _javascriptStateMachine2.default(_jquery2.default.extend({}, _baseComponent2.default, {
 	
 	  methods: {
 	    onBeforeInit: function onBeforeInit() {
@@ -11826,6 +11750,16 @@
 	      var domString = tmp.innerHTML;
 	      return domString;
 	    }
+	  }, {
+	    key: 'text',
+	    get: function get() {
+	      var node = this.node;
+	      if (this.type == "source" || this.type == "destination") {
+	        return this.type.toUpperCase() + ' Node(id: ' + node.id + ', x: ' + node.x + ', y: ' + node.y;
+	      } else {
+	        return this.type.toUpperCase() + ' Node(id: ' + node.id + ', x: ' + node.x + ', y: ' + node.y + ', f: ' + node.f + ', g: ' + node.g + ', pId: ' + node.pId + ')';
+	      }
+	    }
 	  }]);
 	
 	  return Step;
@@ -11874,6 +11808,98 @@
 	
 	var _template2 = _interopRequireDefault(_template);
 	
+	var _jquery = __webpack_require__(13);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var _baseComponent = __webpack_require__(21);
+	
+	var _baseComponent2 = _interopRequireDefault(_baseComponent);
+	
+	var _playback = __webpack_require__(29);
+	
+	var _playback2 = _interopRequireDefault(_playback);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var EventsListComponent = new _javascriptStateMachine2.default(_jquery2.default.extend({}, _baseComponent2.default, {
+	  data: {
+	    events: []
+	  },
+	  methods: {
+	    onBeforeInit: function onBeforeInit() {
+	      (0, _jquery2.default)("#pathfinder").append("<div id='events-list-component'></div>");
+	    },
+	    onLeaveNone: function onLeaveNone() {
+	      (0, _jquery2.default)("#events-list-component").html(_template2.default);
+	      this.bindCallbacks();
+	      this.bindEvents();
+	    },
+	    bindCallbacks: function bindCallbacks() {
+	      _playback2.default.addCallback('init', this.reset.bind(this));
+	      _playback2.default.addCallback('play', this.play.bind(this));
+	      _playback2.default.addCallback('pause', this.pause.bind(this));
+	      _playback2.default.addCallback('reset', this.reset.bind(this));
+	    },
+	    bindEvents: function bindEvents() {},
+	    play: function play() {
+	      (0, _jquery2.default)("#events").hide();
+	    },
+	    pause: function pause() {
+	      (0, _jquery2.default)("#events").show();
+	    },
+	    reset: function reset() {
+	      (0, _jquery2.default)("#events").hide();
+	    },
+	    addEvent: function addEvent(event) {
+	      this.events.push(event);
+	      (0, _jquery2.default)("#events").append('<li class="event">' + event.text + '</li>');
+	      window.requestAnimationFrame(function () {
+	        (0, _jquery2.default)("#events-list")[0].scrollTop = (0, _jquery2.default)("#events-list")[0].scrollHeight;
+	      });
+	    },
+	    removeEvent: function removeEvent() {
+	      this.events.pop();
+	      (0, _jquery2.default)('#events .event:last-child').remove();
+	      (0, _jquery2.default)("#events-list")[0].scrollTop = (0, _jquery2.default)("#events")[0].offsetHeight;
+	    }
+	  }
+	}));
+	
+	exports.default = EventsListComponent;
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var template = function template() {
+	  return "\n  <div id='events-list'>\n    <ol id=\"events\">\n    </ol>\n  </div>\n";
+	};
+	exports.default = template;
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _javascriptStateMachine = __webpack_require__(3);
+	
+	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
+	
+	var _template = __webpack_require__(25);
+	
+	var _template2 = _interopRequireDefault(_template);
+	
 	var _Map = __webpack_require__(14);
 	
 	var _Map2 = _interopRequireDefault(_Map);
@@ -11886,7 +11912,7 @@
 	
 	var _baseComponent2 = _interopRequireDefault(_baseComponent);
 	
-	var _errorNotifier = __webpack_require__(24);
+	var _errorNotifier = __webpack_require__(26);
 	
 	var _errorNotifier2 = _interopRequireDefault(_errorNotifier);
 	
@@ -11896,7 +11922,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var MapComponent = new _javascriptStateMachine2.default(_jquery2.default.extend(_baseComponent2.default, {
+	var MapComponent = new _javascriptStateMachine2.default(_jquery2.default.extend({}, _baseComponent2.default, {
 	  methods: {
 	    onBeforeInit: function onBeforeInit() {
 	      (0, _jquery2.default)("#pathfinder").append("<div id='map-component'></div>");
@@ -11944,7 +11970,7 @@
 	exports.default = MapComponent;
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -11972,7 +11998,7 @@
 	exports.default = template;
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -11987,7 +12013,7 @@
 	exports.default = errorNotifier;
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12000,7 +12026,218 @@
 	
 	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
 	
-	var _template = __webpack_require__(26);
+	var _template = __webpack_require__(28);
+	
+	var _template2 = _interopRequireDefault(_template);
+	
+	var _jquery = __webpack_require__(13);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var _baseComponent = __webpack_require__(21);
+	
+	var _baseComponent2 = _interopRequireDefault(_baseComponent);
+	
+	var _controller = __webpack_require__(2);
+	
+	var _controller2 = _interopRequireDefault(_controller);
+	
+	var _playback = __webpack_require__(29);
+	
+	var _playback2 = _interopRequireDefault(_playback);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var PlaybackControlsComponent = new _javascriptStateMachine2.default(_jquery2.default.extend({}, _baseComponent2.default, {
+	  methods: {
+	    onBeforeInit: function onBeforeInit() {
+	      (0, _jquery2.default)("#pathfinder").append("<div id='playback-controls-component'></div>");
+	    },
+	    onLeaveNone: function onLeaveNone() {
+	      (0, _jquery2.default)("#playback-controls-component").html(_template2.default);
+	      this.hideAll();
+	      this.bindCallbacks();
+	      this.bindEvents();
+	    },
+	    bindCallbacks: function bindCallbacks() {
+	      _playback2.default.addCallback('init', this.reset.bind(this));
+	      _playback2.default.addCallback('play', this.play.bind(this));
+	      _playback2.default.addCallback('pause', this.pause.bind(this));
+	      _playback2.default.addCallback('reset', this.reset.bind(this));
+	    },
+	    bindEvents: function bindEvents() {
+	      (0, _jquery2.default)("#play").on('click', function (e) {
+	        _playback2.default.play();
+	      });
+	      (0, _jquery2.default)("#pause").on('click', function (e) {
+	        _playback2.default.pause();
+	      });
+	      (0, _jquery2.default)("#stop").on('click', function (e) {
+	        _playback2.default.reset();
+	      });
+	      (0, _jquery2.default)("#step-forward").on('click', function (e) {
+	        _controller2.default.stepForward();
+	      });
+	      (0, _jquery2.default)("#step-backward").on('click', function (e) {
+	        _controller2.default.stepBackward();
+	      });
+	    },
+	    hideAll: function hideAll() {
+	      (0, _jquery2.default)('#play').hide();
+	      (0, _jquery2.default)('#step-forward').hide();
+	      (0, _jquery2.default)('#step-backward').hide();
+	      (0, _jquery2.default)('#pause').hide();
+	      (0, _jquery2.default)('#stop').hide();
+	    },
+	    play: function play() {
+	      (0, _jquery2.default)('#play').hide();
+	      (0, _jquery2.default)('#step-forward').hide();
+	      (0, _jquery2.default)('#step-backward').hide();
+	      (0, _jquery2.default)('#pause').show();
+	      (0, _jquery2.default)('#stop').show();
+	    },
+	    pause: function pause() {
+	      (0, _jquery2.default)('#play').show();
+	      (0, _jquery2.default)('#step-forward').show();
+	      (0, _jquery2.default)('#step-backward').show();
+	      (0, _jquery2.default)('#pause').hide();
+	      (0, _jquery2.default)('#stop').show();
+	    },
+	    reset: function reset() {
+	      (0, _jquery2.default)('#play').show();
+	      (0, _jquery2.default)('#step-forward').show();
+	      (0, _jquery2.default)('#step-backward').show();
+	      (0, _jquery2.default)('#pause').hide();
+	      (0, _jquery2.default)('#stop').hide();
+	    }
+	  }
+	}));
+	
+	exports.default = PlaybackControlsComponent;
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var template = function template() {
+	  return "\n  <div id='controls'>\n    <button id='play' title='Play'><i class='fas fa-play'/></button>\n    <button id='pause' title='Pause'><i class='fas fa-pause'/></button>\n    <button id='stop' title='Stop'><i class='fas fa-stop'/></button>\n    <button id='step-backward' title='Step Back'><i class='fas fa-undo'/></button>\n    <button id='step-forward' title='Step Forward'><i class='fas fa-redo'/></button>\n  </div>\n";
+	};
+	exports.default = template;
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _javascriptStateMachine = __webpack_require__(3);
+	
+	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var PlaybackService = new _javascriptStateMachine2.default({
+	  transitions: [{
+	    name: 'init',
+	    from: 'none',
+	    to: 'ready'
+	  }, {
+	    name: 'play',
+	    from: ['ready', 'paused'],
+	    to: 'running'
+	  }, {
+	    name: 'pause',
+	    from: 'running',
+	    to: 'paused'
+	  }, {
+	    name: 'reset',
+	    from: '*',
+	    to: 'ready'
+	  }],
+	  data: {
+	    initCallbacks: [],
+	    readyCallbacks: [],
+	    playCallbacks: [],
+	    pauseCallbacks: [],
+	    resetCallbacks: []
+	  },
+	  methods: {
+	    onInit: function onInit() {
+	      this.runCallbacks('init');
+	    },
+	    onPlay: function onPlay() {
+	      this.runCallbacks('play');
+	    },
+	    onPause: function onPause() {
+	      this.runCallbacks('pause');
+	    },
+	    onReset: function onReset() {
+	      this.runCallbacks('reset');
+	    },
+	    runCallbacks: function runCallbacks(type) {
+	      var callbacks = void 0;
+	      switch (type) {
+	        case "init":
+	          callbacks = this.initCallbacks;
+	          break;
+	        case "play":
+	          callbacks = this.playCallbacks;
+	          break;
+	        case "pause":
+	          callbacks = this.pauseCallbacks;
+	          break;
+	        case "reset":
+	          callbacks = this.resetCallbacks;
+	          break;
+	      }
+	      callbacks.forEach(function (callback) {
+	        callback();
+	      });
+	    },
+	    addCallback: function addCallback(type, callback) {
+	      switch (type) {
+	        case "init":
+	          this.initCallbacks.push(callback);
+	          break;
+	        case "play":
+	          this.playCallbacks.push(callback);
+	          break;
+	        case "pause":
+	          this.pauseCallbacks.push(callback);
+	          break;
+	        case "reset":
+	          this.resetCallbacks.push(callback);
+	          break;
+	      }
+	    }
+	  }
+	});
+	exports.default = PlaybackService;
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _javascriptStateMachine = __webpack_require__(3);
+	
+	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
+	
+	var _template = __webpack_require__(31);
 	
 	var _template2 = _interopRequireDefault(_template);
 	
@@ -12014,12 +12251,12 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var StatsComponent = new _javascriptStateMachine2.default(_jquery2.default.extend(_baseComponent2.default, {}));
+	var StatsComponent = new _javascriptStateMachine2.default(_jquery2.default.extend({}, _baseComponent2.default, {}));
 	
 	exports.default = StatsComponent;
 
 /***/ }),
-/* 26 */
+/* 31 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -12033,102 +12270,7 @@
 	exports.default = template;
 
 /***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _config = __webpack_require__(8);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Playback = function () {
-	  function Playback(list) {
-	    _classCallCheck(this, Playback);
-	
-	    this.list = list;
-	    this.reset();
-	  }
-	
-	  _createClass(Playback, [{
-	    key: 'pause',
-	    value: function pause(callback) {
-	      this.state = 'PAUSED';
-	    }
-	  }, {
-	    key: 'resume',
-	    value: function resume() {
-	      this.state = 'RUNNING';
-	      this.run();
-	    }
-	  }, {
-	    key: 'reset',
-	    value: function reset() {
-	      this.state = 'STOPPED';
-	      this.currentIndex = 0;
-	      this.speed = _config2.default.defaultSpeed;
-	    }
-	  }, {
-	    key: 'start',
-	    value: function start() {
-	      this.state = 'RUNNING';
-	      this.resume();
-	    }
-	  }, {
-	    key: 'run',
-	    value: function run() {
-	      (function loop() {
-	        if (!this.state == 'RUNNING') {
-	          return;
-	        }
-	        this.list[this.currentIndex].play();
-	        this.currentIndex++;
-	        if (this.finished) {
-	          this.state = 'FINISHED';
-	        } else {
-	          setTimeout(loop, this.interval);
-	        }
-	      })();
-	    }
-	  }, {
-	    key: 'stepNext',
-	    value: function stepNext() {
-	      this.goto(this.currentIndex + 1);
-	    }
-	  }, {
-	    key: 'stepBefore',
-	    value: function stepBefore() {
-	      this.goto(this.currentIndex - 1);
-	    }
-	  }, {
-	    key: 'goto',
-	    value: function goto(index) {
-	      this.currentIndex = index;
-	      this.list[index].timeTravel();
-	    }
-	  }, {
-	    key: 'finished',
-	    get: function get() {
-	      return this.list.length == this.currentIndex;
-	    }
-	  }, {
-	    key: 'interval',
-	    get: function get() {
-	      return 1000 / this.speed;
-	    }
-	  }]);
-
-	  return Playback;
-	}();
-
-/***/ }),
-/* 28 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12156,6 +12298,192 @@
 	var _config2 = _interopRequireDefault(_config);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (steps) {
+	  switch (_config2.default.renderType) {
+	    case "svg":
+	      return _svg2.default.bind(this, steps);
+	      break;
+	    case "canvas":
+	      //   return canvasRunner.bind(this, steps);
+	      //   break;
+	      // case "webgl":
+	      return _webgl2.default.bind(this, steps);
+	      break;
+	  }
+	};
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _svg = __webpack_require__(34);
+	
+	var _svg2 = _interopRequireDefault(_svg);
+	
+	var _canvas = __webpack_require__(35);
+	
+	var _canvas2 = _interopRequireDefault(_canvas);
+	
+	var _webgl = __webpack_require__(36);
+	
+	var _webgl2 = _interopRequireDefault(_webgl);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (steps) {
+	  var _this = this;
+	
+	  var startTime = new Date();
+	  var svgNode = this.tracer.svgNode;
+	  $('#tracer-canvas').append(svgNode);
+	  var runner = function runner(id) {
+	    if (id >= Object.keys(steps).length) {
+	      var endTime = new Date();
+	      alert(endTime - startTime);
+	      return;
+	    }
+	    svgNode.append(steps[id].node.domElement);
+	    window.requestAnimationFrame(runner.bind(_this, ++id));
+	  };
+	  window.requestAnimationFrame(runner.bind(this, 1));
+	};
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	exports.default = function (steps) {
+	    var _this = this;
+	
+	    var startTime = new Date();
+	    var canvas = this.tracer.canvas;
+	    var ctx = canvas.getContext('2d');
+	    var totalSteps = Object.keys(steps).length;
+	    var runner = function runner(id) {
+	        if (id >= totalSteps) {
+	            var endTime = new Date();
+	            alert(endTime - startTime);
+	            return;
+	        }
+	        var attrs = steps[id].node.domElement;
+	        ctx.fillStyle = attrs.fillStyle;
+	        ctx.strokeStyle = attrs.strokeStyle;
+	        ctx.fillRect(attrs.x, attrs.y, attrs.width, attrs.height);
+	        ctx.strokeRect(attrs.x, attrs.y, attrs.width, attrs.height);
+	        window.requestAnimationFrame(runner.bind(_this, ++id));
+	    };
+	    window.requestAnimationFrame(runner.bind(this, 1));
+	};
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _drawLine = __webpack_require__(32);
+	
+	var _drawLine2 = _interopRequireDefault(_drawLine);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var runnerFactory = function runnerFactory(steps) {
+	    var self = this;
+	    var startTime = new Date();
+	    var runner = function runner() {
+	        var id = self.currentId;
+	        var rectangles = [];
+	        if (id > self.totalSteps) {
+	            var endTime = new Date();
+	            alert(endTime - startTime);
+	            return;
+	        }
+	        var step = steps[id];
+	        var node = step.node;
+	        var attrs = node.domElement;
+	        var fillStyle = attrs.fillStyle;
+	        if (step.type == 'source') {
+	            self.source = node;
+	        }
+	        if (step.type == 'destination') {
+	            self.destination = node;
+	        }
+	        if (step.type == 'generating' || step.type == 'updating') {
+	            if (!(self.source && node.id == self.source.id) && !(self.destination && node.id == self.destination.id)) {
+	                self.frontierNodes.push(node);
+	                fillStyle = _config2.default.nodeAttrs.frontier.fillColor;
+	            }
+	        }
+	        if (self.source && node.id == self.source.id) {
+	            fillStyle = _config2.default.nodeAttrs.source.fillColor;
+	        }
+	        if (self.destination && node.id == self.destination.id) {
+	            fillStyle = _config2.default.nodeAttrs.destination.fillColor;
+	        }
+	        if (step.type == 'closing') {
+	            self.frontierNodes.forEach(function (fNode) {
+	                var fAttrs = fNode.domElement;
+	                var rectangle = new PIXI.Graphics();
+	                rectangle.lineStyle(1, fAttrs.strokeStyle);
+	                rectangle.beginFill(fAttrs.fillStyle);
+	                rectangle.drawRect(fAttrs.x, fAttrs.y, fAttrs.width, fAttrs.height);
+	                rectangle.endFill();
+	                rectangles.push(rectangle);
+	            });
+	            self.frontierNodes = [];
+	        }
+	        var rectangle = new PIXI.Graphics();
+	        rectangle.lineStyle(1, attrs.strokeStyle);
+	        rectangle.beginFill(fillStyle);
+	        rectangle.drawRect(attrs.x, attrs.y, attrs.width, attrs.height);
+	        rectangle.endFill();
+	        rectangles.push(rectangle);
+	        rectangles.forEach(function (rectangle) {
+	            self.stage.addChild(rectangle);
+	        });
+	        self.history[id] = rectangles;
+	        self.stage.removeChild(self.lines[id - 1]);
+	        self.lines[id] = (0, _drawLine2.default)(node, self.stage);
+	        self.currentId = id + 1;
+	    };
+	    return runner;
+	};
+	exports.default = runnerFactory;
 
 /***/ })
 /******/ ]);

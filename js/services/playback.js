@@ -1,55 +1,83 @@
-import config from '../config'
+import StateMachine from "javascript-state-machine";
 
-class Playback {
-  constructor(list) {
-    this.list = list;
-    this.reset();
-  }
-  pause(callback) {
-    this.state = 'PAUSED';
-  }
-  resume() {
-    this.state = 'RUNNING';
-    this.run();
-  }
-  reset() {
-    this.state = 'STOPPED';
-    this.currentIndex = 0;
-    this.speed = config.defaultSpeed;
-  }
-  start() {
-    this.state = 'RUNNING';
-    this.resume();
-  }
-  run() {
-    (function loop() {
-      if(!this.state=='RUNNING'){
-        return;
+let PlaybackService = new StateMachine({
+  transitions: [{
+        name: 'init',
+        from: 'none',
+        to: 'ready'
+      },
+      {
+        name: 'play',
+        from: ['ready', 'paused'],
+        to: 'running'
+      },
+      {
+        name: 'pause',
+        from: 'running',
+        to: 'paused'
+      },
+      {
+        name: 'reset',
+        from: '*',
+        to: 'ready'
       }
-      this.list[this.currentIndex].play();
-      this.currentIndex++;
-      if(this.finished){
-        this.state = 'FINISHED';
+    ],
+    data: {
+      initCallbacks: [],
+      readyCallbacks: [],
+      playCallbacks: [],
+      pauseCallbacks: [],
+      resetCallbacks: []
+    },
+    methods: {
+      onInit(){
+        this.runCallbacks('init');
+      },
+      onPlay(){
+        this.runCallbacks('play');
+      },
+      onPause(){
+        this.runCallbacks('pause');
+      },
+      onReset(){
+        this.runCallbacks('reset');
+      },
+      runCallbacks(type){
+        let callbacks;
+        switch (type) {
+          case "init":
+            callbacks = this.initCallbacks;
+            break;
+          case "play":
+            callbacks = this.playCallbacks;
+            break;
+          case "pause":
+            callbacks = this.pauseCallbacks;
+            break;
+          case "reset":
+            callbacks = this.resetCallbacks;
+            break;
+        }
+        callbacks.forEach((callback) => {
+          callback();
+        });
+      },
+      addCallback(type, callback){
+        switch (type) {
+          case "init":
+            this.initCallbacks.push(callback);
+            break;
+          case "play":
+            this.playCallbacks.push(callback);
+            break;
+          case "pause":
+            this.pauseCallbacks.push(callback);
+            break;
+          case "reset":
+            this.resetCallbacks.push(callback);
+            break;
+        }
       }
-      else{
-        setTimeout(loop, this.interval);
-      }
-    })();
-  }
-  stepNext(){
-    this.goto(this.currentIndex + 1);
-  }
-  stepBefore(){
-    this.goto(this.currentIndex - 1);
-  }
-  goto(index) {
-    this.currentIndex = index;
-    this.list[index].timeTravel();
-  }
-  get finished(){
-    return this.list.length == this.currentIndex;
-  }
-  get interval(){
-    return 1000/this.speed;
-  }
-}
+    }
+});
+export default PlaybackService;

@@ -1,0 +1,34 @@
+#debug-component{
+  position: absolute;
+}
+#load-map{
+  left: 250px;
+  position: relative;
+}
+#load-algo{
+  display: inline-block;
+}
+#tracer-canvas{
+  position: absolute;
+  transform: translateZ(0);
+  z-index: 1;
+  top: 42px;
+  left: -8px;
+}
+#map-canvas{
+  position: absolute;
+  transform: translateZ(0);
+  top: 50px;
+  left: 0;
+}
+#events-list-component{
+  position: absolute;
+  right: 0;
+  padding: 10px;
+  height: 100%;
+}
+#events-list{
+  max-width: 400px;
+  max-height: 400px;
+  overflow: auto;
+}

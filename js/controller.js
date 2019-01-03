@@ -1,10 +1,12 @@
 import StateMachine from "javascript-state-machine";
 import Components from './components';
-import Playback from './services/playback';
+import EventsListComponent from './components/events-list/component';
+import PlaybackService from './services/playback';
 import Store from './services/Store';
 import config from './config';
 import $ from 'jquery';
 import drawLine from './utils/webgl/draw-line';
+import getRunnerFactory from './services/runner';
 
 let Controller = new StateMachine({
   transitions: [{
@@ -15,180 +17,83 @@ let Controller = new StateMachine({
       {
         name: 'start',
         from: 'ready',
-        to: 'starting'
-      },
-      {
-        name: 'search',
-        from: 'starting',
-        to: 'searching'
-      },
-      {
-        name: 'pause',
-        from: 'searching',
-        to: 'paused'
-      },
-      {
-        name: 'resume',
-        from: 'paused',
-        to: 'searching'
-      },
-      {
-        name: 'reset',
-        from: '*',
-        to: 'ready'
+        to: 'running'
       }
     ],
     data: {
       frontierNodes: [],
-      line: null
+      line: null,
+      runner: null,
+      currentId: 1,
+      history: [],
+      lines: []
     },
     methods: {
-      onBeforeTransition() {
-        console.log(`onBeforeTransition => ${this.state}`);
-        console.log(arguments);
-      },
-      onBeforeNone() {
-        console.log(`onBeforeNone => ${this.state}`);
-        console.log(arguments);
-      },
-      onLeaveState() {
-        console.log(`onLeaveState => ${this.state}`);
-        console.log(arguments);
-      },
-      onLeaveNone() {
-        console.log(`onLeaveNone => ${this.state}`);
+      onInit() {
         Components.forEach((component) => {
           component.init();
         });
-        console.log(arguments);
       },
-      onTransition() {
-        console.log(`onTransition => ${this.state}`);
-        console.log(arguments);
+      onReady() {
+        PlaybackService.addCallback('play', this.loop.bind(this));
+        PlaybackService.addCallback('reset', this.reset.bind(this));
       },
-      onEnterState() {
-        console.log(`onEnterState => ${this.state}`);
-        console.log(arguments);
-      },
-      onEnterReady() {
-        console.log(`onEnterReady => ${this.state}`);
-        console.log(arguments);
-      },
-      onAfterTransition() {
-        console.log(`onAfterTransition => ${this.state}`);
-        console.log(arguments);
-      },
-      onAfterInit() {
-        console.log(`onAfterInit => ${this.state}`);
-        console.log(arguments);
-      },
-      onBeforeStart() {
+      onStart() {
         this.tracer = Store.find('Tracer');
         let that = this;
         this.tracer.steps.then((steps) => {
-          if(config.renderType=='svg'){
-            that.svgRunner(steps);
-          }
-          else{
-            that.webGLRunner(steps);
-          }
+          this.steps = steps;
+          let runnerFactory = getRunnerFactory.call(that, steps);
+          that.setupRenderer();
+          that.runner = runnerFactory();
+          PlaybackService.init();
         });
       },
-      svgRunner(steps) {
-        let startTime = new Date();
-        let svgNode = this.tracer.svgNode;
-        $('#tracer-canvas').append(svgNode);
-        let runner = ((id) => {
-          if(id >= Object.keys(steps).length){
-            let endTime = new Date();
-            alert(endTime - startTime);
-            return;
-          }
-          svgNode.append(steps[id].node.domElement);
-          window.requestAnimationFrame(runner.bind(this, ++id));
+      setupRenderer() {
+        this.app = new PIXI.Application({
+            width: this.tracer.maxX * config.nodeSize,
+            height: this.tracer.maxY * config.nodeSize,
+            view: document.getElementById("tracer-canvas"),
+            transparent: true
         });
-        window.requestAnimationFrame(runner.bind(this, 1));
+        this.renderer = this.app.renderer;
+        this.stage = this.app.stage;
+        this.totalSteps = Object.keys(this.steps).length;
+        this.renderer.render(this.stage);
       },
-
-      canvasRunner(steps) {
-        let startTime = new Date();
-        let canvas = this.tracer.canvas;
-        let ctx = canvas.getContext('2d');
-        let totalSteps = Object.keys(steps).length;
-        let runner = ((id) => {
-          if(id >= totalSteps){
-            let endTime = new Date();
-            alert(endTime - startTime);
+      loop() {
+        let self = this;
+        (function loop(){
+          if(!PlaybackService.is("running")){
             return;
           }
-          let attrs = steps[id].node.domElement;
-          ctx.fillStyle = attrs.fillStyle;
-          ctx.strokeStyle = attrs.strokeStyle;
-          ctx.fillRect(attrs.x, attrs.y, attrs.width, attrs.height);
-          ctx.strokeRect(attrs.x, attrs.y, attrs.width, attrs.height);
-          window.requestAnimationFrame(runner.bind(this, ++id));
-        });
-        window.requestAnimationFrame(runner.bind(this, 1));
+          self.stepForward();
+          window.requestAnimationFrame(loop);
+        })();
       },
-
-      webGLRunner(steps){
-        let startTime = new Date();
-        var app = new PIXI.Application({width: this.tracer.maxX*config.nodeSize, height: this.tracer.maxY*config.nodeSize, view: document.getElementById("tracer-canvas"), transparent: true});
-        let renderer = app.renderer;
-        renderer.backgroundColor = "#fff";
-        let stage = app.stage;
-        renderer.render(stage);
-        let runner = ((id) => {
-          if(id > Object.keys(steps).length){
-            let endTime = new Date();
-            alert(endTime - startTime);
-            return;
-          }
-          let step = steps[id];
-          let node = step.node;
-          let attrs = node.domElement;
-          let fillStyle = attrs.fillStyle;
-          if(step.type == 'source'){
-            this.source = node;
-          }
-          if(step.type == 'destination'){
-            this.destination = node;
-          }
-          if(step.type == 'generating' || step.type == 'updating'){
-            if(!(this.source && node.id == this.source.id) && !(this.destination && node.id == this.destination.id)){
-              this.frontierNodes.push(node);
-              fillStyle = config.nodeAttrs.frontier.fillColor;
-            }
-          }
-          if(this.source && node.id == this.source.id){
-            fillStyle = config.nodeAttrs.source.fillColor;
-          }
-          if(this.destination && node.id == this.destination.id){
-            fillStyle = config.nodeAttrs.destination.fillColor;
-          }
-          if(step.type == 'closing'){
-            this.frontierNodes.forEach((fNode) => {
-              let fAttrs = fNode.domElement;
-              let rectangle = new PIXI.Graphics();
-              rectangle.lineStyle(1, fAttrs.strokeStyle);
-              rectangle.beginFill(fAttrs.fillStyle);
-              rectangle.drawRect(fAttrs.x, fAttrs.y, fAttrs.width, fAttrs.height);
-              rectangle.endFill();
-              stage.addChild(rectangle);
-            });
-            this.frontierNodes = [];
-          }
-          let rectangle = new PIXI.Graphics();
-          rectangle.lineStyle(1, attrs.strokeStyle);
-          rectangle.beginFill(fillStyle);
-          rectangle.drawRect(attrs.x, attrs.y, attrs.width, attrs.height);
-          rectangle.endFill();
-          stage.addChild(rectangle);
-          stage.removeChild(this.line);
-          this.line = drawLine(node, stage);
-          window.requestAnimationFrame(runner.bind(this, ++id));
+      stepForward() {
+        let currentStep = this.steps[this.currentId];
+        this.runner();
+        EventsListComponent.addEvent(currentStep);
+      },
+      reset() {
+        this.currentId = 1;
+        this.renderer.clear();
+        this.setupRenderer();
+      },
+      stepBackward() {
+        if(this.currentId == 1){
+          return;
+        }
+        this.currentId -= 1;
+        let rectangles = this.history.pop();
+        rectangles.forEach((rectange) => {
+          this.stage.removeChild(rectange);
         });
-        window.requestAnimationFrame(runner.bind(this, 1));
+        let line = this.lines.pop();
+        this.stage.removeChild(line);
+        this.stage.addChild(this.lines[this.lines.length-1]);
+        EventsListComponent.removeEvent();
       }
     }
 });
