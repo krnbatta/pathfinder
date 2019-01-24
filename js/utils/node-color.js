@@ -4,6 +4,6 @@ export default {
   'generating': 'opened',
   'expanding': 'current',
   'closing': 'closed',
-  'updating': 'frontier',
-  'end': 'destination',
+  'updating': 'opened',
+  'end': 'destination'
 }

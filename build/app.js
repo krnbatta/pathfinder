@@ -82,13 +82,17 @@
 	
 	var _components2 = _interopRequireDefault(_components);
 	
-	var _component = __webpack_require__(22);
+	var _component = __webpack_require__(25);
 	
 	var _component2 = _interopRequireDefault(_component);
 	
-	var _playback = __webpack_require__(29);
+	var _playback = __webpack_require__(27);
 	
 	var _playback2 = _interopRequireDefault(_playback);
+	
+	var _floatbox = __webpack_require__(44);
+	
+	var _floatbox2 = _interopRequireDefault(_floatbox);
 	
 	var _Store = __webpack_require__(9);
 	
@@ -102,11 +106,11 @@
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _drawLine = __webpack_require__(32);
+	var _drawLine = __webpack_require__(35);
 	
 	var _drawLine2 = _interopRequireDefault(_drawLine);
 	
-	var _runner = __webpack_require__(33);
+	var _runner = __webpack_require__(39);
 	
 	var _runner2 = _interopRequireDefault(_runner);
 	
@@ -123,7 +127,8 @@
 	    to: 'running'
 	  }],
 	  data: {
-	    frontierNodes: [],
+	    frontierHistory: [],
+	    frontierRects: [],
 	    line: null,
 	    runner: null,
 	    currentId: 1,
@@ -151,19 +156,22 @@
 	        that.setupRenderer();
 	        that.runner = runnerFactory();
 	        _playback2.default.init();
+	        _floatbox2.default.init();
 	      });
 	    },
 	    setupRenderer: function setupRenderer() {
-	      this.app = new PIXI.Application({
-	        width: this.tracer.maxX * _config2.default.nodeSize,
-	        height: this.tracer.maxY * _config2.default.nodeSize,
-	        view: document.getElementById("tracer-canvas"),
-	        transparent: true
-	      });
-	      this.renderer = this.app.renderer;
-	      this.stage = this.app.stage;
-	      this.totalSteps = Object.keys(this.steps).length;
-	      this.renderer.render(this.stage);
+	      if (_config2.default.renderType == 'webgl') {
+	        this.app = new PIXI.Application({
+	          width: this.tracer.maxX * _config2.default.nodeSize,
+	          height: this.tracer.maxY * _config2.default.nodeSize,
+	          view: document.getElementById("tracer-canvas"),
+	          transparent: true
+	        });
+	        this.renderer = this.app.renderer;
+	        this.stage = this.app.stage;
+	        this.totalSteps = Object.keys(this.steps).length;
+	        this.renderer.render(this.stage);
+	      }
 	    },
 	    loop: function loop() {
 	      var self = this;
@@ -176,6 +184,9 @@
 	      })();
 	    },
 	    stepForward: function stepForward() {
+	      if (this.currentId >= this.totalSteps && _playback2.default.state != 'paused') {
+	        _playback2.default.pause();
+	      }
 	      var currentStep = this.steps[this.currentId];
 	      this.runner();
 	      _component2.default.addEvent(currentStep);
@@ -192,10 +203,20 @@
 	        return;
 	      }
 	      this.currentId -= 1;
-	      var rectangles = this.history.pop();
-	      rectangles.forEach(function (rectange) {
-	        _this2.stage.removeChild(rectange);
-	      });
+	      var rectangle = this.history.pop();
+	      this.stage.removeChild(rectangle);
+	      var frontiers = this.frontierHistory.pop();
+	      var prevFrontiers = this.frontierHistory[this.currentId - 1];
+	      if (frontiers.length) {
+	        var difference = frontiers.filter(function (x) {
+	          return !prevFrontiers.includes(x);
+	        });
+	        this.stage.removeChild(difference);
+	      } else if (prevFrontiers.length) {
+	        prevFrontiers.forEach(function (rect) {
+	          _this2.stage.addChild(rect);
+	        });
+	      }
 	      var line = this.lines.pop();
 	      this.stage.removeChild(line);
 	      this.stage.addChild(this.lines[this.lines.length - 1]);
@@ -203,6 +224,7 @@
 	    }
 	  }
 	});
+	window.controller = Controller;
 	exports.default = Controller;
 
 /***/ }),
@@ -917,19 +939,19 @@
 	
 	var _component2 = _interopRequireDefault(_component);
 	
-	var _component3 = __webpack_require__(22);
+	var _component3 = __webpack_require__(25);
 	
 	var _component4 = _interopRequireDefault(_component3);
 	
-	var _component5 = __webpack_require__(24);
+	var _component5 = __webpack_require__(28);
 	
 	var _component6 = _interopRequireDefault(_component5);
 	
-	var _component7 = __webpack_require__(27);
+	var _component7 = __webpack_require__(31);
 	
 	var _component8 = _interopRequireDefault(_component7);
 	
-	var _component9 = __webpack_require__(30);
+	var _component9 = __webpack_require__(33);
 	
 	var _component10 = _interopRequireDefault(_component9);
 	
@@ -965,7 +987,7 @@
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _baseComponent = __webpack_require__(21);
+	var _baseComponent = __webpack_require__(24);
 	
 	var _baseComponent2 = _interopRequireDefault(_baseComponent);
 	
@@ -993,6 +1015,7 @@
 	        _Store2.default.createRecord('Tracer', debugFile);
 	        _this.tracer = _Store2.default.find('Tracer');
 	        _controller2.default.start();
+	        (0, _jquery2.default)("#load-algo").hide();
 	      });
 	    }
 	  }
@@ -1038,7 +1061,7 @@
 	  value: true
 	});
 	var config = {
-	  renderType: 'canvas',
+	  renderType: 'webgl',
 	  xmlns: "http://www.w3.org/2000/svg",
 	  operationsPerSecond: 300,
 	  lineColor: 0xFFFFFF,
@@ -1158,11 +1181,11 @@
 	
 	var _Map2 = _interopRequireDefault(_Map);
 	
-	var _Node = __webpack_require__(18);
+	var _Node = __webpack_require__(20);
 	
 	var _Node2 = _interopRequireDefault(_Node);
 	
-	var _Step = __webpack_require__(20);
+	var _Step = __webpack_require__(23);
 	
 	var _Step2 = _interopRequireDefault(_Step);
 	
@@ -1255,7 +1278,14 @@
 	            if (event.y > _this.maxY) {
 	              _this.maxY = event.y;
 	            }
-	            _Store2.default.createRecord('Step', event);
+	            var step = _Store2.default.createRecord('Step', event);
+	            step.tracer = _this;
+	            if (event.type == "source") {
+	              _this.source = step;
+	            }
+	            if (event.type == "destination") {
+	              _this.destination = step;
+	            }
 	          });
 	          return _Store2.default.data.Step;
 	        });
@@ -11259,10 +11289,6 @@
 	
 	var _mapBuilder2 = _interopRequireDefault(_mapBuilder);
 	
-	var _mapBuilder3 = __webpack_require__(17);
-	
-	var _mapBuilder4 = _interopRequireDefault(_mapBuilder3);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -11294,14 +11320,12 @@
 	  }, {
 	    key: 'mapNodes',
 	    get: function get() {
+	      var _this = this;
+	
 	      if (!this._mapNodes) {
 	        this._mapNodes = this.mapData.then(function (mapData) {
 	          return new Promise(function (resolve, reject) {
-	            if (_config2.default.renderType == 'svg') {
-	              (0, _mapBuilder2.default)(mapData, resolve);
-	            } else {
-	              (0, _mapBuilder4.default)(mapData, resolve);
-	            }
+	            _mapBuilder2.default.call(_this, mapData, resolve);
 	          });
 	        });
 	      }
@@ -11351,6 +11375,48 @@
 
 /***/ }),
 /* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (mapData, callback) {
+	  switch (_config2.default.renderType) {
+	    case "svg":
+	      return _svg2.default.call(this, mapData, callback);
+	      break;
+	    case "canvas":
+	      return _canvas2.default.call(this, mapData, callback);
+	      break;
+	    case "webgl":
+	      return _webgl2.default.call(this, mapData, callback);
+	      break;
+	  }
+	};
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _svg = __webpack_require__(17);
+	
+	var _svg2 = _interopRequireDefault(_svg);
+	
+	var _canvas = __webpack_require__(18);
+	
+	var _canvas2 = _interopRequireDefault(_canvas);
+	
+	var _webgl = __webpack_require__(19);
+	
+	var _webgl2 = _interopRequireDefault(_webgl);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -11422,7 +11488,7 @@
 	exports.default = mapBuilder;
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -11483,7 +11549,68 @@
 	exports.default = mapBuilder;
 
 /***/ }),
-/* 18 */
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var rects = [];
+	var width = null;
+	var height = null;
+	var mapStr = null;
+	
+	var mapBuilder = function mapBuilder(mapData, callback) {
+	  console.log(mapData);
+	  mapStr = mapData.mapStr;
+	  width = mapData.width;
+	  height = mapData.height;
+	  var tasks = [];
+	  for (var i = 0; i < width; ++i) {
+	    tasks.push(createRowTask(i));
+	  }
+	  Promise.all(tasks).then(function () {
+	    callback(rects.flat());
+	  });
+	};
+	var createRowTask = function createRowTask(rowId) {
+	  return new Promise(function (resolve, reject) {
+	    rects[rowId] = [];
+	    for (var colId = 0; colId < width; ++colId) {
+	      var x = colId * _config2.default.nodeSize;
+	      var y = rowId * _config2.default.nodeSize;
+	      var stringIndex = rowId * width + colId;
+	      var fillColor = 'white';
+	      if (mapStr[stringIndex] == '@') {
+	        fillColor = 'grey';
+	      }
+	      var attrs = {
+	        x: x,
+	        y: y,
+	        width: _config2.default.nodeSize,
+	        height: _config2.default.nodeSize,
+	        fillStyle: fillColor,
+	        strokeStyle: 'black'
+	      };
+	      rects[rowId].push(attrs);
+	    }
+	    resolve();
+	  });
+	};
+	
+	exports.default = mapBuilder;
+
+/***/ }),
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -11493,8 +11620,6 @@
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	// import {nodeSize, nodeAttrs, xmlns} from '../config'
-	
 	
 	var _Store = __webpack_require__(9);
 	
@@ -11504,9 +11629,13 @@
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _nodeColor = __webpack_require__(19);
+	var _nodeColor = __webpack_require__(21);
 	
 	var _nodeColor2 = _interopRequireDefault(_nodeColor);
+	
+	var _nodeFactory = __webpack_require__(22);
+	
+	var _nodeFactory2 = _interopRequireDefault(_nodeFactory);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -11525,48 +11654,34 @@
 	  }
 	
 	  _createClass(Node, [{
+	    key: 'attrs',
+	    get: function get() {
+	      var nodeAttrs = _config2.default.nodeAttrs[_nodeColor2.default[this.type]];
+	      if (this.id == this.step.tracer.source.node.id) {
+	        nodeAttrs = _config2.default.nodeAttrs['source'];
+	      }
+	      if (this.id == this.step.tracer.destination.node.id) {
+	        nodeAttrs = _config2.default.nodeAttrs['destination'];
+	      }
+	      var x = _config2.default.nodeSize * this.x;
+	      var y = _config2.default.nodeSize * this.y;
+	      return {
+	        x: x,
+	        y: y,
+	        width: _config2.default.nodeSize,
+	        height: _config2.default.nodeSize,
+	        fillStyle: nodeAttrs.fillColor,
+	        strokeStyle: 'black',
+	        strokeWidth: 0.1
+	      };
+	    }
+	  }, {
 	    key: 'domElement',
 	    get: function get() {
 	      var x = void 0,
 	          y = void 0;
 	      if (!this._domElement) {
-	        var attrs = _config2.default.nodeAttrs[_nodeColor2.default[this.type]];
-	        x = _config2.default.nodeSize * this.x;
-	        y = _config2.default.nodeSize * this.y;
-	        // if(["expanding", "updating", "closing", "end"].indexOf(this.type)!=-1){
-	        //   for(let nodeId in this.step.nodes){
-	        //     let node = this.step.nodes[nodeId];
-	        //     if(node.id==this.id && ["expanding", "updating", "closing", "end"].indexOf(node.type)==-1){
-	        //       x = config.nodeSize*node.x;
-	        //       y = config.nodeSize*node.y;
-	        //       break;
-	        //     }
-	        //   }
-	        // }
-	        // else{
-	        //   x = config.nodeSize*this.x;
-	        //   y = config.nodeSize*this.y;
-	        // }
-	        if (_config2.default.renderType == 'svg') {
-	          var elem = document.createElementNS(_config2.default.xmlns, "rect");
-	          elem.setAttributeNS(null, "width", _config2.default.nodeSize);
-	          elem.setAttributeNS(null, "height", _config2.default.nodeSize);
-	          elem.setAttributeNS(null, "fill", attrs.fillColor);
-	          elem.setAttributeNS(null, "x", x);
-	          elem.setAttributeNS(null, "y", y);
-	          elem.setAttributeNS(null, "stroke", "black");
-	          elem.setAttributeNS(null, "stroke-width", 0.1);
-	          this._domElement = elem;
-	        } else {
-	          this._domElement = {
-	            x: x,
-	            y: y,
-	            width: _config2.default.nodeSize,
-	            height: _config2.default.nodeSize,
-	            fillStyle: attrs.fillColor,
-	            strokeStyle: 'black'
-	          };
-	        }
+	        this._domElement = (0, _nodeFactory2.default)(this.attrs, this.values);
 	      }
 	      return this._domElement;
 	    }
@@ -11610,6 +11725,18 @@
 	      }
 	      return this._linePoints;
 	    }
+	  }, {
+	    key: 'values',
+	    get: function get() {
+	      return {
+	        id: this.id,
+	        type: this.type,
+	        pId: this.pId,
+	        f: this.f,
+	        g: this.g,
+	        h: this.h
+	      };
+	    }
 	  }]);
 	
 	  return Node;
@@ -11618,7 +11745,7 @@
 	exports.default = Node;
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -11632,12 +11759,66 @@
 	  'generating': 'opened',
 	  'expanding': 'current',
 	  'closing': 'closed',
-	  'updating': 'frontier',
+	  'updating': 'opened',
 	  'end': 'destination'
 	};
 
 /***/ }),
-/* 20 */
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (attrs, values) {
+	  if (_config2.default.renderType == "svg") {
+	    var elem = document.createElementNS(_config2.default.xmlns, "rect");
+	    $(elem).attr({
+	      'width': attrs.width,
+	      'height': attrs.height,
+	      'fill': attrs.fillStyle,
+	      'x': attrs.x,
+	      'y': attrs.y,
+	      'stroke': attrs.strokeStyle,
+	      'stroke-width': attrs.strokeWidth
+	    });
+	    return elem;
+	  } else {
+	    var rectangle = new PIXI.Graphics();
+	    rectangle.lineStyle(1, attrs.strokeStyle);
+	    rectangle.beginFill(attrs.fillStyle);
+	    rectangle.drawRect(attrs.x, attrs.y, attrs.width, attrs.height);
+	    rectangle.endFill();
+	    rectangle.interactive = true;
+	    rectangle.buttonMode = true;
+	    rectangle.on("mouseover", function (e) {
+	      rectangle.tint = attrs.fillStyle;
+	      _floatbox2.default.execute(e, values);
+	    });
+	    rectangle.on("mouseout", function () {
+	      rectangle.tint = "0xFFFFFF";
+	    });
+	    return rectangle;
+	  }
+	};
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _floatbox = __webpack_require__(44);
+	
+	var _floatbox2 = _interopRequireDefault(_floatbox);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	;
+
+/***/ }),
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -11676,39 +11857,51 @@
 	  _createClass(Step, [{
 	    key: 'nodes',
 	    get: function get() {
-	      var prevNodes = [];
-	      if (this.previousStep) {
-	        prevNodes = this.previousStep.nodes;
+	      if (!this._nodes) {
+	        var prevNodes = [];
+	        if (this.previousStep) {
+	          prevNodes = this.previousStep.nodes;
+	        }
+	        prevNodes.push(this.node);
+	        this._nodes = prevNodes;
 	      }
-	      prevNodes.push(this.node);
-	      return prevNodes;
+	      return this._nodes;
 	    }
 	  }, {
 	    key: 'closedNodes',
 	    get: function get() {
-	      return this.nodes.filter(function (node) {
-	        return node.type == "closing";
-	      });
+	      if (!this._closedNodes) {
+	        this._closedNodes = this.nodes.filter(function (node) {
+	          return node.type == "closing";
+	        });
+	      }
+	      return this._closedNodes;
 	    }
 	  }, {
 	    key: 'openedNodes',
 	    get: function get() {
 	      var _this = this;
 	
-	      return this.nodes.filter(function (node) {
-	        return !_this.closedNodes.includes(node);
-	      }).filter(function (node) {
-	        return !_this.frontierNodes.includes(node);
-	      });
+	      if (!this._openedNodes) {
+	        this._openedNodes = this.nodes.filter(function (node) {
+	          return !_this.closedNodes.includes(node);
+	        }).filter(function (node) {
+	          return !_this.frontierNodes.includes(node);
+	        });
+	      }
+	      return this._openedNodes;
 	    }
 	  }, {
 	    key: 'frontierNodes',
 	    get: function get() {
-	      if (this.isFrontier) {
-	        var cIndex = this.nodes.indexOf(this.currentNode);
-	        return this.nodes.slice(cIndex + 1);
+	      if (!this._frontierNodes) {
+	        if (this.isFrontier) {
+	          var cIndex = this.nodes.indexOf(this.currentNode);
+	          this._frontierNodes = this.nodes.slice(cIndex + 1);
+	        }
+	        this._frontierNodes = [];
 	      }
-	      return [];
+	      return this._frontierNodes;
 	    }
 	  }, {
 	    key: 'isFrontier',
@@ -11718,9 +11911,22 @@
 	  }, {
 	    key: 'currentNode',
 	    get: function get() {
-	      return this.nodes.slice().reverse().find(function (node) {
-	        return node.type == "expanding";
-	      });
+	      if (!this._currentNode) {
+	        this._currentNode = this.nodes.slice().reverse().find(function (node) {
+	          return node.type == "expanding";
+	        });
+	      }
+	      return this._currentNode;
+	    }
+	  }, {
+	    key: 'isSource',
+	    get: function get() {
+	      return this.type == "source";
+	    }
+	  }, {
+	    key: 'isDestination',
+	    get: function get() {
+	      return this.type == "destination";
 	    }
 	  }, {
 	    key: 'isFirstStep',
@@ -11730,35 +11936,48 @@
 	  }, {
 	    key: 'previousStep',
 	    get: function get() {
-	      if (!this.isFirstStep) {
-	        return _Store2.default.data.Step[this._id - 1];
+	      if (!this._previousStep) {
+	        if (!this.isFirstStep) {
+	          this._previousStep = _Store2.default.data.Step[this._id - 1];
+	        }
+	        this._previousStep = null;
 	      }
-	      return null;
+	      return this._previousStep;
+	    }
+	  }, {
+	    key: 'changeColor',
+	    get: function get() {
+	      return this.isFrontier && !this.isSource && !this.isDestination;
 	    }
 	  }, {
 	    key: 'htmlStr',
 	    get: function get() {
-	      var tmp = document.createElement("div");
-	      var svg = document.createElementNS(_config2.default.xmlns, "svg");
-	      var tracer = _Store2.default.find("Tracer");
-	      svg.setAttributeNS(null, "width", _config2.default.nodeSize * tracer.maxX);
-	      svg.setAttributeNS(null, "height", _config2.default.nodeSize * tracer.maxY);
-	      this.nodes.forEach(function (node) {
-	        svg.appendChild(node.domElement);
-	      });
-	      tmp.append(svg);
-	      var domString = tmp.innerHTML;
-	      return domString;
+	      if (!this._htmlStr) {
+	        var tmp = document.createElement("div");
+	        var svg = document.createElementNS(_config2.default.xmlns, "svg");
+	        var tracer = _Store2.default.find("Tracer");
+	        svg.setAttributeNS(null, "width", _config2.default.nodeSize * tracer.maxX);
+	        svg.setAttributeNS(null, "height", _config2.default.nodeSize * tracer.maxY);
+	        this.nodes.forEach(function (node) {
+	          svg.appendChild(node.domElement);
+	        });
+	        tmp.append(svg);
+	        this._htmlStr = tmp.innerHTML;
+	      }
+	      return this._htmlStr;
 	    }
 	  }, {
 	    key: 'text',
 	    get: function get() {
-	      var node = this.node;
-	      if (this.type == "source" || this.type == "destination") {
-	        return this.type.toUpperCase() + ' Node(id: ' + node.id + ', x: ' + node.x + ', y: ' + node.y;
-	      } else {
-	        return this.type.toUpperCase() + ' Node(id: ' + node.id + ', x: ' + node.x + ', y: ' + node.y + ', f: ' + node.f + ', g: ' + node.g + ', pId: ' + node.pId + ')';
+	      if (!this._text) {
+	        var node = this.node;
+	        if (this.type == "source" || this.type == "destination") {
+	          this._text = this.type.toUpperCase() + ' Node(id: ' + node.id + ', x: ' + node.x + ', y: ' + node.y;
+	        } else {
+	          this._text = this.type.toUpperCase() + ' Node(id: ' + node.id + ', x: ' + node.x + ', y: ' + node.y + ', f: ' + node.f + ', g: ' + node.g + ', pId: ' + node.pId + ')';
+	        }
 	      }
+	      return this._text;
 	    }
 	  }]);
 	
@@ -11768,7 +11987,7 @@
 	exports.default = Step;
 
 /***/ }),
-/* 21 */
+/* 24 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -11791,7 +12010,7 @@
 	exports.default = BaseComponent;
 
 /***/ }),
-/* 22 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -11804,7 +12023,7 @@
 	
 	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
 	
-	var _template = __webpack_require__(23);
+	var _template = __webpack_require__(26);
 	
 	var _template2 = _interopRequireDefault(_template);
 	
@@ -11812,11 +12031,11 @@
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _baseComponent = __webpack_require__(21);
+	var _baseComponent = __webpack_require__(24);
 	
 	var _baseComponent2 = _interopRequireDefault(_baseComponent);
 	
-	var _playback = __webpack_require__(29);
+	var _playback = __webpack_require__(27);
 	
 	var _playback2 = _interopRequireDefault(_playback);
 	
@@ -11869,7 +12088,7 @@
 	exports.default = EventsListComponent;
 
 /***/ }),
-/* 23 */
+/* 26 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -11883,254 +12102,7 @@
 	exports.default = template;
 
 /***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _javascriptStateMachine = __webpack_require__(3);
-	
-	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
-	
-	var _template = __webpack_require__(25);
-	
-	var _template2 = _interopRequireDefault(_template);
-	
-	var _Map = __webpack_require__(14);
-	
-	var _Map2 = _interopRequireDefault(_Map);
-	
-	var _jquery = __webpack_require__(13);
-	
-	var _jquery2 = _interopRequireDefault(_jquery);
-	
-	var _baseComponent = __webpack_require__(21);
-	
-	var _baseComponent2 = _interopRequireDefault(_baseComponent);
-	
-	var _errorNotifier = __webpack_require__(26);
-	
-	var _errorNotifier2 = _interopRequireDefault(_errorNotifier);
-	
-	var _config = __webpack_require__(8);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var MapComponent = new _javascriptStateMachine2.default(_jquery2.default.extend({}, _baseComponent2.default, {
-	  methods: {
-	    onBeforeInit: function onBeforeInit() {
-	      (0, _jquery2.default)("#pathfinder").append("<div id='map-component'></div>");
-	    },
-	    onLeaveNone: function onLeaveNone() {
-	      (0, _jquery2.default)("#map-component").html(_template2.default);
-	      this.bindEvents();
-	    },
-	    bindEvents: function bindEvents() {
-	      var _this = this;
-	
-	      (0, _jquery2.default)("#load-map").on('change', function (e) {
-	        var mapFile = e.target.files[0];
-	        _this.map = new _Map2.default(mapFile);
-	        _this.drawMap();
-	      });
-	    },
-	    drawMap: function drawMap() {
-	      var _this2 = this;
-	
-	      this.map.mapNodes.then(function (mapNodes) {
-	        if (_config2.default.renderType == 'svg') {
-	          (0, _jquery2.default)('#map-canvas').html(mapNodes);
-	        } else {
-	          var canvas = document.getElementById('map-canvas');
-	          var ctx = canvas.getContext('2d');
-	          _this2.map.mapData.then(function (mapData) {
-	            canvas.height = mapData.height * _config2.default.nodeSize;
-	            canvas.width = mapData.width * _config2.default.nodeSize;
-	            mapNodes.forEach(function (node) {
-	              ctx.fillStyle = node.fillStyle;
-	              ctx.strokeStyle = node.strokeStyle;
-	              ctx.fillRect(node.x, node.y, node.width, node.height);
-	              ctx.strokeRect(node.x, node.y, node.width, node.height);
-	            });
-	          });
-	        }
-	      }, function (err) {
-	        (0, _errorNotifier2.default)(err);
-	      });
-	    }
-	  }
-	}));
-	
-	exports.default = MapComponent;
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _config = __webpack_require__(8);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var template = function template() {
-	  var temp = "<input type='file' id='load-map' />";
-	  if (_config2.default.renderType == "svg") {
-	    temp += "<div id='map-canvas'></div>";
-	  } else {
-	    temp += "<canvas id='map-canvas'></canvas>";
-	  }
-	  return temp;
-	};
-	
-	exports.default = template;
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var errorNotifier = function errorNotifier(error) {
-	  console.log(error);
-	};
-	
-	exports.default = errorNotifier;
-
-/***/ }),
 /* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _javascriptStateMachine = __webpack_require__(3);
-	
-	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
-	
-	var _template = __webpack_require__(28);
-	
-	var _template2 = _interopRequireDefault(_template);
-	
-	var _jquery = __webpack_require__(13);
-	
-	var _jquery2 = _interopRequireDefault(_jquery);
-	
-	var _baseComponent = __webpack_require__(21);
-	
-	var _baseComponent2 = _interopRequireDefault(_baseComponent);
-	
-	var _controller = __webpack_require__(2);
-	
-	var _controller2 = _interopRequireDefault(_controller);
-	
-	var _playback = __webpack_require__(29);
-	
-	var _playback2 = _interopRequireDefault(_playback);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var PlaybackControlsComponent = new _javascriptStateMachine2.default(_jquery2.default.extend({}, _baseComponent2.default, {
-	  methods: {
-	    onBeforeInit: function onBeforeInit() {
-	      (0, _jquery2.default)("#pathfinder").append("<div id='playback-controls-component'></div>");
-	    },
-	    onLeaveNone: function onLeaveNone() {
-	      (0, _jquery2.default)("#playback-controls-component").html(_template2.default);
-	      this.hideAll();
-	      this.bindCallbacks();
-	      this.bindEvents();
-	    },
-	    bindCallbacks: function bindCallbacks() {
-	      _playback2.default.addCallback('init', this.reset.bind(this));
-	      _playback2.default.addCallback('play', this.play.bind(this));
-	      _playback2.default.addCallback('pause', this.pause.bind(this));
-	      _playback2.default.addCallback('reset', this.reset.bind(this));
-	    },
-	    bindEvents: function bindEvents() {
-	      (0, _jquery2.default)("#play").on('click', function (e) {
-	        _playback2.default.play();
-	      });
-	      (0, _jquery2.default)("#pause").on('click', function (e) {
-	        _playback2.default.pause();
-	      });
-	      (0, _jquery2.default)("#stop").on('click', function (e) {
-	        _playback2.default.reset();
-	      });
-	      (0, _jquery2.default)("#step-forward").on('click', function (e) {
-	        _controller2.default.stepForward();
-	      });
-	      (0, _jquery2.default)("#step-backward").on('click', function (e) {
-	        _controller2.default.stepBackward();
-	      });
-	    },
-	    hideAll: function hideAll() {
-	      (0, _jquery2.default)('#play').hide();
-	      (0, _jquery2.default)('#step-forward').hide();
-	      (0, _jquery2.default)('#step-backward').hide();
-	      (0, _jquery2.default)('#pause').hide();
-	      (0, _jquery2.default)('#stop').hide();
-	    },
-	    play: function play() {
-	      (0, _jquery2.default)('#play').hide();
-	      (0, _jquery2.default)('#step-forward').hide();
-	      (0, _jquery2.default)('#step-backward').hide();
-	      (0, _jquery2.default)('#pause').show();
-	      (0, _jquery2.default)('#stop').show();
-	    },
-	    pause: function pause() {
-	      (0, _jquery2.default)('#play').show();
-	      (0, _jquery2.default)('#step-forward').show();
-	      (0, _jquery2.default)('#step-backward').show();
-	      (0, _jquery2.default)('#pause').hide();
-	      (0, _jquery2.default)('#stop').show();
-	    },
-	    reset: function reset() {
-	      (0, _jquery2.default)('#play').show();
-	      (0, _jquery2.default)('#step-forward').show();
-	      (0, _jquery2.default)('#step-backward').show();
-	      (0, _jquery2.default)('#pause').hide();
-	      (0, _jquery2.default)('#stop').hide();
-	    }
-	  }
-	}));
-	
-	exports.default = PlaybackControlsComponent;
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var template = function template() {
-	  return "\n  <div id='controls'>\n    <button id='play' title='Play'><i class='fas fa-play'/></button>\n    <button id='pause' title='Pause'><i class='fas fa-pause'/></button>\n    <button id='stop' title='Stop'><i class='fas fa-stop'/></button>\n    <button id='step-backward' title='Step Back'><i class='fas fa-undo'/></button>\n    <button id='step-forward' title='Step Forward'><i class='fas fa-redo'/></button>\n  </div>\n";
-	};
-	exports.default = template;
-
-/***/ }),
-/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12224,7 +12196,7 @@
 	exports.default = PlaybackService;
 
 /***/ }),
-/* 30 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12237,7 +12209,138 @@
 	
 	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
 	
-	var _template = __webpack_require__(31);
+	var _template = __webpack_require__(29);
+	
+	var _template2 = _interopRequireDefault(_template);
+	
+	var _Map = __webpack_require__(14);
+	
+	var _Map2 = _interopRequireDefault(_Map);
+	
+	var _jquery = __webpack_require__(13);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var _baseComponent = __webpack_require__(24);
+	
+	var _baseComponent2 = _interopRequireDefault(_baseComponent);
+	
+	var _errorNotifier = __webpack_require__(30);
+	
+	var _errorNotifier2 = _interopRequireDefault(_errorNotifier);
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var MapComponent = new _javascriptStateMachine2.default(_jquery2.default.extend({}, _baseComponent2.default, {
+	  methods: {
+	    onBeforeInit: function onBeforeInit() {
+	      (0, _jquery2.default)("#pathfinder").append("<div id='map-component'></div>");
+	    },
+	    onLeaveNone: function onLeaveNone() {
+	      (0, _jquery2.default)("#map-component").html(_template2.default);
+	      this.bindEvents();
+	    },
+	    bindEvents: function bindEvents() {
+	      var _this = this;
+	
+	      (0, _jquery2.default)("#load-map").on('change', function (e) {
+	        var mapFile = e.target.files[0];
+	        _this.map = new _Map2.default(mapFile);
+	        _this.drawMap();
+	        (0, _jquery2.default)("#load-map").hide();
+	      });
+	    },
+	    drawMap: function drawMap() {
+	      var _this2 = this;
+	
+	      this.map.mapNodes.then(function (mapNodes) {
+	        if (_config2.default.renderType == 'svg') {
+	          (0, _jquery2.default)('#map-canvas').html(mapNodes);
+	        } else {
+	          var canvas = document.getElementById('map-canvas');
+	          var ctx = canvas.getContext('2d');
+	          _this2.map.mapData.then(function (mapData) {
+	            canvas.height = mapData.height * _config2.default.nodeSize;
+	            canvas.width = mapData.width * _config2.default.nodeSize;
+	            mapNodes.forEach(function (node) {
+	              ctx.fillStyle = node.fillStyle;
+	              ctx.strokeStyle = node.strokeStyle;
+	              ctx.fillRect(node.x, node.y, node.width, node.height);
+	              ctx.strokeRect(node.x, node.y, node.width, node.height);
+	            });
+	          });
+	        }
+	      }, function (err) {
+	        (0, _errorNotifier2.default)(err);
+	      });
+	    }
+	  }
+	}));
+	
+	exports.default = MapComponent;
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var template = function template() {
+	  var temp = "<input type='file' id='load-map' />";
+	  if (_config2.default.renderType == "svg") {
+	    temp += "<div id='map-canvas'></div>";
+	  } else {
+	    temp += "<canvas id='map-canvas'></canvas>";
+	  }
+	  return temp;
+	};
+	
+	exports.default = template;
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var errorNotifier = function errorNotifier(error) {
+	  console.log(error);
+	};
+	
+	exports.default = errorNotifier;
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _javascriptStateMachine = __webpack_require__(3);
+	
+	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
+	
+	var _template = __webpack_require__(32);
 	
 	var _template2 = _interopRequireDefault(_template);
 	
@@ -12245,7 +12348,124 @@
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _baseComponent = __webpack_require__(21);
+	var _baseComponent = __webpack_require__(24);
+	
+	var _baseComponent2 = _interopRequireDefault(_baseComponent);
+	
+	var _controller = __webpack_require__(2);
+	
+	var _controller2 = _interopRequireDefault(_controller);
+	
+	var _playback = __webpack_require__(27);
+	
+	var _playback2 = _interopRequireDefault(_playback);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var PlaybackControlsComponent = new _javascriptStateMachine2.default(_jquery2.default.extend({}, _baseComponent2.default, {
+	  methods: {
+	    onBeforeInit: function onBeforeInit() {
+	      (0, _jquery2.default)("#pathfinder").append("<div id='playback-controls-component'></div>");
+	    },
+	    onLeaveNone: function onLeaveNone() {
+	      (0, _jquery2.default)("#playback-controls-component").html(_template2.default);
+	      this.hideAll();
+	      this.bindCallbacks();
+	      this.bindEvents();
+	    },
+	    bindCallbacks: function bindCallbacks() {
+	      _playback2.default.addCallback('init', this.reset.bind(this));
+	      _playback2.default.addCallback('play', this.play.bind(this));
+	      _playback2.default.addCallback('pause', this.pause.bind(this));
+	      _playback2.default.addCallback('reset', this.reset.bind(this));
+	    },
+	    bindEvents: function bindEvents() {
+	      (0, _jquery2.default)("#play").on('click', function (e) {
+	        _playback2.default.play();
+	      });
+	      (0, _jquery2.default)("#pause").on('click', function (e) {
+	        _playback2.default.pause();
+	      });
+	      (0, _jquery2.default)("#stop").on('click', function (e) {
+	        _playback2.default.reset();
+	      });
+	      (0, _jquery2.default)("#step-forward").on('click', function (e) {
+	        _controller2.default.stepForward();
+	      });
+	      (0, _jquery2.default)("#step-backward").on('click', function (e) {
+	        _controller2.default.stepBackward();
+	      });
+	    },
+	    hideAll: function hideAll() {
+	      (0, _jquery2.default)('#play').hide();
+	      (0, _jquery2.default)('#step-forward').hide();
+	      (0, _jquery2.default)('#step-backward').hide();
+	      (0, _jquery2.default)('#pause').hide();
+	      (0, _jquery2.default)('#stop').hide();
+	    },
+	    play: function play() {
+	      (0, _jquery2.default)('#play').hide();
+	      (0, _jquery2.default)('#step-forward').hide();
+	      (0, _jquery2.default)('#step-backward').hide();
+	      (0, _jquery2.default)('#pause').show();
+	      (0, _jquery2.default)('#stop').show();
+	    },
+	    pause: function pause() {
+	      (0, _jquery2.default)('#play').show();
+	      (0, _jquery2.default)('#step-forward').show();
+	      (0, _jquery2.default)('#step-backward').show();
+	      (0, _jquery2.default)('#pause').hide();
+	      (0, _jquery2.default)('#stop').show();
+	    },
+	    reset: function reset() {
+	      (0, _jquery2.default)('#play').show();
+	      (0, _jquery2.default)('#step-forward').show();
+	      (0, _jquery2.default)('#step-backward').show();
+	      (0, _jquery2.default)('#pause').hide();
+	      (0, _jquery2.default)('#stop').hide();
+	    }
+	  }
+	}));
+	
+	exports.default = PlaybackControlsComponent;
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var template = function template() {
+	  return "\n  <div id='controls'>\n    <button id='play' title='Play'><i class='fas fa-play'/></button>\n    <button id='pause' title='Pause'><i class='fas fa-pause'/></button>\n    <button id='stop' title='Stop'><i class='fas fa-stop'/></button>\n    <button id='step-backward' title='Step Back'><i class='fas fa-undo'/></button>\n    <button id='step-forward' title='Step Forward'><i class='fas fa-redo'/></button>\n  </div>\n";
+	};
+	exports.default = template;
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _javascriptStateMachine = __webpack_require__(3);
+	
+	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
+	
+	var _template = __webpack_require__(34);
+	
+	var _template2 = _interopRequireDefault(_template);
+	
+	var _jquery = __webpack_require__(13);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var _baseComponent = __webpack_require__(24);
 	
 	var _baseComponent2 = _interopRequireDefault(_baseComponent);
 	
@@ -12256,7 +12476,7 @@
 	exports.default = StatsComponent;
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -12270,7 +12490,49 @@
 	exports.default = template;
 
 /***/ }),
-/* 32 */
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (node, stage) {
+	  switch (_config2.default.renderType) {
+	    case "svg":
+	      return _svg2.default.call(this, steps);
+	      break;
+	    case "canvas":
+	      return _canvas2.default.call(this, steps);
+	      break;
+	    case "webgl":
+	      return _webgl2.default.call(this, node, stage);
+	      break;
+	  }
+	};
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _svg = __webpack_require__(36);
+	
+	var _svg2 = _interopRequireDefault(_svg);
+	
+	var _canvas = __webpack_require__(37);
+	
+	var _canvas2 = _interopRequireDefault(_canvas);
+	
+	var _webgl = __webpack_require__(38);
+	
+	var _webgl2 = _interopRequireDefault(_webgl);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12300,7 +12562,67 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 33 */
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (node, stage) {
+	  var line = new PIXI.Graphics();
+	  line.lineStyle(1, _config2.default.lineColor);
+	  node.linePoints.forEach(function (point, index) {
+	    if (index == 0) {
+	      line.moveTo(point.x, point.y);
+	    } else {
+	      line.lineTo(point.x, point.y);
+	    }
+	  });
+	  stage.addChild(line);
+	  return line;
+	};
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (node, stage) {
+	  var line = new PIXI.Graphics();
+	  line.lineStyle(1, _config2.default.lineColor);
+	  node.linePoints.forEach(function (point, index) {
+	    if (index == 0) {
+	      line.moveTo(point.x, point.y);
+	    } else {
+	      line.lineTo(point.x, point.y);
+	    }
+	  });
+	  stage.addChild(line);
+	  return line;
+	};
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -12315,9 +12637,9 @@
 	      return _svg2.default.bind(this, steps);
 	      break;
 	    case "canvas":
-	      //   return canvasRunner.bind(this, steps);
-	      //   break;
-	      // case "webgl":
+	      return _canvas2.default.bind(this, steps);
+	      break;
+	    case "webgl":
 	      return _webgl2.default.bind(this, steps);
 	      break;
 	  }
@@ -12327,23 +12649,23 @@
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _svg = __webpack_require__(34);
+	var _svg = __webpack_require__(40);
 	
 	var _svg2 = _interopRequireDefault(_svg);
 	
-	var _canvas = __webpack_require__(35);
+	var _canvas = __webpack_require__(41);
 	
 	var _canvas2 = _interopRequireDefault(_canvas);
 	
-	var _webgl = __webpack_require__(36);
+	var _webgl = __webpack_require__(42);
 	
 	var _webgl2 = _interopRequireDefault(_webgl);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 34 */
-/***/ (function(module, exports) {
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -12356,7 +12678,7 @@
 	
 	  var startTime = new Date();
 	  var svgNode = this.tracer.svgNode;
-	  $('#tracer-canvas').append(svgNode);
+	  (0, _jquery2.default)('#tracer-canvas').append(svgNode);
 	  var runner = function runner(id) {
 	    if (id >= Object.keys(steps).length) {
 	      var endTime = new Date();
@@ -12368,9 +12690,15 @@
 	  };
 	  window.requestAnimationFrame(runner.bind(this, 1));
 	};
+	
+	var _jquery = __webpack_require__(13);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 35 */
+/* 41 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -12403,87 +12731,251 @@
 	};
 
 /***/ }),
-/* 36 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _config = __webpack_require__(8);
 	
 	var _config2 = _interopRequireDefault(_config);
 	
-	var _drawLine = __webpack_require__(32);
+	var _drawLine = __webpack_require__(35);
 	
 	var _drawLine2 = _interopRequireDefault(_drawLine);
 	
+	var _nodeFactory = __webpack_require__(22);
+	
+	var _nodeFactory2 = _interopRequireDefault(_nodeFactory);
+	
+	var _insertNode = __webpack_require__(43);
+	
+	var _insertNode2 = _interopRequireDefault(_insertNode);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	//history
+	//clear the canvas
+	//trace all the nodes till now
+	//create the frontier nodes as per the array of frontier nodes.
+	
+	var addFrontierNode = function addFrontierNode(controller, node) {
+	  var id = controller.currentId;
+	  var attrs = node.attrs;
+	  attrs['fillStyle'] = _config2.default.nodeAttrs['frontier'].fillColor;
+	  var rectangle = (0, _nodeFactory2.default)(attrs, node.values);
+	  (0, _insertNode2.default)(controller, rectangle);
+	  controller.frontierRects.push(rectangle);
+	  controller.frontierHistory[id] = controller.frontierRects;
+	};
+	
+	var clearFrontierNodes = function clearFrontierNodes(controller) {
+	  var id = controller.currentId;
+	  controller.frontierRects.forEach(function (rect) {
+	    controller.stage.removeChild(rect);
+	  });
+	  controller.frontierRects = [];
+	  controller.frontierHistory[id] = [];
+	};
+	
+	//put rectangles that are extra - this includes. removing the frontier nodes as well - only when closing
+	//when generating/updating - first opened node and then frontier node
+	var updateHistory = function updateHistory(controller, rectangle) {
+	  var id = controller.currentId;
+	  controller.history[id] = rectangle;
+	};
+	
+	var updateLine = function updateLine(controller, node) {
+	  var id = controller.currentId;
+	  controller.stage.removeChild(controller.lines[id - 1]);
+	  controller.lines[id] = (0, _drawLine2.default)(node, controller.stage);
+	};
+	
+	var updateId = function updateId(controller) {
+	  var id = controller.currentId;
+	  controller.currentId = id + 1;
+	};
+	
+	//source, destination, expanding, frontier, opened, closed
+	//source and destination remain untouched
+	//expanding is current - its color is coming directly.
+	//frontier - all generating/updating nodes that come between 2 expanding
+	//opened - all the nodes that are not closed or expanded
+	//closed - the one that is closed
+	
+	//source, destination, expanding, closed, opened are mentioned. Only frontier is tricky
 	var runnerFactory = function runnerFactory(steps) {
-	    var self = this;
-	    var startTime = new Date();
-	    var runner = function runner() {
-	        var id = self.currentId;
-	        var rectangles = [];
-	        if (id > self.totalSteps) {
-	            var endTime = new Date();
-	            alert(endTime - startTime);
-	            return;
-	        }
-	        var step = steps[id];
-	        var node = step.node;
-	        var attrs = node.domElement;
-	        var fillStyle = attrs.fillStyle;
-	        if (step.type == 'source') {
-	            self.source = node;
-	        }
-	        if (step.type == 'destination') {
-	            self.destination = node;
-	        }
-	        if (step.type == 'generating' || step.type == 'updating') {
-	            if (!(self.source && node.id == self.source.id) && !(self.destination && node.id == self.destination.id)) {
-	                self.frontierNodes.push(node);
-	                fillStyle = _config2.default.nodeAttrs.frontier.fillColor;
-	            }
-	        }
-	        if (self.source && node.id == self.source.id) {
-	            fillStyle = _config2.default.nodeAttrs.source.fillColor;
-	        }
-	        if (self.destination && node.id == self.destination.id) {
-	            fillStyle = _config2.default.nodeAttrs.destination.fillColor;
-	        }
-	        if (step.type == 'closing') {
-	            self.frontierNodes.forEach(function (fNode) {
-	                var fAttrs = fNode.domElement;
-	                var rectangle = new PIXI.Graphics();
-	                rectangle.lineStyle(1, fAttrs.strokeStyle);
-	                rectangle.beginFill(fAttrs.fillStyle);
-	                rectangle.drawRect(fAttrs.x, fAttrs.y, fAttrs.width, fAttrs.height);
-	                rectangle.endFill();
-	                rectangles.push(rectangle);
-	            });
-	            self.frontierNodes = [];
-	        }
-	        var rectangle = new PIXI.Graphics();
-	        rectangle.lineStyle(1, attrs.strokeStyle);
-	        rectangle.beginFill(fillStyle);
-	        rectangle.drawRect(attrs.x, attrs.y, attrs.width, attrs.height);
-	        rectangle.endFill();
-	        rectangles.push(rectangle);
-	        rectangles.forEach(function (rectangle) {
-	            self.stage.addChild(rectangle);
-	        });
-	        self.history[id] = rectangles;
-	        self.stage.removeChild(self.lines[id - 1]);
-	        self.lines[id] = (0, _drawLine2.default)(node, self.stage);
-	        self.currentId = id + 1;
-	    };
-	    return runner;
+	  var self = this;
+	  var startTime = new Date();
+	  var runner = function runner() {
+	    var id = self.currentId;
+	    if (id > self.totalSteps) {
+	      var endTime = new Date();
+	      alert(endTime - startTime);
+	      return;
+	    }
+	    var step = steps[id];
+	    var node = step.node;
+	    var rectangle = node.domElement;
+	    (0, _insertNode2.default)(controller, rectangle);
+	    if (step.changeColor) {
+	      addFrontierNode(self, node);
+	    }
+	    if (step.type == 'closing') {
+	      clearFrontierNodes(self);
+	    }
+	    //update history
+	    updateHistory(self, rectangle);
+	    //update line
+	    updateLine(self, node);
+	    //update id
+	    updateId(self);
+	  };
+	  return runner;
 	};
 	exports.default = runnerFactory;
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (context, rectangle) {
+	  if (_config2.default.renderType == "svg") {
+	    context.tracer.svgNode.append(rectangle);
+	  } else {
+	    context.stage.addChild(rectangle);
+	  }
+	};
+	
+	var _config = __webpack_require__(8);
+	
+	var _config2 = _interopRequireDefault(_config);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _javascriptStateMachine = __webpack_require__(3);
+	
+	var _javascriptStateMachine2 = _interopRequireDefault(_javascriptStateMachine);
+	
+	var _jquery = __webpack_require__(13);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var _debounce = __webpack_require__(45);
+	
+	var _debounce2 = _interopRequireDefault(_debounce);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var FloatboxService = new _javascriptStateMachine2.default({
+	  transitions: [{
+	    name: 'init',
+	    from: 'none',
+	    to: 'hidden'
+	  }, {
+	    name: 'show',
+	    from: 'hidden',
+	    to: 'shown'
+	  }, {
+	    name: 'hide',
+	    from: 'shown',
+	    to: 'hidden'
+	  }],
+	  data: {
+	    values: null
+	  },
+	  methods: {
+	    onInit: function onInit() {
+	      var view = document.createElement('div');
+	      view.id = 'context-menu';
+	      view.style.display = 'none';
+	      (0, _jquery2.default)('body').append(view);
+	      this.execute = (0, _debounce2.default)(this.showMenu);
+	      this.bindHide();
+	    },
+	    onHide: function onHide() {
+	      //hide from tab
+	      (0, _jquery2.default)("#context-menu").hide();
+	    },
+	    onShow: function onShow(transition, event, values) {
+	      this.values = values;
+	      (0, _jquery2.default)("#context-menu").html(this.htmlStr());
+	      //show it on tab
+	      // $("#context-menu").css("left",event.pageX);
+	      // $("#context-menu").css("top",event.pageY);
+	      (0, _jquery2.default)("#context-menu").show();
+	    },
+	    bindHide: function bindHide() {
+	      var _this = this;
+	
+	      (0, _jquery2.default)(document).on("click", function () {
+	        if (_this.state != "hidden") {
+	          _this.hide();
+	        }
+	      });
+	    },
+	    showMenu: function showMenu(event, values) {
+	      if (this.state != "hidden") {
+	        this.hide();
+	      }
+	      this.show(event, values);
+	    },
+	    htmlStr: function htmlStr() {
+	      return "\n          <ul id='node-details'>\n            <li>id: " + this.values.id + "</li>\n            <li>type: " + this.values.type + "</li>\n            <li>pId: " + this.values.pId + "</li>\n            <li>f: " + this.values.f + "</li>\n            <li>g: " + this.values.g + "</li>\n            <li>h: " + this.values.h + "</li>\n          </ul>\n        ";
+	    }
+	  }
+	});
+	exports.default = FloatboxService;
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports.default = function (func, wait, immediate) {
+	  var timeout;
+	  return function () {
+	    var context = this,
+	        args = arguments;
+	    var later = function later() {
+	      timeout = null;
+	      if (!immediate) {
+	        func.apply(context, args);
+	      }
+	    };
+	    var callNow = immediate && !timeout;
+	    clearTimeout(timeout);
+	    timeout = setTimeout(later, wait || 200);
+	    if (callNow) {
+	      func.apply(context, args);
+	    }
+	  };
+	};
 
 /***/ })
 /******/ ]);

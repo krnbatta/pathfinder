@@ -12,30 +12,42 @@ class Step {
   }
 
   get nodes(){
-    let prevNodes = [];
-    if(this.previousStep){
-      prevNodes = this.previousStep.nodes;
+    if(!this._nodes){
+      let prevNodes = [];
+      if(this.previousStep){
+        prevNodes = this.previousStep.nodes;
+      }
+      prevNodes.push(this.node);
+      this._nodes = prevNodes;
     }
-    prevNodes.push(this.node);
-    return prevNodes;
+    return this._nodes;
   }
 
   get closedNodes(){
-    return this.nodes.filter((node) => {
-      return node.type == "closing";
-    });
+    if(!this._closedNodes){
+      this._closedNodes = this.nodes.filter((node) => {
+        return node.type == "closing";
+      });
+    }
+    return this._closedNodes;
   }
 
   get openedNodes(){
-    return this.nodes.filter(node => !this.closedNodes.includes(node)).filter(node => !this.frontierNodes.includes(node));
+    if(!this._openedNodes){
+      this._openedNodes = this.nodes.filter(node => !this.closedNodes.includes(node)).filter(node => !this.frontierNodes.includes(node));
+    }
+    return this._openedNodes;
   }
 
   get frontierNodes(){
-    if(this.isFrontier){
-      let cIndex = this.nodes.indexOf(this.currentNode);
-      return this.nodes.slice(cIndex+1);
+    if(!this._frontierNodes){
+      if(this.isFrontier){
+        let cIndex = this.nodes.indexOf(this.currentNode);
+        this._frontierNodes = this.nodes.slice(cIndex+1);
+      }
+      this._frontierNodes = [];
     }
-    return [];
+    return this._frontierNodes;
   }
 
   get isFrontier(){
@@ -43,9 +55,20 @@ class Step {
   }
 
   get currentNode() {
-    return this.nodes.slice().reverse().find((node) => {
-      return node.type == "expanding";
-    });
+    if(!this._currentNode){
+      this._currentNode = this.nodes.slice().reverse().find((node) => {
+        return node.type == "expanding";
+      });
+    }
+    return this._currentNode;
+  }
+
+  get isSource() {
+    return this.type=="source";
+  }
+
+  get isDestination() {
+    return this.type=="destination";
   }
 
   get isFirstStep(){
@@ -53,34 +76,46 @@ class Step {
   }
 
   get previousStep(){
-    if(!this.isFirstStep){
-      return Store.data.Step[this._id-1];
+    if(!this._previousStep){
+      if(!this.isFirstStep){
+        this._previousStep = Store.data.Step[this._id-1];
+      }
+      this._previousStep = null;
     }
-    return null;
+    return this._previousStep;
+  }
+
+  get changeColor(){
+    return this.isFrontier && !this.isSource && !this.isDestination;
   }
 
   get htmlStr() {
-    let tmp = document.createElement("div");
-    let svg = document.createElementNS(config.xmlns, "svg");
-    let tracer = Store.find("Tracer");
-    svg.setAttributeNS(null, "width", config.nodeSize*tracer.maxX);
-    svg.setAttributeNS(null, "height", config.nodeSize*tracer.maxY);
-    this.nodes.forEach((node) => {
-      svg.appendChild(node.domElement);
-    })
-    tmp.append(svg);
-    let domString = tmp.innerHTML;
-    return domString;
+    if(!this._htmlStr){
+      let tmp = document.createElement("div");
+      let svg = document.createElementNS(config.xmlns, "svg");
+      let tracer = Store.find("Tracer");
+      svg.setAttributeNS(null, "width", config.nodeSize*tracer.maxX);
+      svg.setAttributeNS(null, "height", config.nodeSize*tracer.maxY);
+      this.nodes.forEach((node) => {
+        svg.appendChild(node.domElement);
+      })
+      tmp.append(svg);
+      this._htmlStr = tmp.innerHTML;
+    }
+    return this._htmlStr;
   }
 
   get text() {
-    let node = this.node;
-    if(this.type == "source" || this.type == "destination"){
-      return `${this.type.toUpperCase()} Node(id: ${node.id}, x: ${node.x}, y: ${node.y}`;
+    if(!this._text){
+      let node = this.node;
+      if(this.type == "source" || this.type == "destination"){
+        this._text = `${this.type.toUpperCase()} Node(id: ${node.id}, x: ${node.x}, y: ${node.y}`;
+      }
+      else{
+        this._text = `${this.type.toUpperCase()} Node(id: ${node.id}, x: ${node.x}, y: ${node.y}, f: ${node.f}, g: ${node.g}, pId: ${node.pId})`;
+      }
     }
-    else{
-      return `${this.type.toUpperCase()} Node(id: ${node.id}, x: ${node.x}, y: ${node.y}, f: ${node.f}, g: ${node.g}, pId: ${node.pId})`;
-    }
+    return this._text;
   }
 
 }

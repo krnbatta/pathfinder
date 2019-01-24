@@ -1,12 +1,63 @@
 import config from '../../../config';
-import drawLine from '../../../utils/webgl/draw-line';
+import drawLine from '../../../utils/draw-line';
+import nodeFactory from '../../../utils/node-factory';
+import insertNode from '../../../utils/insert-node';
 
+//history
+//clear the canvas
+//trace all the nodes till now
+//create the frontier nodes as per the array of frontier nodes.
+
+let addFrontierNode = (controller, node) => {
+  let id = controller.currentId;
+  let attrs = node.attrs;
+  attrs['fillStyle'] = config.nodeAttrs['frontier'].fillColor;
+  let rectangle = nodeFactory(attrs, node.values);
+  insertNode(controller, rectangle);
+  controller.frontierRects.push(rectangle);
+  controller.frontierHistory[id] = controller.frontierRects;
+}
+
+let clearFrontierNodes = (controller) => {
+  let id = controller.currentId;
+  controller.frontierRects.forEach((rect) => {
+    controller.stage.removeChild(rect);
+  });
+  controller.frontierRects = [];
+  controller.frontierHistory[id] = [];
+}
+
+//put rectangles that are extra - this includes. removing the frontier nodes as well - only when closing
+//when generating/updating - first opened node and then frontier node
+let updateHistory = (controller, rectangle) => {
+  let id = controller.currentId;
+  controller.history[id] = rectangle;
+}
+
+let updateLine = (controller, node) => {
+  let id = controller.currentId;
+  controller.stage.removeChild(controller.lines[id-1]);
+  controller.lines[id] = drawLine(node, controller.stage);
+}
+
+let updateId = (controller) => {
+  let id = controller.currentId;
+  controller.currentId = id+1;
+}
+
+//source, destination, expanding, frontier, opened, closed
+//source and destination remain untouched
+//expanding is current - its color is coming directly.
+//frontier - all generating/updating nodes that come between 2 expanding
+//opened - all the nodes that are not closed or expanded
+//closed - the one that is closed
+
+//source, destination, expanding, closed, opened are mentioned. Only frontier is tricky
 let runnerFactory = function(steps) {
     let self = this;
     let startTime = new Date();
     let runner = (() => {
         let id = self.currentId;
-        let rectangles = [];
         if (id > self.totalSteps) {
             let endTime = new Date();
             alert(endTime - startTime);
@@ -14,51 +65,20 @@ let runnerFactory = function(steps) {
         }
         let step = steps[id];
         let node = step.node;
-        let attrs = node.domElement;
-        let fillStyle = attrs.fillStyle;
-        if (step.type == 'source') {
-            self.source = node;
-        }
-        if (step.type == 'destination') {
-            self.destination = node;
-        }
-        if (step.type == 'generating' || step.type == 'updating') {
-            if (!(self.source && node.id == self.source.id) && !(self.destination && node.id == self.destination.id)) {
-                self.frontierNodes.push(node);
-                fillStyle = config.nodeAttrs.frontier.fillColor;
-            }
-        }
-        if (self.source && node.id == self.source.id) {
-            fillStyle = config.nodeAttrs.source.fillColor;
-        }
-        if (self.destination && node.id == self.destination.id) {
-            fillStyle = config.nodeAttrs.destination.fillColor;
+        let rectangle = node.domElement;
+        insertNode(controller, rectangle);
+        if (step.changeColor) {
+          addFrontierNode(self, node);
         }
         if (step.type == 'closing') {
-            self.frontierNodes.forEach((fNode) => {
-                let fAttrs = fNode.domElement;
-                let rectangle = new PIXI.Graphics();
-                rectangle.lineStyle(1, fAttrs.strokeStyle);
-                rectangle.beginFill(fAttrs.fillStyle);
-                rectangle.drawRect(fAttrs.x, fAttrs.y, fAttrs.width, fAttrs.height);
-                rectangle.endFill();
-                rectangles.push(rectangle);
-            });
-            self.frontierNodes = [];
+          clearFrontierNodes(self);
         }
-        let rectangle = new PIXI.Graphics();
-        rectangle.lineStyle(1, attrs.strokeStyle);
-        rectangle.beginFill(fillStyle);
-        rectangle.drawRect(attrs.x, attrs.y, attrs.width, attrs.height);
-        rectangle.endFill();
-        rectangles.push(rectangle);
-        rectangles.forEach((rectangle) => {
-          self.stage.addChild(rectangle);
-        });
-        self.history[id] = rectangles;
-        self.stage.removeChild(self.lines[id-1]);
-        self.lines[id] = drawLine(node, self.stage);
-        self.currentId = id+1;
+        //update history
+        updateHistory(self, rectangle);
+        //update line
+        updateLine(self, node);
+        //update id
+        updateId(self);
     });
     return runner;
 }

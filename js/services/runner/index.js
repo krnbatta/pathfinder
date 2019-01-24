@@ -9,9 +9,9 @@ export default function(steps){
       return svgRunner.bind(this, steps);
       break;
     case "canvas":
-    //   return canvasRunner.bind(this, steps);
-    //   break;
-    // case "webgl":
+      return canvasRunner.bind(this, steps);
+      break;
+    case "webgl":
       return webglRunner.bind(this, steps);
       break;
   }

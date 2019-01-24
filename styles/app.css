@@ -28,7 +28,47 @@
   height: 100%;
 }
 #events-list{
-  max-width: 400px;
+  max-width: 300px;
   max-height: 400px;
   overflow: auto;
+}
+
+
+/* Float Box css */
+#node-details{
+  list-style:none;
+  margin:0px;
+  margin-top:4px;
+  padding-left:10px;
+  padding-right:10px;
+  padding-bottom:3px;
+  font-size:17px;
+  color: #333333;
+
+}
+#node-details > hr { width: 85%;
+  background-color:#E4E4E4;
+  border-color:#E4E4E4;
+  color:#E4E4E4;
+}
+#context-menu{
+  display:none;
+  position:fixed;
+  border:1px solid #B2B2B2;
+  width:150px;
+  background:#F9F9F9;
+  box-shadow: 3px 3px 2px #E9E9E9;
+  border-radius:4px;
+}
+
+#node-details > li{
+  padding: 3px;
+  padding-left:10px;
+}
+
+
+#node-details :hover{
+  color: white;
+  background:#284570;
+  border-radius:2px;
 }

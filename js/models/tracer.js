@@ -46,7 +46,14 @@ class Tracer {
           if(event.y > this.maxY){
             this.maxY = event.y;
           }
-          Store.createRecord('Step', event);
+          let step = Store.createRecord('Step', event);
+          step.tracer = this;
+          if(event.type=="source"){
+            this.source = step;
+          }
+          if(event.type=="destination"){
+            this.destination = step;
+          }
         });
         return Store.data.Step;
       });

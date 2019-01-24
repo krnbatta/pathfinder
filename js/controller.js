@@ -2,10 +2,11 @@ import StateMachine from "javascript-state-machine";
 import Components from './components';
 import EventsListComponent from './components/events-list/component';
 import PlaybackService from './services/playback';
+import FloatboxService from './services/floatbox';
 import Store from './services/Store';
 import config from './config';
 import $ from 'jquery';
-import drawLine from './utils/webgl/draw-line';
+import drawLine from './utils/draw-line';
 import getRunnerFactory from './services/runner';
 
 let Controller = new StateMachine({
@@ -21,7 +22,8 @@ let Controller = new StateMachine({
       }
     ],
     data: {
-      frontierNodes: [],
+      frontierHistory: [],
+      frontierRects: [],
       line: null,
       runner: null,
       currentId: 1,
@@ -47,19 +49,22 @@ let Controller = new StateMachine({
           that.setupRenderer();
           that.runner = runnerFactory();
           PlaybackService.init();
+          FloatboxService.init();
         });
       },
       setupRenderer() {
-        this.app = new PIXI.Application({
-            width: this.tracer.maxX * config.nodeSize,
-            height: this.tracer.maxY * config.nodeSize,
-            view: document.getElementById("tracer-canvas"),
-            transparent: true
-        });
-        this.renderer = this.app.renderer;
-        this.stage = this.app.stage;
-        this.totalSteps = Object.keys(this.steps).length;
-        this.renderer.render(this.stage);
+        if(config.renderType=='webgl'){
+          this.app = new PIXI.Application({
+              width: this.tracer.maxX * config.nodeSize,
+              height: this.tracer.maxY * config.nodeSize,
+              view: document.getElementById("tracer-canvas"),
+              transparent: true
+          });
+          this.renderer = this.app.renderer;
+          this.stage = this.app.stage;
+          this.totalSteps = Object.keys(this.steps).length;
+          this.renderer.render(this.stage);
+        }
       },
       loop() {
         let self = this;
@@ -72,6 +77,9 @@ let Controller = new StateMachine({
         })();
       },
       stepForward() {
+        if(this.currentId >= this.totalSteps && PlaybackService.state != 'paused'){
+          PlaybackService.pause();
+        }
         let currentStep = this.steps[this.currentId];
         this.runner();
         EventsListComponent.addEvent(currentStep);
@@ -86,10 +94,19 @@ let Controller = new StateMachine({
           return;
         }
         this.currentId -= 1;
-        let rectangles = this.history.pop();
-        rectangles.forEach((rectange) => {
-          this.stage.removeChild(rectange);
-        });
+        let rectangle = this.history.pop();
+        this.stage.removeChild(rectangle);
+        let frontiers = this.frontierHistory.pop();
+        let prevFrontiers = this.frontierHistory[this.currentId-1];
+        if(frontiers.length){
+          let difference = frontiers.filter(x => !prevFrontiers.includes(x));
+          this.stage.removeChild(difference);
+        }
+        else if(prevFrontiers.length){
+          prevFrontiers.forEach((rect) => {
+            this.stage.addChild(rect);
+          });
+        }
         let line = this.lines.pop();
         this.stage.removeChild(line);
         this.stage.addChild(this.lines[this.lines.length-1]);
@@ -97,4 +114,5 @@ let Controller = new StateMachine({
       }
     }
 });
+window.controller = Controller;
 export default Controller;

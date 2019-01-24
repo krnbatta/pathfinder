@@ -21,6 +21,7 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
         let mapFile = e.target.files[0];
         this.map = new Map(mapFile);
         this.drawMap();
+        $("#load-map").hide();
       });
     },
     drawMap() {

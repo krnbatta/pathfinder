@@ -1,5 +1,5 @@
 const config = {
-  renderType: 'canvas',
+  renderType: 'webgl',
   xmlns: "http://www.w3.org/2000/svg",
   operationsPerSecond: 300,
   lineColor: 0xFFFFFF,
