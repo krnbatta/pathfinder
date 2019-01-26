@@ -34,7 +34,12 @@ class StoreSingleton {
         return record;
     }
     find(modelName){
-      return this.data[modelName][0];
+      try{
+        return this.data[modelName][0];
+      }
+      catch(e){
+        return null;
+      }
     }
 }
 let Store = new StoreSingleton();

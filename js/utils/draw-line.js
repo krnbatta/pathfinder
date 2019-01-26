@@ -1,4 +1,4 @@
-import config from '../../../config';
+import config from '../config';
 
 export default function(node, stage){
   let line = new PIXI.Graphics();

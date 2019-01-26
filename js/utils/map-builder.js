@@ -1,4 +1,4 @@
-import config from '../../../config'
+import config from '../config'
 
 let rects = [];
 let width = null;
@@ -25,9 +25,9 @@ let createRowTask = (rowId) => {
       let x = colId * config.nodeSize;
       let y = rowId * config.nodeSize;
       let stringIndex = rowId * width + colId;
-      let fillColor = 'white';
+      let fillColor = config.pathColor;
       if (mapStr[stringIndex]=='@'){
-        fillColor='grey';
+        fillColor=config.wallColor;
       }
       let attrs = {
         x: x,
@@ -35,7 +35,7 @@ let createRowTask = (rowId) => {
         width: config.nodeSize,
         height: config.nodeSize,
         fillStyle: fillColor,
-        strokeStyle: 'black',
+        strokeStyle: config.borderColor,
       };
       rects[rowId].push(attrs);
     }

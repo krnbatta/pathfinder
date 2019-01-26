@@ -32,15 +32,13 @@ let FloatboxService = new StateMachine({
         this.bindHide();
       },
       onHide(){
-        //hide from tab
         $("#context-menu").hide();
       },
-      onShow(transition, event, values){
+      onShow(transition, event, values, position){
         this.values = values;
         $("#context-menu").html(this.htmlStr());
-        //show it on tab
-        // $("#context-menu").css("left",event.pageX);
-        // $("#context-menu").css("top",event.pageY);
+        $("#context-menu").css("left",position.x);
+        $("#context-menu").css("top",position.y);
         $("#context-menu").show();
       },
       bindHide() {
@@ -50,11 +48,11 @@ let FloatboxService = new StateMachine({
           }
         });
       },
-      showMenu(event, values) {
+      showMenu(event, values, position) {
         if(this.state!="hidden"){
           this.hide();
         }
-        this.show(event, values);
+        this.show(event, values, position);
       },
       htmlStr() {
         return `

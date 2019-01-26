@@ -29,8 +29,8 @@ class Node {
       width: config.nodeSize,
       height: config.nodeSize,
       fillStyle: nodeAttrs.fillColor,
-      strokeStyle: 'black',
-      strokeWidth: 0.1
+      strokeStyle: config.borderColor,
+      strokeWidth: config.borderWidth
     }
   }
 
@@ -85,6 +85,10 @@ class Node {
       g: this.g,
       h: this.h
     }
+  }
+
+  get h() {
+    return this.f + this.g;
   }
 
 }

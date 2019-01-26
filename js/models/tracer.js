@@ -1,8 +1,8 @@
 import Store from '../services/Store';
 import config from '../config';
-import svgTracerParser from '../utils/tracer-parser';
-import canvasTracerParser from '../utils/tracer-parser';
+import tracerParser from '../utils/tracer-parser';
 import $ from 'jquery';
+import environment from '../environment';
 
 class Tracer {
   constructor(debugFile) {
@@ -19,12 +19,7 @@ class Tracer {
       let that = this;
       this._debugJson = new Promise((resolve, reject) => {
         try{
-          if(config.renderType=='svg'){
-            svgTracerParser(that.debugFile, resolve);
-          }
-          else{
-            canvasTracerParser(that.debugFile, resolve);
-          }
+          tracerParser(that.debugFile, resolve);
         }
         catch(e){
           reject(e);
@@ -68,10 +63,32 @@ class Tracer {
   }
 
   get canvas(){
-    let canvas = document.getElementById('tracer-canvas');
-    canvas.height = this.maxY*config.nodeSize;
-    canvas.width = this.maxX*config.nodeSize;
-    return canvas;
+    if(!this._canvas){
+      let canvas = document.getElementById('tracer-canvas');
+      if(environment.mapUploaded){
+        canvas.height = environment.mapHeight;
+        canvas.width = environment.mapWidth;
+      }
+      else{
+        canvas.height = this.maxY*config.nodeSize;
+        canvas.width = this.maxX*config.nodeSize;
+      }
+      this._canvas = canvas;
+    }
+    return this._canvas;
+  }
+
+  setDimensions(width, height) {
+    this.canvas.width = width;
+    this.canvas.height = height;
+  }
+
+  get width() {
+    return this.maxX * config.nodeSize
+  }
+
+  get height() {
+    return this.maxY * config.nodeSize
   }
 
 }

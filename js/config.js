@@ -1,8 +1,10 @@
 const config = {
-  renderType: 'webgl',
-  xmlns: "http://www.w3.org/2000/svg",
   operationsPerSecond: 300,
   lineColor: 0xFFFFFF,
+  wallColor: 0xD3D3D3,
+  pathColor: 0xFFFFFF,
+  borderColor: 0x000000,
+  borderWidth: 0.1,
   nodeSize: 10,
   nodeAttrs: {
     source: {

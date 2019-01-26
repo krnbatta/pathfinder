@@ -4,9 +4,12 @@ import mapBuilder from '../utils/map-builder';
 
 class Map {
   constructor(mapFile) {
+    this._id = 0;
     this.mapFile = mapFile;
     this._mapData = null;
     this._mapNodes = null;
+    this.width = null;
+    this.height = null;
   }
 
   get mapData(){
@@ -14,7 +17,11 @@ class Map {
       let that = this;
       this._mapData = new Promise((resolve, reject) => {
         try{
-          mapParser(that.mapFile, resolve);
+          mapParser(that.mapFile, (data) => {
+            that.width = data.width * config.nodeSize;
+            that.height = data.height * config.nodeSize;
+            resolve(data);
+          });
         }
         catch(e){
           reject(e);

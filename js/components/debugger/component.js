@@ -22,7 +22,8 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
         Store.createRecord('Tracer', debugFile);
         this.tracer = Store.find('Tracer');
         Controller.start();
-        $("#load-algo").hide();
+        $("#map-component").hide();
+        $("#debug-component").hide();
       });
     }
   }

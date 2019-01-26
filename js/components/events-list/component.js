@@ -5,13 +5,17 @@ import $ from 'jquery';
 import BaseComponent from '../base-component';
 import PlaybackService from '../../services/playback';
 
+import Controller from '../../controller';
+
+import TabletComponent from '../tablet/component';
+
 let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
   data: {
     events: []
   },
   methods: {
     onBeforeInit() {
-      $("#pathfinder").append("<div id='events-list-component'></div>");
+      TabletComponent.display("<div id='events-list-component'></div>");
     },
     onLeaveNone() {
       $("#events-list-component").html(template);
@@ -37,7 +41,11 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     },
     addEvent(event) {
       this.events.push(event);
-      $("#events").append(`<li class="event">${event.text}</li>`)
+      let li = $.parseHTML(`<li class="event">${event.text}</li>`)[0];
+      $(li).on("click", (e) => {
+        Controller.retraceHistory(event._id);
+      });
+      $("#events").append(li);
       window.requestAnimationFrame(() => {
         $("#events-list")[0].scrollTop = $("#events-list")[0].scrollHeight;
       });
@@ -46,6 +54,12 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
       this.events.pop();
       $('#events .event:last-child').remove();
       $("#events-list")[0].scrollTop = $("#events")[0].offsetHeight;
+    },
+    clearEvents(id){
+      let pruneLength = this.events.length - id;
+      let pruneEvents = $('#events .event').slice(-pruneLength);
+      pruneEvents.remove();
+      this.events.length = id;
     }
   }
 }));

@@ -89,30 +89,14 @@ class Step {
     return this.isFrontier && !this.isSource && !this.isDestination;
   }
 
-  get htmlStr() {
-    if(!this._htmlStr){
-      let tmp = document.createElement("div");
-      let svg = document.createElementNS(config.xmlns, "svg");
-      let tracer = Store.find("Tracer");
-      svg.setAttributeNS(null, "width", config.nodeSize*tracer.maxX);
-      svg.setAttributeNS(null, "height", config.nodeSize*tracer.maxY);
-      this.nodes.forEach((node) => {
-        svg.appendChild(node.domElement);
-      })
-      tmp.append(svg);
-      this._htmlStr = tmp.innerHTML;
-    }
-    return this._htmlStr;
-  }
-
   get text() {
     if(!this._text){
       let node = this.node;
       if(this.type == "source" || this.type == "destination"){
-        this._text = `${this.type.toUpperCase()} Node(id: ${node.id}, x: ${node.x}, y: ${node.y}`;
+        this._text = `${this.type.toUpperCase()} Node(id: ${node.id}, x: ${node.x}, y: ${node.y})`;
       }
       else{
-        this._text = `${this.type.toUpperCase()} Node(id: ${node.id}, x: ${node.x}, y: ${node.y}, f: ${node.f}, g: ${node.g}, pId: ${node.pId})`;
+        this._text = `${this.type.toUpperCase()} Node(id: ${node.id}, x: ${node.x}, y: ${node.y}, f: ${node.f}, g: ${node.g}, h: ${node.h}, pId: ${node.pId})`;
       }
     }
     return this._text;
