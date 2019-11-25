@@ -13,12 +13,12 @@ export default function(attrs, values){
     rectangle.buttonMode=true;
     rectangle.on("mouseover", (e) => {
       rectangle.tint=attrs.fillStyle;
-      let tilePosition = Controller.renderer.plugins.interaction.mouse.global;
-      let canvasPosition = Controller.canvasPosition;
-      let scroll = document.getElementById("pathfinder").scrollTop;
+      // let tilePosition = Controller.renderer.plugins.interaction.mouse.global;
+      // let canvasPosition = Controller.canvasPosition;
+      // let scroll = document.getElementById("pathfinder").scrollTop;
       let position  = {
-        x: tilePosition.x + canvasPosition.left,
-        y: tilePosition.y + canvasPosition.top - scroll
+        x: Controller.x,//tilePosition.x + canvasPosition.left,
+        y: Controller.y//tilePosition.y + canvasPosition.top - scroll
       }
       FloatboxService.execute(e, values, position);
     });

@@ -4,16 +4,61 @@ import tracerParser from '../utils/tracer-parser';
 import $ from 'jquery';
 import environment from '../environment';
 
+/** Class representing a tracer of the algorithm */
 class Tracer {
+  /**
+  * Create a tracer for the search algorithm
+  * @param {object} debugFile - Algorithm Debug file uploaded by the user
+  */
   constructor(debugFile) {
+    /**
+    * _id is unique id of the grid that is set to 0.
+    * @type  {number}
+    * @private
+    */
     this._id = 0;
+
+    /**
+    * debugFile is file of the algorithm that is set from the param.
+    * @type  {object}
+    * @public
+    */
     this.debugFile = debugFile;
+
+    /**
+    * _debugJson is cache and promise object that resolves to data contained in debug file which is in json format.
+    * @type {object}
+    * @private
+    */
     this._debugJson = null;
+
+    /**
+    * _steps is cache and promise object of array of Step object of the algorithm
+    * @type {Promise}
+    * @private
+    */
     this._steps = null;
+
+    /**
+    * maxX is maximum value of x explored by the algorithm. Default value is step to -1.
+    * @type {number}
+    * @public
+    */
     this.maxX = -1;
+
+    /**
+    * maxY is maximum value of y explored by the algorithm. Default value is step to -1.
+    * @type {number}
+    * @public
+    */
     this.maxY = -1;
   }
 
+  /**
+  * debugJson returns _debugJson if it is resolved. Else, sets it.
+  * @type {object}
+  * @public
+  */
   get debugJson(){
     if(!this._debugJson){
       let that = this;
@@ -29,7 +74,11 @@ class Tracer {
     return this._debugJson;
   }
 
-  //create step
+  /**
+  * steps returns _steps if it is resolved. Else, sets it. This also sets maxX, maxY, source and destination of the tracer.
+  * @type {object}
+  * @public
+  */
   get steps() {
     if(!this._steps){
       this._steps = this.debugJson.then((json) => {
@@ -52,41 +101,24 @@ class Tracer {
         });
         return Store.data.Step;
       });
-      return this._steps;
     }
-  }
-  get svgNode() {
-    let svg = document.createElementNS(config.xmlns, "svg");
-    svg.setAttributeNS(null, "width", config.nodeSize*this.maxX);
-    svg.setAttributeNS(null, "height", config.nodeSize*this.maxY);
-    return svg;
+    return this._steps;
   }
 
-  get canvas(){
-    if(!this._canvas){
-      let canvas = document.getElementById('tracer-canvas');
-      if(environment.mapUploaded){
-        canvas.height = environment.mapHeight;
-        canvas.width = environment.mapWidth;
-      }
-      else{
-        canvas.height = this.maxY*config.nodeSize;
-        canvas.width = this.maxX*config.nodeSize;
-      }
-      this._canvas = canvas;
-    }
-    return this._canvas;
-  }
-
-  setDimensions(width, height) {
-    this.canvas.width = width;
-    this.canvas.height = height;
-  }
-
+  /**
+  * width returns width required for visualising the tracer.
+  * @type {number}
+  * @public
+  */
   get width() {
     return this.maxX * config.nodeSize
   }
 
+  /**
+  * height returns height required for visualising the tracer.
+  * @type {number}
+  * @public
+  */
   get height() {
     return this.maxY * config.nodeSize
   }

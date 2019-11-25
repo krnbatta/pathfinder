@@ -1,5 +1,3 @@
-//this is data store implementation. Store is a singleton class
-//the values are stored in data. and it has common functions like createRecord, findAll, findBy, find, getRecord, relationships(hasMany, belongsTo)
 import models from '../models';
 
 let getModel = function(modelName) {
@@ -18,6 +16,10 @@ let getModel = function(modelName) {
 }
 
 let instance = null;
+
+/** @module services/mouse-tracker
+* this is data store implementation. Store is a singleton class. the values are stored in data. and it has common functions like createRecord, findAll, findBy, find, getRecord, relationships(hasMany, belongsTo)
+*/
 class StoreSingleton {
     constructor() {
         if (!instance) {

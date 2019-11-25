@@ -1079,13 +1079,13 @@ function () {
 
     this._gridData = null;
     /**
-    * _cells is cache and promise object that resolves to array of rows which array of cells in
+    * _gridNodes is cache and promise object that resolves to array of rows which array of cells in
     * each column that has information of position, width, height, color, border.
     * @type {Promise}
     * @private
     */
 
-    this._cells = null;
+    this._gridNodes = null;
     /**
     * width is width of the grid
     * @type {number}
@@ -1129,23 +1129,23 @@ function () {
       return this._gridData;
     }
     /**
-    * cells returns _cells if it is resolved. Else, sets it.
+    * gridNodes returns _gridNodes if it is resolved. Else, sets it.
     * @type {object}
     * @public
     */
 
   }, {
-    key: "cells",
+    key: "gridNodes",
     get: function get() {
-      if (!this._cells) {
-        this._cells = this.gridData.then(function (gridData) {
+      if (!this._gridNodes) {
+        this._gridNodes = this.gridData.then(function (gridData) {
           return new Promise(function (resolve, reject) {
             _services_grid__WEBPACK_IMPORTED_MODULE_1__["default"].builder.build(gridData, resolve);
           });
         });
       }
 
-      return this._cells;
+      return this._gridNodes;
     }
   }]);
 
@@ -1922,6 +1922,8 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+//this is data store implementation. Store is a singleton class
+//the values are stored in data. and it has common functions like createRecord, findAll, findBy, find, getRecord, relationships(hasMany, belongsTo)
 
 
 var getModel = function getModel(modelName) {
@@ -1940,9 +1942,6 @@ var getModel = function getModel(modelName) {
 };
 
 var instance = null;
-/** @module services/mouse-tracker
-* this is data store implementation. Store is a singleton class. the values are stored in data. and it has common functions like createRecord, findAll, findBy, find, getRecord, relationships(hasMany, belongsTo)
-*/
 
 var StoreSingleton =
 /*#__PURE__*/
@@ -2130,7 +2129,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _error_notifier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./error-notifier */ "./js/services/error-notifier.js");
 /* harmony import */ var _utils_node_factory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/node-factory */ "./js/utils/node-factory.js");
 /* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
-/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
+/* harmony import */ var _utils_insert_edges__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/insert-edges */ "./js/utils/insert-edges.js");
+/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
+
 
 
 
@@ -2143,10 +2144,6 @@ __webpack_require__.r(__webpack_exports__);
 */
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  /**
-  * Parser parses the grid map file by extracting height, width and structure of map and passing this into callback.
-  * @public
-  */
   parser: {
     parse: function parse(file, callback) {
       var gridReader = new FileReader();
@@ -2172,11 +2169,6 @@ __webpack_require__.r(__webpack_exports__);
       gridReader.readAsText(file);
     }
   },
-
-  /**
-  * Builder takes the gridData and builds all the cells of the grid map. Each cell has property of coordinates, dimensions, color, border.
-  * @public
-  */
   builder: {
     cells: [],
     width: null,
@@ -2190,7 +2182,7 @@ __webpack_require__.r(__webpack_exports__);
       this.height = gridData.height;
       var tasks = [];
 
-      for (var i = 0; i < this.width; ++i) {
+      for (var i = 0; i < this.height; ++i) {
         tasks.push(this.createRowTask(i));
       }
 
@@ -2230,21 +2222,16 @@ __webpack_require__.r(__webpack_exports__);
       });
     }
   },
-
-  /**
-  * Drawer draws the map on the canvas. It takes the cells from the Grid Model created by the builder and constructs PIXI.Graphics object and finally renders on the canvas.
-  * @public
-  */
   drawer: {
     draw: function draw() {
       var grid = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Grid');
-      grid.cells.then(function (cells) {
-        _controller__WEBPACK_IMPORTED_MODULE_6__["default"].setupRenderer();
+      grid.gridNodes.then(function (gridNodes) {
+        _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
         grid.gridData.then(function (gridData) {
-          cells.forEach(function (cell) {
-            cell.isMap = true;
-            var cellElement = Object(_utils_node_factory__WEBPACK_IMPORTED_MODULE_4__["default"])(node);
-            Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], cellElement);
+          gridNodes.forEach(function (node) {
+            node.isMap = true;
+            var cell = Object(_utils_node_factory__WEBPACK_IMPORTED_MODULE_4__["default"])(node, {});
+            Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], cell);
           });
         });
       }, function (err) {
@@ -2309,9 +2296,6 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/** @module services/mouse-tracker
-* This service is responsible for setting up latest x and y position of mouse on the context.
-*/
 /* harmony default export */ __webpack_exports__["default"] = (function (context) {
   document.addEventListener('mousemove', onMouseUpdate, false);
   document.addEventListener('mouseenter', onMouseUpdate, false);
@@ -2336,10 +2320,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var javascript_state_machine__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! javascript-state-machine */ "./node_modules/javascript-state-machine/lib/state-machine.js");
 /* harmony import */ var javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(javascript_state_machine__WEBPACK_IMPORTED_MODULE_0__);
 
-/** @module services/playback
-* This service is responsible for giving playback controls to the app. It is a StateMachine with 4 states: none, ready, paused and running. Init transition changes state from none to ready. Play transition changes state from ready/paused to running. Pause transition changes state from running to paused. Reset transition changes state to ready.
-*/
-
 var PlaybackService = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a({
   transitions: [{
     name: 'init',
@@ -2358,54 +2338,26 @@ var PlaybackService = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___
     from: '*',
     to: 'ready'
   }],
-
-  /**
-  * Data of this state machine has callbacks corresponding to each transition
-  */
   data: {
     initCallbacks: [],
+    readyCallbacks: [],
     playCallbacks: [],
     pauseCallbacks: [],
     resetCallbacks: []
   },
   methods: {
-    /**
-    * @function onInit
-    * This lifecycle function is called when this service is initiated. It calls and the callbacks function corresponding to this transition
-    */
     onInit: function onInit() {
       this.runCallbacks('init');
     },
-
-    /**
-    * @function onPlay
-    * This lifecycle function is called when this service is played. It calls and the callbacks function corresponding to this transition
-    */
     onPlay: function onPlay() {
       this.runCallbacks('play');
     },
-
-    /**
-    * @function onPause
-    * This lifecycle function is called when this service is paused. It calls and the callbacks function corresponding to this transition
-    */
     onPause: function onPause() {
       this.runCallbacks('pause');
     },
-
-    /**
-    * @function onReset
-    * This lifecycle function is called when this service is reset. It calls and the callbacks function corresponding to this transition
-    */
     onReset: function onReset() {
       this.runCallbacks('reset');
     },
-
-    /**
-    * @function runCallbacks
-    * This funciton runs all the callbacks corresponding to the transition type passed to it.
-    * @param {string} type - type of transition
-    */
     runCallbacks: function runCallbacks(type) {
       var callbacks;
 
@@ -2431,13 +2383,6 @@ var PlaybackService = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___
         callback();
       });
     },
-
-    /**
-    * @function addCallback
-    * This function adds callback function to the callbacks array of corresponding transition type
-    * @param {string} type - type of transition
-    * @param {function} callback - callback funciton
-    */
     addCallback: function addCallback(type, callback) {
       switch (type) {
         case "init":
@@ -2475,15 +2420,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 
-/** @module services/renderer
-* This service is responsible for rendering the canvas onto the DOM.
-*/
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-  /**
-  * @function render
-  * This function creates a canvas element of height and width specified and appends it to div with class screen. Additionally, it also sets PIXI.Application as app on the context object, renderer and stage as well. It then sets rendered flag as true on the context object.
-  */
   render: function render(context, width, height) {
     context.canvas = document.createElement("canvas");
     context.canvas.id = "canvas";
@@ -2524,13 +2461,6 @@ __webpack_require__.r(__webpack_exports__);
 //trace all the nodes till now
 //create the frontier nodes as per the array of frontier nodes.
 
-/**
-* @function addFrontierNode
-* This function checks if the node can be frontier. If so, it adds it changes it creates a new node with frontier color and node attributes and renders it on the screen. Additionally, it adds it to the frontierRects and frontierHistory as well.
-* @param {Controller} controller
-* @param {Node} node
-*/
-
 var addFrontierNode = function addFrontierNode(controller, node) {
   var id = controller.currentId;
 
@@ -2544,12 +2474,6 @@ var addFrontierNode = function addFrontierNode(controller, node) {
 
   controller.frontierHistory[id] = controller.frontierRects.slice();
 };
-/**
-* @function clearFrontierNodes
-* This function remove all the frontierNodes from the screen, frontierRects and frontierHistory.
-* @param {Controller} controller
-*/
-
 
 var clearFrontierNodes = function clearFrontierNodes(controller) {
   var id = controller.currentId;
@@ -2558,26 +2482,14 @@ var clearFrontierNodes = function clearFrontierNodes(controller) {
   });
   controller.frontierRects = [];
   controller.frontierHistory[id] = [];
-};
-/**
-* @function updateHistory
-* This function adds the node domElement as the current history node identified by the current id.
-* @param {Controller} controller
-* @param {PIXI.Graphics} rectangle
-*/
+}; //put rectangles that are extra - this includes. removing the frontier nodes as well - only when closing
+//when generating/updating - first opened node and then frontier node
 
 
 var updateHistory = function updateHistory(controller, rectangle) {
   var id = controller.currentId;
   controller.history[id] = rectangle;
 };
-/**
-* @function updateLine
-* This function removes the previous line drawn and adds the current line on the screen. Line is from source to the current node.
-* @param {Controller} controller
-* @param {Node} node
-*/
-
 
 var updateLine = function updateLine(controller, node) {
   var id = controller.currentId;
@@ -2585,32 +2497,17 @@ var updateLine = function updateLine(controller, node) {
   controller.line = Object(_utils_draw_line__WEBPACK_IMPORTED_MODULE_1__["default"])(controller, node);
   controller.lines[id] = controller.line;
 };
-/**
-* @function updateId
-* This function increments the running currentId
-* @param {Controller} controller
-*/
-
 
 var updateId = function updateId(controller) {
   var id = controller.currentId;
   controller.currentId = id + 1;
-}; //put rectangles that are extra - this includes. removing the frontier nodes as well - only when closing
-//when generating/updating - first opened node and then frontier node
-//source, destination, expanding, frontier, opened, closed
+}; //source, destination, expanding, frontier, opened, closed
 //source and destination remain untouched
 //expanding is current - its color is coming directly.
 //frontier - all generating/updating nodes that come between 2 expanding
 //opened - all the nodes that are not closed or expanded
 //closed - the one that is closed
 //source, destination, expanding, closed, opened are mentioned. Only frontier is tricky
-
-/**
-* @function runnerFactory
-* This function return the runner function that visualises the current step of the algorithm. It inserts the current node, add or clear frontier nodes if applicable, update the history, update the line and update the id.
-* @param {Array} steps - array of steps of the algorithm
-* @returns {function} runner - returns the runner function
-*/
 
 
 var runnerFactory = function runnerFactory(steps) {
@@ -2728,7 +2625,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = (function (context, node) {
   [node.up, node.down, node.left, node.right].forEach(function (neighbour) {
     if (neighbour) {
-      context.graph.addLink(node.id, neighbour); // let linkId = node.id + '👉 ' + neighbour;
+      context.graph.addLink(node.id, neighbour); // let linkId = node.id + 'ðŸ‘‰ ' + neighbour;
       // let line = Controller.graphics.getLinkUI(linkId);
       // line.color = 0xFFFFFFff;
     }

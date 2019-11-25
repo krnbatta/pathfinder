@@ -1,6 +1,6 @@
 const config = {
   operationsPerSecond: 300,
-  lineColor: 0xFFFFFF,
+  lineColor: 0x6B3838,
   wallColor: 0xD3D3D3,
   pathColor: 0xFFFFFF,
   borderColor: 0x000000,

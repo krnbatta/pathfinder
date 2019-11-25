@@ -2,6 +2,9 @@ import StateMachine from "javascript-state-machine";
 import $ from "jquery";
 import debounce from "../utils/debounce";
 
+/** @module services/floatbox
+* This service is responsible for showing node information on mouse hover. It is a StateMachine with 3 states: none, hidden and shown. Init transition changes state from none to hidden. Show transition changes state from hidden to shown. Hide transition changes state from shown to hidden.
+*/
 let FloatboxService = new StateMachine({
   transitions: [{
         name: 'init',
@@ -23,6 +26,10 @@ let FloatboxService = new StateMachine({
       values: null
     },
     methods: {
+      /**
+      * @function onInit
+      * This lifecycle function is called when this service is initiated. It creates menu div element and appends it to the body. It also sets show and hide function for the div.
+      */
       onInit(){
         let view = document.createElement('div');
         view.id = 'context-menu';
@@ -31,9 +38,19 @@ let FloatboxService = new StateMachine({
         this.execute = debounce(this.showMenu);
         this.bindHide();
       },
+
+      /**
+      * @function onHide
+      * This lifecycle function hides the context menu
+      */
       onHide(){
         $("#context-menu").hide();
       },
+
+      /**
+      * @function onShow
+      * This lifecycle function shows the context menu
+      */
       onShow(transition, event, values, position){
         this.values = values;
         $("#context-menu").html(this.htmlStr());
@@ -41,6 +58,11 @@ let FloatboxService = new StateMachine({
         $("#context-menu").css("top",position.y);
         $("#context-menu").show();
       },
+
+      /**
+      * @function bindHide
+      * This function hides the menu when the mouse is clicked outside the menu and when the state is hidden.
+      */
       bindHide() {
         $(document).on("click",() => {
           if(this.state!="hidden"){
@@ -48,12 +70,22 @@ let FloatboxService = new StateMachine({
           }
         });
       },
+
+      /**
+      * @function showMenu
+      * This function hides previous menu(if any). Loads the menu witht he new information and shows it.
+      */
       showMenu(event, values, position) {
         if(this.state!="hidden"){
           this.hide();
         }
         this.show(event, values, position);
       },
+
+      /**
+      * @function htmlStr
+      * This function returns ul element with latest values loaded.
+      */
       htmlStr() {
         return `
           <ul id='node-details'>

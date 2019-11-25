@@ -6,13 +6,14 @@ var webpack = require('webpack');
      path: path.resolve(__dirname, 'build'),
      filename: 'app.js'
    },
+   mode: 'development',
    module: {
-     loaders: [
+     rules: [
        {
          test: /\.js$/,
          loader: 'babel-loader',
          query: {
-           presets: ['es2015']
+           presets: ['@babel/preset-env']
          }
        }
      ]

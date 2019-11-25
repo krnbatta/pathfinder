@@ -9,7 +9,10 @@ import $ from 'jquery';
 import drawLine from './utils/draw-line';
 import insertNode from './utils/insert-node';
 import runnerFactory from './services/runner';
+import Renderer from './services/renderer';
+import mouseTracker from './services/mouse-tracker';
 
+//Contrller is in 2 states: none and ready.
 let Controller = new StateMachine({
   transitions: [{
         name: 'init',
@@ -23,30 +26,50 @@ let Controller = new StateMachine({
       }
     ],
     data: {
+      //frontierHistory =>
       frontierHistory: [],
+      //frontierRects =>
       frontierRects: [],
+      //line =>
       line: null,
+      //runner =>
       runner: null,
+      //currentId =>
       currentId: 1,
+      //history =>
       history: [],
+      //lines =>
       lines: [],
+      //rendered =>
       rendered: false,
+      //app =>
       app: null,
+      //renderer =>
       renderer: null,
+      //stage =>
       stage: null,
+      //canvas =>
       canvas: null,
+      //canvasPosition =>
       canvasPosition: {}
     },
     methods: {
+      //called when the Controller is initiated(init transition) i.e. none to ready state
+      //initiates all the components on the page.
       onInit() {
+        mouseTracker(this);
         Components.forEach((component) => {
           component.init();
         });
       },
+      //called when Controller has entered ready state by init transition
+      //setup play and reset callback in playback service with Controller context
       onReady() {
         PlaybackService.addCallback('play', this.loop.bind(this));
         PlaybackService.addCallback('reset', this.reset.bind(this));
       },
+      //called when Controller is started(start transition) i.e. ready to running state
+      //
       onStart() {
         this.tracer = Store.find('Tracer');
         let that = this;
@@ -60,30 +83,22 @@ let Controller = new StateMachine({
         });
       },
       setupRenderer() {
-        let width, height;
-        let map = Store.find('Map');
-        if(map){
-          this.map = map;
-          width = map.width;
-          height = map.height;
+        if(!this.rendered){
+          let width, height;
+          //TODO
+          let map = Store.find('Grid');
+          // let map = Store.find('Mesh');
+          if(map){
+            this.map = map;
+            width = map.width;
+            height = map.height;
+          }
+          else{
+            width = this.tracer.width;
+            height = this.tracer.height;
+          }
+          Renderer.render(this, width, height);
         }
-        else{
-          width = this.tracer.width;
-          height = this.tracer.height;
-        }
-        this.canvas = document.createElement("canvas");
-        this.canvas.id = "canvas";
-        $(".screen").append(this.canvas);
-        this.canvasPosition = this.canvas.getBoundingClientRect();
-        this.app = new PIXI.Application({
-            width: width,
-            height: height,
-            view: this.canvas,
-            transparent: true
-        });
-        this.renderer = this.app.renderer;
-        this.stage = this.app.stage;
-        this.renderer.render(this.stage);
       },
       loop() {
         let self = this;
@@ -141,7 +156,7 @@ let Controller = new StateMachine({
         this.stage.removeChild(this.line);
       },
       reset() {
-        cleanCanvas();
+        this.cleanCanvas();
         this.currentId = 1;
         this.history = [];
         this.frontierRects = [];

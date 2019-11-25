@@ -1,10 +1,11 @@
 import Tracer from './Tracer';
-import Map from './Map';
+import Grid from './Grid';
+import Mesh from './Mesh';
 import Node from './Node';
 import Step from './Step';
 
 let models = function(){
-  return [Tracer, Map, Node, Step];
+  return [Tracer, Grid, Mesh, Node, Step];
 }
 
 export default models;

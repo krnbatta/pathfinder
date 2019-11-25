@@ -19,15 +19,16 @@
   },
   "homepage": "https://github.com/krnbatta/pathfinder#readme",
   "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
     "async": "^2.6.1",
-    "babel-core": "^6.10.4",
-    "babel-loader": "^6.2.4",
+    "babel-loader": "^8.0.5",
     "babel-preset-es2015": "^6.9.0",
     "http-server": "^0.11.1",
     "javascript-state-machine": "^3.1.0",
     "jquery": "^3.3.1",
-    "pixi": "^0.3.1",
-    "raphael": "^2.2.7",
-    "webpack": "^1.13.1"
-  }
+    "webpack": "^4.29.5",
+    "webpack-cli": "^3.2.3"
+  },
+  "dependencies": {}
 }

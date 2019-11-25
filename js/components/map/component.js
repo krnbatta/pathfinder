@@ -1,13 +1,14 @@
 import StateMachine from "javascript-state-machine";
 
 import template from './template'
-import Map from '../../models/Map';
+import Grid from '../../models/Grid';
 import $ from 'jquery';
 import BaseComponent from '../base-component';
 import config from '../../config';
 import environment from '../../environment';
 import Store from '../../services/Store';
-import MapDrawer from '../../services/map-drawer';
+import GridService from '../../services/grid';
+import MeshDrawer from '../../services/mesh-drawer';
 
 let MapComponent = new StateMachine($.extend({}, BaseComponent, {
   methods: {
@@ -20,10 +21,18 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
     },
     bindEvents() {
       $("#load-map").on('change', (e) => {
-        let mapFile = e.target.files[0];
-        Store.createRecord('Map', mapFile);
-        this.map = Store.find('Map');
-        MapDrawer.draw();
+        let file = e.target.files[0];
+        let fileType = file.name.split(".").pop();
+        if(fileType == "grid"){
+          Store.createRecord('Grid', file);
+          this.map = Store.find('Grid');
+          GridService.drawer.draw();
+        }
+        else if(fileType == "mesh"){
+          Store.createRecord('Mesh', file);
+          this.mesh = Store.find('Mesh');
+          MeshDrawer.draw();
+        }
         $("#map-component").hide();
       });
     }

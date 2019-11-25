@@ -1,6 +1,6 @@
 import config from '../config';
 
-export default function(node, stage){
+export default function(context, node){
   let line = new PIXI.Graphics();
   line.lineStyle(1, config.lineColor);
   node.linePoints.forEach((point, index) => {
@@ -11,6 +11,6 @@ export default function(node, stage){
       line.lineTo(point.x, point.y);
     }
   });
-  stage.addChild(line);
+  context.stage.addChild(line);
   return line;
 }
