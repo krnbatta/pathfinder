@@ -889,7 +889,7 @@ var config = {
   pathColor: 0xFFFFFF,
   borderColor: 0x000000,
   borderWidth: 0.1,
-  nodeSize: 10,
+  nodeSize: 20,
   nodeAttrs: {
     source: {
       fillColor: 0x00DD00 //green :) 43
@@ -1050,8 +1050,9 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     setupRenderer: function setupRenderer() {
       if (!this.rendered) {
         var width, height; //TODO
+        // let map = Store.find('Grid');
 
-        var map = _services_Store__WEBPACK_IMPORTED_MODULE_5__["default"].find('Grid'); // let map = Store.find('Mesh');
+        var map = _services_Store__WEBPACK_IMPORTED_MODULE_5__["default"].find('Mesh');
 
         if (map) {
           this.map = map;
@@ -1388,7 +1389,7 @@ function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
-!(function webpackMissingModule() { var e = new Error("Cannot find module '../../services/mesh'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+/* harmony import */ var _services_mesh__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../services/mesh */ "./js/services/mesh.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -1417,7 +1418,7 @@ function () {
         var that = this;
         this._meshData = new Promise(function (resolve, reject) {
           try {
-            !(function webpackMissingModule() { var e = new Error("Cannot find module '../../services/mesh'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).parser.parse(that.meshFile, function (data) {
+            _services_mesh__WEBPACK_IMPORTED_MODULE_1__["default"].parser.parse(that.meshFile, function (data) {
               that.width = data.maxX * _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize;
               that.height = data.maxY * _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize;
               resolve(data);
@@ -1436,7 +1437,7 @@ function () {
       if (!this._meshNodes) {
         this._meshPolygons = this.meshData.then(function (meshData) {
           return new Promise(function (resolve, reject) {
-            !(function webpackMissingModule() { var e = new Error("Cannot find module '../../services/mesh'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).builder.build(meshData, resolve);
+            _services_mesh__WEBPACK_IMPORTED_MODULE_1__["default"].builder.build(meshData, resolve);
           });
         });
       }
@@ -2523,51 +2524,25 @@ __webpack_require__.r(__webpack_exports__);
         data.shift();
         var pointsArr = data.slice(0, totalPoints).map(function (pointLine) {
           return pointLine.split(" ").slice(0, 2);
+        }).map(function (pt) {
+          return [parseInt(pt[0]), parseInt(pt[1])];
         });
+        var maxX = Math.max.apply(null, pointsArr.map(function (p) {
+          return p[0];
+        }));
+        var maxY = Math.max.apply(null, pointsArr.map(function (p) {
+          return p[1];
+        }));
         var polygonData = data.slice(totalPoints, data.length);
         var polygonsArr = [];
-        var maxX = 0;
-        var maxY = 0;
-        var minX = 0;
-        var minY = 0;
         polygonData.forEach(function (polygonLine) {
-          var pts = polygonLine.split(" ").slice(1).map(function (pt) {
-            return parseInt(pt);
+          var pts = polygonLine.split(" ");
+          var totalPolygonPoints = parseInt(pts[0]);
+          var points = pts.slice(1, totalPolygonPoints + 1).map(function (pt) {
+            return pointsArr[parseInt(pt)];
           });
-          var points = [];
-
-          for (var i = 0; i < pts.length; i += 2) {
-            if (maxX < pts[i]) {
-              maxX = pts[i];
-            }
-
-            if (maxY < pts[i + 1]) {
-              maxY = pts[i + 1];
-            }
-
-            if (minX > pts[i]) {
-              minX = pts[i];
-            }
-
-            if (minY > pts[i + 1]) {
-              minY = pts[i + 1];
-            }
-
-            points.push([pts[i], pts[i + 1]]);
-          }
-
-          if (points.length) {
-            polygonsArr.push(points);
-          }
+          polygonsArr.push(points);
         });
-        polygonsArr.forEach(function (points, polygonIndex) {
-          points.forEach(function (point, pointIndex) {
-            polygonsArr[polygonIndex][pointIndex][0] -= minX;
-            polygonsArr[polygonIndex][pointIndex][1] -= minY;
-          });
-        });
-        maxX -= minX;
-        maxY -= minY;
         console.log("meshData", totalPoints, totalPolygons, pointsArr, polygonsArr, maxX, maxY);
         var meshData = {
           totalPoints: totalPoints,

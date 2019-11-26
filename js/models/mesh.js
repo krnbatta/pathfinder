@@ -1,5 +1,5 @@
 import config from '../config';
-import MeshService from '../../services/mesh';
+import MeshService from '../services/mesh';
 
 class Mesh {
   constructor(meshFile) {

@@ -28,43 +28,17 @@ export default {
           const totalPoints = Number(data[0].split(' ')[0]);
           const totalPolygons = Number(data[0].split(' ')[1]);
           data.shift();
-          const pointsArr = data.slice(0, totalPoints).map((pointLine) => pointLine.split(" ").slice(0, 2));
+          const pointsArr = data.slice(0, totalPoints).map((pointLine) => pointLine.split(" ").slice(0, 2)).map((pt) => [parseInt(pt[0]), parseInt(pt[1])]);
+          let maxX = Math.max.apply(null, pointsArr.map((p) => p[0]));
+          let maxY = Math.max.apply(null, pointsArr.map((p) => p[1]));
           const polygonData = data.slice(totalPoints, data.length);
           let polygonsArr = [];
-          let maxX = 0;
-          let maxY = 0;
-          let minX = 0;
-          let minY = 0;
           polygonData.forEach((polygonLine) => {
-            let pts = polygonLine.split(" ").slice(1).map((pt) => parseInt(pt));
-            let points = [];
-            for(let i = 0; i<pts.length; i+=2){
-              if(maxX < pts[i]){
-                maxX = pts[i];
-              }
-              if(maxY < pts[i+1]){
-                maxY = pts[i+1];
-              }
-              if(minX > pts[i]){
-                minX = pts[i];
-              }
-              if(minY > pts[i+1]){
-                minY = pts[i+1];
-              }
-              points.push([pts[i], pts[i+1]]);
-            }
-            if(points.length){
-              polygonsArr.push(points);
-            }
+            let pts = polygonLine.split(" ")
+            let totalPolygonPoints = parseInt(pts[0])
+            let points = pts.slice(1, totalPolygonPoints + 1).map((pt) => pointsArr[parseInt(pt)]);
+            polygonsArr.push(points);
           });
-          polygonsArr.forEach((points, polygonIndex) => {
-            points.forEach((point, pointIndex) => {
-              polygonsArr[polygonIndex][pointIndex][0] -= minX;
-              polygonsArr[polygonIndex][pointIndex][1] -= minY;
-            });
-          });
-          maxX -= minX;
-          maxY -= minY;
           console.log("meshData", totalPoints, totalPolygons, pointsArr, polygonsArr, maxX, maxY);
 
           const meshData =  {totalPoints:totalPoints, totalPolygons:totalPolygons, pointsArr:pointsArr, polygonsArr:polygonsArr, maxX:maxX, maxY:maxY};

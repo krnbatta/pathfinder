@@ -104,8 +104,8 @@ let Controller = new StateMachine({
         if(!this.rendered){
           let width, height;
           //TODO
-          let map = Store.find('Grid');
-          // let map = Store.find('Mesh');
+          // let map = Store.find('Grid');
+          let map = Store.find('Mesh');
           if(map){
             this.map = map;
             width = map.width;
