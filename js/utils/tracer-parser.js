@@ -1,3 +1,10 @@
+/**
+* @function tracerParser
+* This function reads the algorithm debug file and parse it by extracting json and passing it to the callback
+* @param {File} file
+* @param {Function} callback
+*/
+
 export default (file, callback) => {
     let tracerReader = new FileReader();
 

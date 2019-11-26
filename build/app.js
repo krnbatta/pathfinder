@@ -790,7 +790,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- //Contrller is in 2 states: none and ready.
+ //Controller is in 2 states: none and ready.
+
+/**
+* @module controller
+* The controller is the main part which controls the whole app. It is a StateMachine with 3 states: none, ready and running. Init transition changes state from none to ready. Start transition changes state from ready to running.
+*/
 
 var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a({
   transitions: [{
@@ -802,51 +807,61 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     from: 'ready',
     to: 'running'
   }],
+
+  /**
+  * Data of this state machine has keeps all the variables required for functioning.
+  */
   data: {
-    //frontierHistory =>
+    //frontierHistory => This is array of all the frontier nodes at each step of the algorithm
     frontierHistory: [],
-    //frontierRects =>
+    //frontierRects => This is list of graphics object that are currently rendered on the screen.
     frontierRects: [],
-    //line =>
+    //line => The line is line PIXI.Graphics object which is basically a line drawn from current node to the source.
     line: null,
-    //runner =>
+    //runner => The runner is function looper that runs every step of the algorithm serially.
     runner: null,
-    //currentId =>
+    //currentId => Id of the current step being run
     currentId: 1,
-    //history =>
+    //history => History is array of all the nodes at each step of the algorithm
     history: [],
-    //lines =>
+    //lines => Lines is history of lines drawn at each step.
     lines: [],
-    //rendered =>
+    //rendered => If the canvas has been rendered on the screen or not.
     rendered: false,
-    //app =>
+    //app => PIXI.Application object
     app: null,
-    //renderer =>
+    //renderer => app.renderer
     renderer: null,
-    //stage =>
+    //stage => app.stage
     stage: null,
-    //canvas =>
-    canvas: null,
-    //canvasPosition =>
-    canvasPosition: {}
+    //canvas => DOM element canvas
+    canvas: null
   },
   methods: {
-    //called when the Controller is initiated(init transition) i.e. none to ready state
-    //initiates all the components on the page.
+    /**
+    * @function onInit
+    * This function is called when the Controller is initiated(init transition) i.e. none to ready state. It initiates all the components on the page.
+    */
     onInit: function onInit() {
       Object(_services_mouse_tracker__WEBPACK_IMPORTED_MODULE_12__["default"])(this);
       _components__WEBPACK_IMPORTED_MODULE_1__["default"].forEach(function (component) {
         component.init();
       });
     },
-    //called when Controller has entered ready state by init transition
-    //setup play and reset callback in playback service with Controller context
+
+    /**
+    * @function onReady
+    * This function is called when the Controller has entered ready state by init transition. It setup play and reset callback in playback service with Controller context.
+    */
     onReady: function onReady() {
       _services_playback__WEBPACK_IMPORTED_MODULE_3__["default"].addCallback('play', this.loop.bind(this));
       _services_playback__WEBPACK_IMPORTED_MODULE_3__["default"].addCallback('reset', this.reset.bind(this));
     },
-    //called when Controller is started(start transition) i.e. ready to running state
-    //
+
+    /**
+    * @function onStart
+    * This function is called when Controller is started(start transition) i.e. ready to running state. It is basically called when the algorithm is uploaded and app can be in running state. It calculates total steps in the algorithm, setups runner and initiates Playback and Floatbox services.
+    */
     onStart: function onStart() {
       var _this = this;
 
@@ -861,6 +876,11 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
         _services_floatbox__WEBPACK_IMPORTED_MODULE_4__["default"].init();
       });
     },
+
+    /**
+    * @function setupRenderer
+    * This function initiates the canvas by map's height and width if it is uploaded. Otherwise, just algorithm's max width and height used. Renderer service is used to render.
+    */
     setupRenderer: function setupRenderer() {
       if (!this.rendered) {
         var width, height; //TODO
@@ -879,6 +899,11 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
         _services_renderer__WEBPACK_IMPORTED_MODULE_11__["default"].render(this, width, height);
       }
     },
+
+    /**
+    * @function loop
+    * This function is called by playback play control and keeps stepping forward unless paused or stopped.
+    */
     loop: function loop() {
       var self = this;
 
@@ -891,6 +916,12 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
         window.requestAnimationFrame(loop);
       })();
     },
+
+    /**
+    * @function retraceHistory
+    * This function removes everything from canvas. Draws all the objects from the history. Also draws the line.
+    * @param {number} id - id of the step at which algorithm is to be retraced.
+    */
     retraceHistory: function retraceHistory(id) {
       var _this2 = this;
 
@@ -911,6 +942,11 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
       this.line = this.lines[id];
       this.stage.addChild(this.line);
     },
+
+    /**
+    * @function clearFutureData
+    * This function clears all the data by limiting rectangles, frontierHistory and lines history with currentId.
+    */
     clearFutureData: function clearFutureData() {
       if (this.historyRetraced) {
         this.lines.length = this.currentId;
@@ -920,6 +956,11 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
         this.historyRetraced = false;
       }
     },
+
+    /**
+    * @function stepForward
+    * This function calls runner to draw the current step and also add step text.
+    */
     stepForward: function stepForward() {
       this.clearFutureData();
 
@@ -931,6 +972,11 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
       this.runner();
       _components_events_list_component__WEBPACK_IMPORTED_MODULE_2__["default"].addEvent(currentStep);
     },
+
+    /**
+    * @function cleanCanvas
+    * This function removes all the rectangles from history, frontierRects and lines from the canvas.
+    */
     cleanCanvas: function cleanCanvas() {
       for (var i = 1; i <= this.currentId; i++) {
         var rectangle = this.history[i];
@@ -944,6 +990,11 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
 
       this.stage.removeChild(this.line);
     },
+
+    /**
+    * @function reset
+    * This function resets everything to the start.
+    */
     reset: function reset() {
       this.cleanCanvas();
       this.currentId = 1;
@@ -952,6 +1003,11 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
       this.frontierHistory = [];
       _components_events_list_component__WEBPACK_IMPORTED_MODULE_2__["default"].clearEvents(this.currentId);
     },
+
+    /**
+    * @function stepBackward
+    * This function decrements the current id. It removes the current rectangle. It removes the new frontier rectanges if added in current step or retraces the frontier rectangles that were in the previous step. It also removes the current line and adds the previous line. It also removes the current even text from the list.
+    */
     stepBackward: function stepBackward() {
       var _this3 = this;
 
@@ -2660,6 +2716,13 @@ var runnerFactory = function runnerFactory(steps) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/**
+ * @function debounce
+ * This function is debounce implementation
+ * @param {function} func
+ * @param {number} wait
+ * @param {boolean} immediate
+*/
 /* harmony default export */ __webpack_exports__["default"] = (function (func, wait, immediate) {
   var timeout;
   return function () {
@@ -2696,6 +2759,14 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
+
+/**
+ * @function drawLine
+ * This function draws the line from the node passed to its source via its linePoints property
+ * @param {Controller} context
+ * @param {Node} node
+ * @return {PIXI.Graphics}
+*/
 
 /* harmony default export */ __webpack_exports__["default"] = (function (context, node) {
   var line = new PIXI.Graphics();
@@ -2746,6 +2817,12 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/**
+ * @function insertNode
+ * This function add the Graphics object to the stage and renders it.
+ * @param {Controller} context
+ * @param {PIXI.Graphics} rectangle
+*/
 /* harmony default export */ __webpack_exports__["default"] = (function (context, rectangle) {
   context.stage.addChild(rectangle);
 });
@@ -2894,6 +2971,9 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/**
+* This object is dictionary for type of node to its color type.
+*/
 /* harmony default export */ __webpack_exports__["default"] = ({
   'source': 'source',
   'destination': 'destination',
@@ -2921,6 +3001,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * @function nodeFactory
+ * This function creates a PIXI.Graphics object with given attributes, binds floatbox service with the given values and bind mouseout and mouseover events.
+ * @param {Object} attrs
+ * @param {Object} attrs
+ * @return {PIXI.Graphics}
+*/
+
 /* harmony default export */ __webpack_exports__["default"] = (function (attrs, values) {
   var rectangle = new PIXI.Graphics();
   rectangle.lineStyle(1, attrs.strokeStyle);
@@ -2932,15 +3020,10 @@ __webpack_require__.r(__webpack_exports__);
     rectangle.interactive = true;
     rectangle.buttonMode = true;
     rectangle.on("mouseover", function (e) {
-      rectangle.tint = attrs.fillStyle; // let tilePosition = Controller.renderer.plugins.interaction.mouse.global;
-      // let canvasPosition = Controller.canvasPosition;
-      // let scroll = document.getElementById("pathfinder").scrollTop;
-
+      rectangle.tint = attrs.fillStyle;
       var position = {
         x: _controller__WEBPACK_IMPORTED_MODULE_2__["default"].x,
-        //tilePosition.x + canvasPosition.left,
-        y: _controller__WEBPACK_IMPORTED_MODULE_2__["default"].y //tilePosition.y + canvasPosition.top - scroll
-
+        y: _controller__WEBPACK_IMPORTED_MODULE_2__["default"].y
       };
       _services_floatbox__WEBPACK_IMPORTED_MODULE_1__["default"].execute(e, values, position);
     });
@@ -2991,6 +3074,12 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/**
+* @function tracerParser
+* This function reads the algorithm debug file and parse it by extracting json and passing it to the callback
+* @param {File} file
+* @param {Function} callback
+*/
 /* harmony default export */ __webpack_exports__["default"] = (function (file, callback) {
   var tracerReader = new FileReader();
   tracerReader.addEventListener("load", function (event) {

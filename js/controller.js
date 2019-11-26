@@ -12,7 +12,11 @@ import runnerFactory from './services/runner';
 import Renderer from './services/renderer';
 import mouseTracker from './services/mouse-tracker';
 
-//Contrller is in 2 states: none and ready.
+//Controller is in 2 states: none and ready.
+/**
+* @module controller
+* The controller is the main part which controls the whole app. It is a StateMachine with 3 states: none, ready and running. Init transition changes state from none to ready. Start transition changes state from ready to running.
+*/
 let Controller = new StateMachine({
   transitions: [{
         name: 'init',
@@ -25,51 +29,61 @@ let Controller = new StateMachine({
         to: 'running'
       }
     ],
+
+    /**
+    * Data of this state machine has keeps all the variables required for functioning.
+    */
     data: {
-      //frontierHistory =>
+      //frontierHistory => This is array of all the frontier nodes at each step of the algorithm
       frontierHistory: [],
-      //frontierRects =>
+      //frontierRects => This is list of graphics object that are currently rendered on the screen.
       frontierRects: [],
-      //line =>
+      //line => The line is line PIXI.Graphics object which is basically a line drawn from current node to the source.
       line: null,
-      //runner =>
+      //runner => The runner is function looper that runs every step of the algorithm serially.
       runner: null,
-      //currentId =>
+      //currentId => Id of the current step being run
       currentId: 1,
-      //history =>
+      //history => History is array of all the nodes at each step of the algorithm
       history: [],
-      //lines =>
+      //lines => Lines is history of lines drawn at each step.
       lines: [],
-      //rendered =>
+      //rendered => If the canvas has been rendered on the screen or not.
       rendered: false,
-      //app =>
+      //app => PIXI.Application object
       app: null,
-      //renderer =>
+      //renderer => app.renderer
       renderer: null,
-      //stage =>
+      //stage => app.stage
       stage: null,
-      //canvas =>
-      canvas: null,
-      //canvasPosition =>
-      canvasPosition: {}
+      //canvas => DOM element canvas
+      canvas: null
     },
     methods: {
-      //called when the Controller is initiated(init transition) i.e. none to ready state
-      //initiates all the components on the page.
+      /**
+      * @function onInit
+      * This function is called when the Controller is initiated(init transition) i.e. none to ready state. It initiates all the components on the page.
+      */
       onInit() {
         mouseTracker(this);
         Components.forEach((component) => {
           component.init();
         });
       },
-      //called when Controller has entered ready state by init transition
-      //setup play and reset callback in playback service with Controller context
+
+      /**
+      * @function onReady
+      * This function is called when the Controller has entered ready state by init transition. It setup play and reset callback in playback service with Controller context.
+      */
       onReady() {
         PlaybackService.addCallback('play', this.loop.bind(this));
         PlaybackService.addCallback('reset', this.reset.bind(this));
       },
-      //called when Controller is started(start transition) i.e. ready to running state
-      //
+
+      /**
+      * @function onStart
+      * This function is called when Controller is started(start transition) i.e. ready to running state. It is basically called when the algorithm is uploaded and app can be in running state. It calculates total steps in the algorithm, setups runner and initiates Playback and Floatbox services.
+      */
       onStart() {
         this.tracer = Store.find('Tracer');
         let that = this;
@@ -82,6 +96,11 @@ let Controller = new StateMachine({
           FloatboxService.init();
         });
       },
+
+      /**
+      * @function setupRenderer
+      * This function initiates the canvas by map's height and width if it is uploaded. Otherwise, just algorithm's max width and height used. Renderer service is used to render.
+      */
       setupRenderer() {
         if(!this.rendered){
           let width, height;
@@ -100,6 +119,11 @@ let Controller = new StateMachine({
           Renderer.render(this, width, height);
         }
       },
+
+      /**
+      * @function loop
+      * This function is called by playback play control and keeps stepping forward unless paused or stopped.
+      */
       loop() {
         let self = this;
         (function loop(){
@@ -110,6 +134,12 @@ let Controller = new StateMachine({
           window.requestAnimationFrame(loop);
         })();
       },
+
+      /**
+      * @function retraceHistory
+      * This function removes everything from canvas. Draws all the objects from the history. Also draws the line.
+      * @param {number} id - id of the step at which algorithm is to be retraced.
+      */
       retraceHistory(id) {
         this.historyRetraced = true;
         this.cleanCanvas();
@@ -126,6 +156,11 @@ let Controller = new StateMachine({
         this.line = this.lines[id];
         this.stage.addChild(this.line);
       },
+
+      /**
+      * @function clearFutureData
+      * This function clears all the data by limiting rectangles, frontierHistory and lines history with currentId.
+      */
       clearFutureData() {
         if(this.historyRetraced){
           this.lines.length = this.currentId;
@@ -135,6 +170,11 @@ let Controller = new StateMachine({
           this.historyRetraced = false;
         }
       },
+
+      /**
+      * @function stepForward
+      * This function calls runner to draw the current step and also add step text.
+      */
       stepForward() {
         this.clearFutureData();
         if(this.currentId >= this.totalSteps && PlaybackService.state != 'paused'){
@@ -144,6 +184,11 @@ let Controller = new StateMachine({
         this.runner();
         EventsListComponent.addEvent(currentStep);
       },
+
+      /**
+      * @function cleanCanvas
+      * This function removes all the rectangles from history, frontierRects and lines from the canvas.
+      */
       cleanCanvas() {
         for(let i = 1; i<=this.currentId; i++){
           let rectangle = this.history[i];
@@ -155,6 +200,11 @@ let Controller = new StateMachine({
         }
         this.stage.removeChild(this.line);
       },
+
+      /**
+      * @function reset
+      * This function resets everything to the start.
+      */
       reset() {
         this.cleanCanvas();
         this.currentId = 1;
@@ -163,6 +213,11 @@ let Controller = new StateMachine({
         this.frontierHistory = [];
         EventsListComponent.clearEvents(this.currentId);
       },
+
+      /**
+      * @function stepBackward
+      * This function decrements the current id. It removes the current rectangle. It removes the new frontier rectanges if added in current step or retraces the frontier rectangles that were in the previous step. It also removes the current line and adds the previous line. It also removes the current even text from the list.
+      */
       stepBackward() {
         this.clearFutureData();
         if(this.currentId == 1){
