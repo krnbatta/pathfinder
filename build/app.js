@@ -2560,7 +2560,7 @@ __webpack_require__.r(__webpack_exports__);
   },
 
   /**
-  * Builder takes the gridData and builds all the cells of the grid map. Each cell has property of coordinates, dimensions, color, border.
+  * Builder takes the meshData and builds all the polygons of the mesh map. Each polygon has property of points coordinates, color, border.
   * @public
   */
   builder: {
@@ -2600,7 +2600,7 @@ __webpack_require__.r(__webpack_exports__);
   },
 
   /**
-  * Drawer draws the map on the canvas. It takes the cells from the Grid Model created by the builder and constructs PIXI.Graphics object and finally renders on the canvas.
+  * Drawer draws the map on the canvas. It takes the polygons from the Mesh Model created by the builder and constructs PIXI.Graphics object and finally renders on the canvas.
   * @public
   */
   drawer: {
