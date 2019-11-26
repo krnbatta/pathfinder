@@ -133,15 +133,34 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+* @module components/debugger
+* This component handles the uploading of algorithm event debug file.
+*/
+
 var DebuggerComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a(jquery__WEBPACK_IMPORTED_MODULE_3___default.a.extend({}, _base_component__WEBPACK_IMPORTED_MODULE_4__["default"], {
   methods: {
+    /**
+    * @function onBeforeInit
+    * This function creates component div container and appends it to the page.
+    */
     onBeforeInit: function onBeforeInit() {
       jquery__WEBPACK_IMPORTED_MODULE_3___default()("#pathfinder").append("<div id='debug-component'></div>");
     },
+
+    /**
+    * @function onLeaveNone
+    * This function fills the component container with the template file and initiates event binding.
+    */
     onLeaveNone: function onLeaveNone() {
       jquery__WEBPACK_IMPORTED_MODULE_3___default()("#debug-component").html(_template__WEBPACK_IMPORTED_MODULE_1__["default"]);
       this.bindEvents();
     },
+
+    /**
+    * @function bindEvents
+    * This function creates Tracer record from the algorithm debug file, hides map and algorithm upload. It then starts the controller.
+    */
     bindEvents: function bindEvents() {
       var _this = this;
 
@@ -205,19 +224,38 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+* @module components/events-list
+* This component handles the display of events of algorithms on the panel
+*/
+
 var EventsListComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a(jquery__WEBPACK_IMPORTED_MODULE_2___default.a.extend({}, _base_component__WEBPACK_IMPORTED_MODULE_3__["default"], {
   data: {
     events: []
   },
   methods: {
+    /**
+    * @function onBeforeInit
+    * This function creates component div container and appends it to the page.
+    */
     onBeforeInit: function onBeforeInit() {
       _tablet_component__WEBPACK_IMPORTED_MODULE_6__["default"].display("<div id='events-list-component'></div>");
     },
+
+    /**
+    * @function onLeaveNone
+    * This function fills the component container with the template file, initiates event binding and callback binding.
+    */
     onLeaveNone: function onLeaveNone() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events-list-component").html(_template__WEBPACK_IMPORTED_MODULE_1__["default"]);
       this.bindCallbacks();
       this.bindEvents();
     },
+
+    /**
+    * @function bindCallbacks
+    * This function add the playback functions to playback callback service.
+    */
     bindCallbacks: function bindCallbacks() {
       _services_playback__WEBPACK_IMPORTED_MODULE_4__["default"].addCallback('init', this.reset.bind(this));
       _services_playback__WEBPACK_IMPORTED_MODULE_4__["default"].addCallback('play', this.play.bind(this));
@@ -225,15 +263,36 @@ var EventsListComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_
       _services_playback__WEBPACK_IMPORTED_MODULE_4__["default"].addCallback('reset', this.reset.bind(this));
     },
     bindEvents: function bindEvents() {},
+
+    /**
+    * @function play
+    * This function hides the event list when algorithm is running.
+    */
     play: function play() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events").hide();
     },
+
+    /**
+    * @function pause
+    * This function shows the event list when algorithm is paused.
+    */
     pause: function pause() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events").show();
     },
+
+    /**
+    * @function reset
+    * This function hides the event list when algorithm is stopped.
+    */
     reset: function reset() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events").hide();
     },
+
+    /**
+    * @function addEvent
+    * This function add li element with the event details passed to it. It also binds retrace history upon clicking on the event.
+    * @param {Object} event - It has _id, text
+    */
     addEvent: function addEvent(event) {
       this.events.push(event);
       var li = jquery__WEBPACK_IMPORTED_MODULE_2___default.a.parseHTML("<li class=\"event\">".concat(event.text, "</li>"))[0];
@@ -245,11 +304,22 @@ var EventsListComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_
         jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events-list")[0].scrollTop = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events-list")[0].scrollHeight;
       });
     },
+
+    /**
+    * @function removeEvent
+    * This function removes the last event from the list and screen.
+    */
     removeEvent: function removeEvent() {
       this.events.pop();
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#events .event:last-child').remove();
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events-list")[0].scrollTop = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events")[0].offsetHeight;
     },
+
+    /**
+    * @function clearEvents
+    * This function clear all the events up to the id passed.
+    * @param {number} id
+    */
     clearEvents: function clearEvents(id) {
       var pruneLength = this.events.length - id;
       var pruneEvents = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#events .event').slice(-pruneLength);
@@ -329,7 +399,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _environment__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../environment */ "./js/environment.js");
 /* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../services/Store */ "./js/services/Store.js");
 /* harmony import */ var _services_grid__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../services/grid */ "./js/services/grid.js");
-/* harmony import */ var _services_mesh_drawer__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../services/mesh-drawer */ "./js/services/mesh-drawer.js");
+/* harmony import */ var _services_mesh__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../services/mesh */ "./js/services/mesh.js");
 
 
 
@@ -339,16 +409,35 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+/**
+* @module components/map
+* This component handles the uploading of map file.
+*/
 
 var MapComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a(jquery__WEBPACK_IMPORTED_MODULE_3___default.a.extend({}, _base_component__WEBPACK_IMPORTED_MODULE_4__["default"], {
   methods: {
+    /**
+    * @function onBeforeInit
+    * This function creates component div container and appends it to the page.
+    */
     onBeforeInit: function onBeforeInit() {
       jquery__WEBPACK_IMPORTED_MODULE_3___default()("#pathfinder").append("<div id='map-component'></div>");
     },
+
+    /**
+    * @function onLeaveNone
+    * This function fills the component container with the template file and initiates event binding.
+    */
     onLeaveNone: function onLeaveNone() {
       jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map-component").html(_template__WEBPACK_IMPORTED_MODULE_1__["default"]);
       this.bindEvents();
     },
+
+    /**
+    * @function bindEvents
+    * This function creates map record from the map fil and hides map upload. It then draws the map on the screen.
+    */
     bindEvents: function bindEvents() {
       var _this = this;
 
@@ -363,7 +452,7 @@ var MapComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___def
         } else if (fileType == "mesh") {
           _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Mesh', file);
           _this.mesh = _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].find('Mesh');
-          _services_mesh_drawer__WEBPACK_IMPORTED_MODULE_9__["default"].draw();
+          _services_mesh__WEBPACK_IMPORTED_MODULE_9__["default"].drawer.draw();
         }
 
         jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map-component").hide();
@@ -414,11 +503,25 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+* @module components/monitor
+* This component handles the uploading of algorithm event debug file.
+*/
+
 var MonitorComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a(jquery__WEBPACK_IMPORTED_MODULE_2___default.a.extend({}, _base_component__WEBPACK_IMPORTED_MODULE_3__["default"], {
   methods: {
+    /**
+    * @function onBeforeInit
+    * This function creates component div container and appends it to the page.
+    */
     onBeforeInit: function onBeforeInit() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#pathfinder").append("<div id='monitor-component'></div>");
     },
+
+    /**
+    * @function onLeaveNone
+    * This function fills the component container with the template file and initiates event binding.
+    */
     onLeaveNone: function onLeaveNone() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#monitor-component").html(_template__WEBPACK_IMPORTED_MODULE_1__["default"]);
       this.bindEvents();
@@ -473,23 +576,47 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+* @module components/playback-controls
+* This component handles the playback controls buttons.
+*/
+
 var PlaybackControlsComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a(jquery__WEBPACK_IMPORTED_MODULE_2___default.a.extend({}, _base_component__WEBPACK_IMPORTED_MODULE_3__["default"], {
   methods: {
+    /**
+    * @function onBeforeInit
+    * This function creates component div container and appends it to the page.
+    */
     onBeforeInit: function onBeforeInit() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#pathfinder").append("<div id='playback-controls-component'></div>");
     },
+
+    /**
+    * @function onLeaveNone
+    * This function fills the component container with the template file and initiates event binding.
+    */
     onLeaveNone: function onLeaveNone() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#playback-controls-component").html(_template__WEBPACK_IMPORTED_MODULE_1__["default"]);
       this.hideAll();
       this.bindCallbacks();
       this.bindEvents();
     },
+
+    /**
+    * @function bindCallbacks
+    * This function add the playback functions to playback callback service.
+    */
     bindCallbacks: function bindCallbacks() {
       _services_playback__WEBPACK_IMPORTED_MODULE_5__["default"].addCallback('init', this.reset.bind(this));
       _services_playback__WEBPACK_IMPORTED_MODULE_5__["default"].addCallback('play', this.play.bind(this));
       _services_playback__WEBPACK_IMPORTED_MODULE_5__["default"].addCallback('pause', this.pause.bind(this));
       _services_playback__WEBPACK_IMPORTED_MODULE_5__["default"].addCallback('reset', this.reset.bind(this));
     },
+
+    /**
+    * @function bindEvents
+    * This function calls the PlaybackService callbacks as per the button clicked
+    */
     bindEvents: function bindEvents() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#play").on('click', function (e) {
         _services_playback__WEBPACK_IMPORTED_MODULE_5__["default"].play();
@@ -507,6 +634,11 @@ var PlaybackControlsComponent = new javascript_state_machine__WEBPACK_IMPORTED_M
         _controller__WEBPACK_IMPORTED_MODULE_4__["default"].stepBackward();
       });
     },
+
+    /**
+    * @function hideAll
+    * This function hides all the buttons
+    */
     hideAll: function hideAll() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#play').hide();
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#step-forward').hide();
@@ -514,6 +646,11 @@ var PlaybackControlsComponent = new javascript_state_machine__WEBPACK_IMPORTED_M
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#pause').hide();
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#stop').hide();
     },
+
+    /**
+    * @function play
+    * This function shows only pause and stop button
+    */
     play: function play() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#play').hide();
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#step-forward').hide();
@@ -521,6 +658,11 @@ var PlaybackControlsComponent = new javascript_state_machine__WEBPACK_IMPORTED_M
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#pause').show();
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#stop').show();
     },
+
+    /**
+    * @function pause
+    * This function shows play, step and stop button
+    */
     pause: function pause() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#play').show();
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#step-forward').show();
@@ -528,6 +670,11 @@ var PlaybackControlsComponent = new javascript_state_machine__WEBPACK_IMPORTED_M
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#pause').hide();
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#stop').show();
     },
+
+    /**
+    * @function reset
+    * This function shows play and step buttons
+    */
     reset: function reset() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#play').show();
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#step-forward').show();
@@ -670,16 +817,36 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+* @module components/tablet
+* This component handles the display of the algorithm steps.
+*/
+
 var TabletComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a(jquery__WEBPACK_IMPORTED_MODULE_2___default.a.extend({}, _base_component__WEBPACK_IMPORTED_MODULE_3__["default"], {
   methods: {
+    /**
+    * @function onBeforeInit
+    * This function creates component div container and appends it to the page.
+    */
     onBeforeInit: function onBeforeInit() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#pathfinder").append("<div id='tablet-component'></div>");
     },
+
+    /**
+    * @function onLeaveNone
+    * This function fills the component container with the template file.
+    */
     onLeaveNone: function onLeaveNone() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#tablet-component").html(_template__WEBPACK_IMPORTED_MODULE_1__["default"]);
       this.bindEvents();
     },
     bindEvents: function bindEvents() {},
+
+    /**
+    * @function display
+    * This function appends the html passed to it in the component.
+    * @param {String} content
+    */
     display: function display(content) {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#tablet-content").append(content);
     }
@@ -790,7 +957,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- //Controller is in 2 states: none and ready.
 
 /**
 * @module controller
@@ -1222,14 +1388,12 @@ function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
-/* harmony import */ var _utils_mesh_parser__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/mesh-parser */ "./js/utils/mesh-parser.js");
-/* harmony import */ var _utils_mesh_builder__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/mesh-builder */ "./js/utils/mesh-builder.js");
+!(function webpackMissingModule() { var e = new Error("Cannot find module '../../services/mesh'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 
 
 
@@ -1253,7 +1417,7 @@ function () {
         var that = this;
         this._meshData = new Promise(function (resolve, reject) {
           try {
-            Object(_utils_mesh_parser__WEBPACK_IMPORTED_MODULE_1__["default"])(that.meshFile, function (data) {
+            !(function webpackMissingModule() { var e = new Error("Cannot find module '../../services/mesh'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).parser.parse(that.meshFile, function (data) {
               that.width = data.maxX * _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize;
               that.height = data.maxY * _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize;
               resolve(data);
@@ -1272,7 +1436,7 @@ function () {
       if (!this._meshNodes) {
         this._meshPolygons = this.meshData.then(function (meshData) {
           return new Promise(function (resolve, reject) {
-            _utils_mesh_builder__WEBPACK_IMPORTED_MODULE_2__["default"].build(meshData, resolve);
+            !(function webpackMissingModule() { var e = new Error("Cannot find module '../../services/mesh'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).builder.build(meshData, resolve);
           });
         });
       }
@@ -2312,10 +2476,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./js/services/mesh-drawer.js":
-/*!************************************!*\
-  !*** ./js/services/mesh-drawer.js ***!
-  \************************************/
+/***/ "./js/services/mesh.js":
+/*!*****************************!*\
+  !*** ./js/services/mesh.js ***!
+  \*****************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2337,20 +2501,148 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/** @module services/mesh
+* This service is responsible for: parsing mesh file, building grid poylgons and drawing mesh on canvas.
+*/
+
 /* harmony default export */ __webpack_exports__["default"] = ({
-  draw: function draw() {
-    var mesh = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Mesh');
-    mesh.meshPolygons.then(function (meshPolygons) {
-      _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
-      mesh.meshData.then(function (meshData) {
-        meshPolygons.forEach(function (polygonObj) {
-          var polygon = Object(_utils_polygon_factory__WEBPACK_IMPORTED_MODULE_4__["default"])(polygonObj);
-          Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], polygon);
+  /**
+  * Parser parses the mesh map file by extracting totalPoints, totalPolygons and structure of map and passing this into callback.
+  * @public
+  */
+  parser: {
+    parse: function parse(file, callback) {
+      var meshReader = new FileReader();
+      meshReader.addEventListener("load", function (event) {
+        var textFile = event.target;
+        var data = textFile.result.split(/\n|\r\n/);
+        data.shift();
+        data.shift();
+        var totalPoints = Number(data[0].split(' ')[0]);
+        var totalPolygons = Number(data[0].split(' ')[1]);
+        data.shift();
+        var pointsArr = data.slice(0, totalPoints).map(function (pointLine) {
+          return pointLine.split(" ").slice(0, 2);
         });
+        var polygonData = data.slice(totalPoints, data.length);
+        var polygonsArr = [];
+        var maxX = 0;
+        var maxY = 0;
+        var minX = 0;
+        var minY = 0;
+        polygonData.forEach(function (polygonLine) {
+          var pts = polygonLine.split(" ").slice(1).map(function (pt) {
+            return parseInt(pt);
+          });
+          var points = [];
+
+          for (var i = 0; i < pts.length; i += 2) {
+            if (maxX < pts[i]) {
+              maxX = pts[i];
+            }
+
+            if (maxY < pts[i + 1]) {
+              maxY = pts[i + 1];
+            }
+
+            if (minX > pts[i]) {
+              minX = pts[i];
+            }
+
+            if (minY > pts[i + 1]) {
+              minY = pts[i + 1];
+            }
+
+            points.push([pts[i], pts[i + 1]]);
+          }
+
+          if (points.length) {
+            polygonsArr.push(points);
+          }
+        });
+        polygonsArr.forEach(function (points, polygonIndex) {
+          points.forEach(function (point, pointIndex) {
+            polygonsArr[polygonIndex][pointIndex][0] -= minX;
+            polygonsArr[polygonIndex][pointIndex][1] -= minY;
+          });
+        });
+        maxX -= minX;
+        maxY -= minY;
+        console.log("meshData", totalPoints, totalPolygons, pointsArr, polygonsArr, maxX, maxY);
+        var meshData = {
+          totalPoints: totalPoints,
+          totalPolygons: totalPolygons,
+          pointsArr: pointsArr,
+          polygonsArr: polygonsArr,
+          maxX: maxX,
+          maxY: maxY
+        };
+        callback(meshData);
+      }); //Read the text file
+
+      meshReader.readAsText(file);
+    }
+  },
+
+  /**
+  * Builder takes the gridData and builds all the cells of the grid map. Each cell has property of coordinates, dimensions, color, border.
+  * @public
+  */
+  builder: {
+    polygons: [],
+    build: function build(meshData, callback) {
+      var _this = this;
+
+      var polygonsArr = meshData.polygonsArr;
+      var tasks = [];
+
+      for (var i = 0; i < polygonsArr.length; ++i) {
+        tasks.push(this.createPolygonTask(polygonsArr[i]));
+      }
+
+      Promise.all(tasks).then(function () {
+        callback(_this.polygons);
       });
-    }, function (err) {
-      Object(_error_notifier__WEBPACK_IMPORTED_MODULE_3__["default"])(err);
-    });
+    },
+    createPolygonTask: function createPolygonTask(coordinates) {
+      var _this2 = this;
+
+      return new Promise(function (resolve, reject) {
+        var points = coordinates.flat();
+        var polygon = {
+          points: points.concat(points.slice(0, 2)).map(function (pt) {
+            return pt * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+          }),
+          fillStyle: _config__WEBPACK_IMPORTED_MODULE_1__["default"].pathColor,
+          strokeStyle: _config__WEBPACK_IMPORTED_MODULE_1__["default"].borderColor
+        };
+
+        _this2.polygons.push(polygon);
+
+        resolve();
+      });
+    }
+  },
+
+  /**
+  * Drawer draws the map on the canvas. It takes the cells from the Grid Model created by the builder and constructs PIXI.Graphics object and finally renders on the canvas.
+  * @public
+  */
+  drawer: {
+    draw: function draw() {
+      var mesh = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Mesh');
+      mesh.meshPolygons.then(function (meshPolygons) {
+        _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
+        mesh.meshData.then(function (meshData) {
+          meshPolygons.forEach(function (polygonObj) {
+            var polygon = Object(_utils_polygon_factory__WEBPACK_IMPORTED_MODULE_4__["default"])(polygonObj);
+            Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], polygon);
+          });
+        });
+      }, function (err) {
+        Object(_error_notifier__WEBPACK_IMPORTED_MODULE_3__["default"])(err);
+      });
+    }
   }
 });
 
@@ -2825,139 +3117,6 @@ __webpack_require__.r(__webpack_exports__);
 */
 /* harmony default export */ __webpack_exports__["default"] = (function (context, rectangle) {
   context.stage.addChild(rectangle);
-});
-
-/***/ }),
-
-/***/ "./js/utils/mesh-builder.js":
-/*!**********************************!*\
-  !*** ./js/utils/mesh-builder.js ***!
-  \**********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
-
-var MeshBuilder = {
-  polygons: [],
-  build: function build(meshData, callback) {
-    var _this = this;
-
-    var polygonsArr = meshData.polygonsArr;
-    var tasks = [];
-
-    for (var i = 0; i < polygonsArr.length; ++i) {
-      tasks.push(this.createPolygonTask(polygonsArr[i]));
-    }
-
-    Promise.all(tasks).then(function () {
-      callback(_this.polygons);
-    });
-  },
-  createPolygonTask: function createPolygonTask(coordinates) {
-    var _this2 = this;
-
-    return new Promise(function (resolve, reject) {
-      var points = coordinates.flat();
-      var polygon = {
-        points: points.concat(points.slice(0, 2)).map(function (pt) {
-          return pt * _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize;
-        }),
-        fillStyle: _config__WEBPACK_IMPORTED_MODULE_0__["default"].pathColor,
-        strokeStyle: _config__WEBPACK_IMPORTED_MODULE_0__["default"].borderColor
-      };
-
-      _this2.polygons.push(polygon);
-
-      resolve();
-    });
-  }
-};
-/* harmony default export */ __webpack_exports__["default"] = (MeshBuilder);
-
-/***/ }),
-
-/***/ "./js/utils/mesh-parser.js":
-/*!*********************************!*\
-  !*** ./js/utils/mesh-parser.js ***!
-  \*********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (function (file, callback) {
-  var meshReader = new FileReader();
-  meshReader.addEventListener("load", function (event) {
-    var textFile = event.target;
-    var data = textFile.result.split(/\n|\r\n/);
-    data.shift();
-    data.shift();
-    var totalPoints = Number(data[0].split(' ')[0]);
-    var totalPolygons = Number(data[0].split(' ')[1]);
-    data.shift();
-    var pointsArr = data.slice(0, totalPoints).map(function (pointLine) {
-      return pointLine.split(" ").slice(0, 2);
-    });
-    var polygonData = data.slice(totalPoints, data.length);
-    var polygonsArr = [];
-    var maxX = 0;
-    var maxY = 0;
-    var minX = 0;
-    var minY = 0;
-    polygonData.forEach(function (polygonLine) {
-      var pts = polygonLine.split(" ").slice(1).map(function (pt) {
-        return parseInt(pt);
-      });
-      var points = [];
-
-      for (var i = 0; i < pts.length; i += 2) {
-        if (maxX < pts[i]) {
-          maxX = pts[i];
-        }
-
-        if (maxY < pts[i + 1]) {
-          maxY = pts[i + 1];
-        }
-
-        if (minX > pts[i]) {
-          minX = pts[i];
-        }
-
-        if (minY > pts[i + 1]) {
-          minY = pts[i + 1];
-        }
-
-        points.push([pts[i], pts[i + 1]]);
-      }
-
-      if (points.length) {
-        polygonsArr.push(points);
-      }
-    });
-    polygonsArr.forEach(function (points, polygonIndex) {
-      points.forEach(function (point, pointIndex) {
-        polygonsArr[polygonIndex][pointIndex][0] -= minX;
-        polygonsArr[polygonIndex][pointIndex][1] -= minY;
-      });
-    });
-    maxX -= minX;
-    maxY -= minY;
-    console.log("meshData", totalPoints, totalPolygons, pointsArr, polygonsArr, maxX, maxY);
-    var meshData = {
-      totalPoints: totalPoints,
-      totalPolygons: totalPolygons,
-      pointsArr: pointsArr,
-      polygonsArr: polygonsArr,
-      maxX: maxX,
-      maxY: maxY
-    };
-    callback(meshData);
-  }); //Read the text file
-
-  meshReader.readAsText(file);
 });
 
 /***/ }),

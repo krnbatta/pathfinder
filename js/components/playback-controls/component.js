@@ -6,23 +6,46 @@ import BaseComponent from '../base-component';
 import Controller from '../../controller';
 import PlaybackService from '../../services/playback';
 
+/**
+* @module components/playback-controls
+* This component handles the playback controls buttons.
+*/
 let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
   methods: {
+    /**
+    * @function onBeforeInit
+    * This function creates component div container and appends it to the page.
+    */
     onBeforeInit() {
       $("#pathfinder").append("<div id='playback-controls-component'></div>");
     },
+
+    /**
+    * @function onLeaveNone
+    * This function fills the component container with the template file and initiates event binding.
+    */
     onLeaveNone() {
       $("#playback-controls-component").html(template);
       this.hideAll();
       this.bindCallbacks();
       this.bindEvents();
     },
+
+    /**
+    * @function bindCallbacks
+    * This function add the playback functions to playback callback service.
+    */
     bindCallbacks() {
       PlaybackService.addCallback('init', this.reset.bind(this));
       PlaybackService.addCallback('play', this.play.bind(this));
       PlaybackService.addCallback('pause', this.pause.bind(this));
       PlaybackService.addCallback('reset', this.reset.bind(this));
     },
+
+    /**
+    * @function bindEvents
+    * This function calls the PlaybackService callbacks as per the button clicked
+    */
     bindEvents() {
       $("#play").on('click', (e) => {
         PlaybackService.play();
@@ -40,6 +63,11 @@ let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
         Controller.stepBackward();
       });
     },
+
+    /**
+    * @function hideAll
+    * This function hides all the buttons
+    */
     hideAll(){
       $('#play').hide();
       $('#step-forward').hide();
@@ -47,6 +75,11 @@ let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
       $('#pause').hide();
       $('#stop').hide();
     },
+
+    /**
+    * @function play
+    * This function shows only pause and stop button
+    */
     play(){
       $('#play').hide();
       $('#step-forward').hide();
@@ -54,6 +87,11 @@ let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
       $('#pause').show();
       $('#stop').show();
     },
+
+    /**
+    * @function pause
+    * This function shows play, step and stop button
+    */
     pause(){
       $('#play').show();
       $('#step-forward').show();
@@ -61,6 +99,11 @@ let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
       $('#pause').hide();
       $('#stop').show();
     },
+
+    /**
+    * @function reset
+    * This function shows play and step buttons
+    */
     reset(){
       $('#play').show();
       $('#step-forward').show();

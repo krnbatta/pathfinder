@@ -12,7 +12,6 @@ import runnerFactory from './services/runner';
 import Renderer from './services/renderer';
 import mouseTracker from './services/mouse-tracker';
 
-//Controller is in 2 states: none and ready.
 /**
 * @module controller
 * The controller is the main part which controls the whole app. It is a StateMachine with 3 states: none, ready and running. Init transition changes state from none to ready. Start transition changes state from ready to running.

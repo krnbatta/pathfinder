@@ -1,6 +1,5 @@
 import config from '../config';
-import meshParser from '../utils/mesh-parser';
-import MeshBuilder from '../utils/mesh-builder';
+import MeshService from '../../services/mesh';
 
 class Mesh {
   constructor(meshFile) {
@@ -15,7 +14,7 @@ class Mesh {
       let that = this;
       this._meshData = new Promise((resolve, reject) => {
         try{
-          meshParser(that.meshFile, (data) => {
+          MeshService.parser.parse(that.meshFile, (data) => {
             that.width = data.maxX * config.nodeSize;
             that.height = data.maxY * config.nodeSize;
             resolve(data);
@@ -33,7 +32,7 @@ class Mesh {
     if(!this._meshNodes){
       this._meshPolygons = this.meshData.then((meshData) => {
         return new Promise((resolve, reject) => {
-          MeshBuilder.build(meshData, resolve);
+          MeshService.builder.build(meshData, resolve);
         });
       });
     }
