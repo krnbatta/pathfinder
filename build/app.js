@@ -1050,9 +1050,8 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     setupRenderer: function setupRenderer() {
       if (!this.rendered) {
         var width, height; //TODO
-        // let map = Store.find('Grid');
 
-        var map = _services_Store__WEBPACK_IMPORTED_MODULE_5__["default"].find('Mesh');
+        var map = _services_Store__WEBPACK_IMPORTED_MODULE_5__["default"].find('Grid'); // let map = Store.find('Mesh');
 
         if (map) {
           this.map = map;
@@ -2464,7 +2463,7 @@ __webpack_require__.r(__webpack_exports__);
         grid.gridData.then(function (gridData) {
           cells.forEach(function (cell) {
             cell.isMap = true;
-            var cellElement = Object(_utils_node_factory__WEBPACK_IMPORTED_MODULE_4__["default"])(node);
+            var cellElement = Object(_utils_node_factory__WEBPACK_IMPORTED_MODULE_4__["default"])(cell);
             Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], cellElement);
           });
         });

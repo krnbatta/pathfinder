@@ -104,7 +104,7 @@ export default {
         grid.gridData.then((gridData) => {
           cells.forEach((cell) => {
             cell.isMap = true;
-            let cellElement = nodeFactory(node);
+            let cellElement = nodeFactory(cell);
             insertNode(Controller, cellElement);
           });
         });
