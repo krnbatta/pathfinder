@@ -24,10 +24,53 @@ class Node {
     * @private
     */
     this._linePoints = null;
+
+    let variables = options.variables;
+
+    delete options.variables;
+
     //assigning the options configuration to the node
     Object.assign(this, options);
+
+    //setting up node nodeObjects
+    this.setNodeObjects(variables);
+
     //incrementing the _id for next object
     _id++;
+  }
+
+  setNodeObjects(variables){
+    this.nodeObjects = this.step.tracer.nodeStructure.map((obj) => {
+      let nodeConf = JSON.parse(JSON.stringify(obj));
+      delete nodeConf.variables;
+      nodeConf.node = this;
+      let coordinates = {};
+      Object.keys(obj.variables).forEach((key) => {
+        coordinates[key] = variables[obj.variables[key]];
+      });
+      let options = {nodeConf: nodeConf, coordinates: coordinates};
+      switch (obj.type) {
+        case "rectangle":
+          return Store.createRecord('Rectangle', options)
+        case "circle":
+          return Store.createRecord('Circle', options)
+        case "line":
+          return Store.createRecord('Line', options)
+      }
+    });
+  }
+
+  get unPersistedObjects(){
+    return this.nodeObjects.filter((nodeObject) => !nodeObject.persisted);
+  }
+
+  get persistedObjects(){
+    return this.nodeObjects.filter((nodeObject) => nodeObject.persisted);
+  }
+
+  hideUnPersistedPart(){
+    this.unPersistedObjects.forEach((nodeObject) => nodeObject.hide());
+    this._backgroundHighlight.visible = false;
   }
 
   /**
@@ -46,16 +89,8 @@ class Node {
     if(this.id==this.step.tracer.destination.node.id){
       nodeAttrs=config.nodeAttrs['destination'];
     }
-    //set x position based on node size in the configuration and x value of the node specified in constructor
-    let x = config.nodeSize*this.x;
-    //set y position based on node size in the configuration and y value of the node specified in constructor
-    let y = config.nodeSize*this.y;
 
     return {
-      x: x,
-      y: y,
-      width: config.nodeSize,
-      height: config.nodeSize,
       fillStyle: nodeAttrs.fillColor,
       strokeStyle: config.borderColor,
       strokeWidth: config.borderWidth
@@ -63,16 +98,57 @@ class Node {
   }
 
   /**
-  * domElement is PIXI.Graphics object that is a rectangle to drawn on canvas using nodeFactory.
+  * graphics is PIXI.Graphics object that is a rectangle to drawn on canvas using nodeFactory.
   * @type {PIXI.Graphics}
   * @public
   */
-  get domElement() {
-    let x, y;
-    if (!this._domElement){
-      this._domElement = nodeFactory(this.attrs, this.values);
+  get graphics() {
+    if (!this._graphics){
+      let container = new PIXI.Container();
+      this.nodeObjects.forEach((nodeObject) => container.addChild(nodeObject.graphics));
+      container.addChild(this.backgroundHighlight);
+      this._graphics = container;
     }
-    return this._domElement;
+    return this._graphics;
+  }
+
+  get lineNodeObjects(){
+    return this.nodeObjects.filter((nodeObject) => (nodeObject.type == "line"));
+  }
+
+  get backgroundHighlight(){
+    if(!this._backgroundHighlight){
+      let polygonPoints = [];
+      this.lineNodeObjects.forEach((line) => {
+        let point = [line.x1, line.y1];
+        let pointPresent = polygonPoints.some((pt) => (pt.x == point[0] && pt.y == point[1]));
+        if(!pointPresent){
+            polygonPoints.push(point);
+        }
+        point = [line.x2, line.y2];
+        pointPresent = polygonPoints.some((pt) => (pt[0] == point[0] && pt[1] == point[1]));
+        if(!pointPresent){
+            polygonPoints.push(point);
+        }
+      });
+      polygonPoints = polygonPoints.flat().map((pt) => pt*config.nodeSize);
+      let polygon = new PIXI.Graphics();
+      polygon.lineStyle(1, this.attrs.strokeStyle);
+      polygon.beginFill(this.attrs.fillStyle);
+      polygon.alpha = 0.5;
+      polygon.drawPolygon(polygonPoints);
+      polygon.endFill();
+      this._backgroundHighlight = polygon;
+    }
+    return this._backgroundHighlight;
+  }
+
+  get maxX(){
+    return Math.max.apply(Math, this.nodeObjects.map((nodeObject) => nodeObject.maxX));
+  }
+
+  get maxY(){
+    return Math.max.apply(Math, this.nodeObjects.map((nodeObject) => nodeObject.maxY));
   }
 
   /**
@@ -80,9 +156,9 @@ class Node {
   * @type {Step}
   * public
   */
-  get step(){
-    return Store.data.Step[this.stepId];
-  }
+  // get step(){
+  //   return Store.data.Step[this.stepId];
+  // }
 
   /**
   * parentNode is parent node
@@ -103,13 +179,16 @@ class Node {
     return pNode;
   }
 
+  get pathNodeObject(){
+    return this.nodeObjects.find((nodeObject) => nodeObject.drawPath);
+  }
   /**
   * center is ceter position of the current node.
   * @type {object}
   * @public
   */
   get center(){
-    return {x: config.nodeSize*(this.x+0.5), y: config.nodeSize*(this.y+0.5)};
+    return this.pathNodeObject.center;
   }
 
   /**

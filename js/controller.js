@@ -3,6 +3,9 @@ import Components from './components';
 import EventsListComponent from './components/events-list/component';
 import PlaybackService from './services/playback';
 import FloatboxService from './services/floatbox';
+import FrontierService from './services/frontier';
+import HistoryService from './services/history';
+import SearchPathService from './services/search-path';
 import Store from './services/Store';
 import config from './config';
 import $ from 'jquery';
@@ -33,20 +36,10 @@ let Controller = new StateMachine({
     * Data of this state machine has keeps all the variables required for functioning.
     */
     data: {
-      //frontierHistory => This is array of all the frontier nodes at each step of the algorithm
-      frontierHistory: [],
-      //frontierRects => This is list of graphics object that are currently rendered on the screen.
-      frontierRects: [],
-      //line => The line is line PIXI.Graphics object which is basically a line drawn from current node to the source.
-      line: null,
       //runner => The runner is function looper that runs every step of the algorithm serially.
       runner: null,
       //currentId => Id of the current step being run
       currentId: 1,
-      //history => History is array of all the nodes at each step of the algorithm
-      history: [],
-      //lines => Lines is history of lines drawn at each step.
-      lines: [],
       //rendered => If the canvas has been rendered on the screen or not.
       rendered: false,
       //app => PIXI.Application object
@@ -68,6 +61,9 @@ let Controller = new StateMachine({
         Components.forEach((component) => {
           component.init();
         });
+        HistoryService.init(this);
+        FrontierService.init(this);
+        SearchPathService.init(this);
       },
 
       /**
@@ -142,18 +138,9 @@ let Controller = new StateMachine({
       retraceHistory(id) {
         this.historyRetraced = true;
         this.cleanCanvas();
-        for(let i = 1; i<=id; i++){
-          let rectangle = this.history[i];
-          insertNode(this, rectangle);
-        }
-        this.currentId = id+1;
-        this.frontierRects = this.frontierHistory[id];
-        this.frontierRects.forEach((rectangle) => {
-          insertNode(this, rectangle);
-        });
-        this.stage.removeChild(this.line);
-        this.line = this.lines[id];
-        this.stage.addChild(this.line);
+        HistoryService.retraceHistory(id);
+        FrontierService.retraceHistory(id);
+        SearchPathService.retraceHistory(id);
       },
 
       /**
@@ -162,9 +149,9 @@ let Controller = new StateMachine({
       */
       clearFutureData() {
         if(this.historyRetraced){
-          this.lines.length = this.currentId;
-          this.history.length = this.currentId;
-          this.frontierHistory.length = this.currentId;
+          SearchPathService.clearFuture();
+          HistoryService.clearFuture();
+          FrontierService.clearFuture();
           EventsListComponent.clearEvents(this.currentId-1);
           this.historyRetraced = false;
         }
@@ -189,15 +176,9 @@ let Controller = new StateMachine({
       * This function removes all the rectangles from history, frontierRects and lines from the canvas.
       */
       cleanCanvas() {
-        for(let i = 1; i<=this.currentId; i++){
-          let rectangle = this.history[i];
-          this.stage.removeChild(rectangle);
-        }
-        for(let i = 0; i<this.frontierRects.length; i++){
-          let rectangle = this.frontierRects[i];
-          this.stage.removeChild(rectangle);
-        }
-        this.stage.removeChild(this.line);
+        HistoryService.clean();
+        FrontierService.clean();
+        SearchPathService.clean();
       },
 
       /**
@@ -206,10 +187,8 @@ let Controller = new StateMachine({
       */
       reset() {
         this.cleanCanvas();
-        this.currentId = 1;
-        this.history = [];
-        this.frontierRects = [];
-        this.frontierHistory = [];
+        HistoryService.reset();
+        FrontierService.reset();
         EventsListComponent.clearEvents(this.currentId);
       },
 
@@ -223,25 +202,9 @@ let Controller = new StateMachine({
           return;
         }
         this.currentId -= 1;
-        let rectangle = this.history.pop();
-        this.stage.removeChild(rectangle);
-        let frontiers = this.frontierHistory.pop();
-        let prevFrontiers = this.frontierHistory[this.currentId-1];
-        this.frontierRects = prevFrontiers;
-        if(frontiers.length){
-          let difference = frontiers.filter(x => !prevFrontiers.includes(x));
-          difference.forEach((child) => {
-            this.stage.removeChild(child);
-          });
-        }
-        else if(prevFrontiers.length){
-          prevFrontiers.forEach((rect) => {
-            this.stage.addChild(rect);
-          });
-        }
-        let line = this.lines.pop();
-        this.stage.removeChild(line);
-        this.stage.addChild(this.lines[this.lines.length-1]);
+        HistoryService.stepBackward();
+        FrontierService.stepBackward();
+        SearchPathService.stepBackward();
         EventsListComponent.removeEvent();
       }
     }

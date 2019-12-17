@@ -2,8 +2,8 @@
  * @function insertNode
  * This function add the Graphics object to the stage and renders it.
  * @param {Controller} context
- * @param {PIXI.Graphics} rectangle
+ * @param {PIXI.Graphics} graphics
 */
-export default function(context, rectangle) {
-  context.stage.addChild(rectangle);
+export default function(context, graphics) {
+  context.stage.addChild(graphics);
 }

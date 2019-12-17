@@ -889,7 +889,7 @@ var config = {
   pathColor: 0xFFFFFF,
   borderColor: 0x000000,
   borderWidth: 0.1,
-  nodeSize: 20,
+  nodeSize: 15,
   nodeAttrs: {
     source: {
       fillColor: 0x00DD00 //green :) 43
@@ -936,15 +936,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_events_list_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/events-list/component */ "./js/components/events-list/component.js");
 /* harmony import */ var _services_playback__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./services/playback */ "./js/services/playback.js");
 /* harmony import */ var _services_floatbox__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./services/floatbox */ "./js/services/floatbox.js");
-/* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./services/Store */ "./js/services/Store.js");
-/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./config */ "./js/config.js");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var _utils_draw_line__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils/draw-line */ "./js/utils/draw-line.js");
-/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./utils/insert-node */ "./js/utils/insert-node.js");
-/* harmony import */ var _services_runner__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./services/runner */ "./js/services/runner.js");
-/* harmony import */ var _services_renderer__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./services/renderer */ "./js/services/renderer.js");
-/* harmony import */ var _services_mouse_tracker__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./services/mouse-tracker */ "./js/services/mouse-tracker.js");
+/* harmony import */ var _services_frontier__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./services/frontier */ "./js/services/frontier.js");
+/* harmony import */ var _services_history__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./services/history */ "./js/services/history.js");
+/* harmony import */ var _services_search_path__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./services/search-path */ "./js/services/search-path.js");
+/* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./services/Store */ "./js/services/Store.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./config */ "./js/config.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var _utils_draw_line__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./utils/draw-line */ "./js/utils/draw-line.js");
+/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./utils/insert-node */ "./js/utils/insert-node.js");
+/* harmony import */ var _services_runner__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./services/runner */ "./js/services/runner.js");
+/* harmony import */ var _services_renderer__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./services/renderer */ "./js/services/renderer.js");
+/* harmony import */ var _services_mouse_tracker__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/mouse-tracker */ "./js/services/mouse-tracker.js");
+
+
+
 
 
 
@@ -978,20 +984,10 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
   * Data of this state machine has keeps all the variables required for functioning.
   */
   data: {
-    //frontierHistory => This is array of all the frontier nodes at each step of the algorithm
-    frontierHistory: [],
-    //frontierRects => This is list of graphics object that are currently rendered on the screen.
-    frontierRects: [],
-    //line => The line is line PIXI.Graphics object which is basically a line drawn from current node to the source.
-    line: null,
     //runner => The runner is function looper that runs every step of the algorithm serially.
     runner: null,
     //currentId => Id of the current step being run
     currentId: 1,
-    //history => History is array of all the nodes at each step of the algorithm
-    history: [],
-    //lines => Lines is history of lines drawn at each step.
-    lines: [],
     //rendered => If the canvas has been rendered on the screen or not.
     rendered: false,
     //app => PIXI.Application object
@@ -1009,10 +1005,13 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     * This function is called when the Controller is initiated(init transition) i.e. none to ready state. It initiates all the components on the page.
     */
     onInit: function onInit() {
-      Object(_services_mouse_tracker__WEBPACK_IMPORTED_MODULE_12__["default"])(this);
+      Object(_services_mouse_tracker__WEBPACK_IMPORTED_MODULE_15__["default"])(this);
       _components__WEBPACK_IMPORTED_MODULE_1__["default"].forEach(function (component) {
         component.init();
       });
+      _services_history__WEBPACK_IMPORTED_MODULE_6__["default"].init(this);
+      _services_frontier__WEBPACK_IMPORTED_MODULE_5__["default"].init(this);
+      _services_search_path__WEBPACK_IMPORTED_MODULE_7__["default"].init(this);
     },
 
     /**
@@ -1031,13 +1030,13 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     onStart: function onStart() {
       var _this = this;
 
-      this.tracer = _services_Store__WEBPACK_IMPORTED_MODULE_5__["default"].find('Tracer');
+      this.tracer = _services_Store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Tracer');
       var that = this;
       this.tracer.steps.then(function (steps) {
         _this.steps = steps;
         that.setupRenderer();
         _this.totalSteps = Object.keys(_this.steps).length;
-        that.runner = _services_runner__WEBPACK_IMPORTED_MODULE_10__["default"].call(that, steps);
+        that.runner = _services_runner__WEBPACK_IMPORTED_MODULE_13__["default"].call(that, steps);
         _services_playback__WEBPACK_IMPORTED_MODULE_3__["default"].init();
         _services_floatbox__WEBPACK_IMPORTED_MODULE_4__["default"].init();
       });
@@ -1051,7 +1050,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
       if (!this.rendered) {
         var width, height; //TODO
 
-        var map = _services_Store__WEBPACK_IMPORTED_MODULE_5__["default"].find('Grid'); // let map = Store.find('Mesh');
+        var map = _services_Store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Grid'); // let map = Store.find('Mesh');
 
         if (map) {
           this.map = map;
@@ -1062,7 +1061,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
           height = this.tracer.height;
         }
 
-        _services_renderer__WEBPACK_IMPORTED_MODULE_11__["default"].render(this, width, height);
+        _services_renderer__WEBPACK_IMPORTED_MODULE_14__["default"].render(this, width, height);
       }
     },
 
@@ -1089,24 +1088,11 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     * @param {number} id - id of the step at which algorithm is to be retraced.
     */
     retraceHistory: function retraceHistory(id) {
-      var _this2 = this;
-
       this.historyRetraced = true;
       this.cleanCanvas();
-
-      for (var i = 1; i <= id; i++) {
-        var rectangle = this.history[i];
-        Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_9__["default"])(this, rectangle);
-      }
-
-      this.currentId = id + 1;
-      this.frontierRects = this.frontierHistory[id];
-      this.frontierRects.forEach(function (rectangle) {
-        Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_9__["default"])(_this2, rectangle);
-      });
-      this.stage.removeChild(this.line);
-      this.line = this.lines[id];
-      this.stage.addChild(this.line);
+      _services_history__WEBPACK_IMPORTED_MODULE_6__["default"].retraceHistory(id);
+      _services_frontier__WEBPACK_IMPORTED_MODULE_5__["default"].retraceHistory(id);
+      _services_search_path__WEBPACK_IMPORTED_MODULE_7__["default"].retraceHistory(id);
     },
 
     /**
@@ -1115,9 +1101,9 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     */
     clearFutureData: function clearFutureData() {
       if (this.historyRetraced) {
-        this.lines.length = this.currentId;
-        this.history.length = this.currentId;
-        this.frontierHistory.length = this.currentId;
+        _services_search_path__WEBPACK_IMPORTED_MODULE_7__["default"].clearFuture();
+        _services_history__WEBPACK_IMPORTED_MODULE_6__["default"].clearFuture();
+        _services_frontier__WEBPACK_IMPORTED_MODULE_5__["default"].clearFuture();
         _components_events_list_component__WEBPACK_IMPORTED_MODULE_2__["default"].clearEvents(this.currentId - 1);
         this.historyRetraced = false;
       }
@@ -1144,17 +1130,9 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     * This function removes all the rectangles from history, frontierRects and lines from the canvas.
     */
     cleanCanvas: function cleanCanvas() {
-      for (var i = 1; i <= this.currentId; i++) {
-        var rectangle = this.history[i];
-        this.stage.removeChild(rectangle);
-      }
-
-      for (var _i = 0; _i < this.frontierRects.length; _i++) {
-        var _rectangle = this.frontierRects[_i];
-        this.stage.removeChild(_rectangle);
-      }
-
-      this.stage.removeChild(this.line);
+      _services_history__WEBPACK_IMPORTED_MODULE_6__["default"].clean();
+      _services_frontier__WEBPACK_IMPORTED_MODULE_5__["default"].clean();
+      _services_search_path__WEBPACK_IMPORTED_MODULE_7__["default"].clean();
     },
 
     /**
@@ -1163,10 +1141,8 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     */
     reset: function reset() {
       this.cleanCanvas();
-      this.currentId = 1;
-      this.history = [];
-      this.frontierRects = [];
-      this.frontierHistory = [];
+      _services_history__WEBPACK_IMPORTED_MODULE_6__["default"].reset();
+      _services_frontier__WEBPACK_IMPORTED_MODULE_5__["default"].reset();
       _components_events_list_component__WEBPACK_IMPORTED_MODULE_2__["default"].clearEvents(this.currentId);
     },
 
@@ -1175,8 +1151,6 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     * This function decrements the current id. It removes the current rectangle. It removes the new frontier rectanges if added in current step or retraces the frontier rectangles that were in the previous step. It also removes the current line and adds the previous line. It also removes the current even text from the list.
     */
     stepBackward: function stepBackward() {
-      var _this3 = this;
-
       this.clearFutureData();
 
       if (this.currentId == 1) {
@@ -1184,28 +1158,9 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
       }
 
       this.currentId -= 1;
-      var rectangle = this.history.pop();
-      this.stage.removeChild(rectangle);
-      var frontiers = this.frontierHistory.pop();
-      var prevFrontiers = this.frontierHistory[this.currentId - 1];
-      this.frontierRects = prevFrontiers;
-
-      if (frontiers.length) {
-        var difference = frontiers.filter(function (x) {
-          return !prevFrontiers.includes(x);
-        });
-        difference.forEach(function (child) {
-          _this3.stage.removeChild(child);
-        });
-      } else if (prevFrontiers.length) {
-        prevFrontiers.forEach(function (rect) {
-          _this3.stage.addChild(rect);
-        });
-      }
-
-      var line = this.lines.pop();
-      this.stage.removeChild(line);
-      this.stage.addChild(this.lines[this.lines.length - 1]);
+      _services_history__WEBPACK_IMPORTED_MODULE_6__["default"].stepBackward();
+      _services_frontier__WEBPACK_IMPORTED_MODULE_5__["default"].stepBackward();
+      _services_search_path__WEBPACK_IMPORTED_MODULE_7__["default"].stepBackward();
       _components_events_list_component__WEBPACK_IMPORTED_MODULE_2__["default"].removeEvent();
     }
   }
@@ -1246,6 +1201,117 @@ function init() {
 }
 
 ;
+
+/***/ }),
+
+/***/ "./js/models/Circle.js":
+/*!*****************************!*\
+  !*** ./js/models/Circle.js ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+var _id = 1;
+
+var Circle =
+/*#__PURE__*/
+function (_NodeObject) {
+  _inherits(Circle, _NodeObject);
+
+  function Circle(options) {
+    var _this;
+
+    _classCallCheck(this, Circle);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Circle).call(this, options.nodeConf));
+    Object.assign(_assertThisInitialized(_this), options.coordinates);
+    _this.r = 0.25 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+    return _this;
+  }
+
+  _createClass(Circle, [{
+    key: "createGraphics",
+    value: function createGraphics(attrs) {
+      var _graphics = new PIXI.Graphics();
+
+      _graphics.lineStyle(1, attrs.strokeStyle);
+
+      _graphics.beginFill(attrs.fillStyle);
+
+      _graphics.drawCircle(this.cx * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, this.cy * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, this.r);
+
+      _graphics.endFill();
+
+      _graphics.interactive = true;
+      _graphics.buttonMode = true;
+
+      _graphics.on("mouseover", function (e) {
+        _graphics.tint = attrs.fillStyle;
+      });
+
+      _graphics.on("mouseout", function () {
+        _graphics.tint = "0xFFFFFF";
+      });
+
+      return _graphics;
+    }
+  }, {
+    key: "graphics",
+    get: function get() {
+      if (!this._graphics) {
+        this._graphics = this.createGraphics(this.node.attrs);
+      }
+
+      return this._graphics;
+    }
+  }, {
+    key: "center",
+    get: function get() {
+      return {
+        x: _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize * this.cx,
+        y: _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize * this.cy
+      };
+    }
+  }, {
+    key: "maxX",
+    get: function get() {
+      return this.cx;
+    }
+  }, {
+    key: "maxY",
+    get: function get() {
+      return this.cy;
+    }
+  }]);
+
+  return Circle;
+}(_node_object__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (Circle);
 
 /***/ }),
 
@@ -1378,6 +1444,106 @@ function () {
 
 /***/ }),
 
+/***/ "./js/models/Line.js":
+/*!***************************!*\
+  !*** ./js/models/Line.js ***!
+  \***************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+var _id = 1;
+
+var Line =
+/*#__PURE__*/
+function (_NodeObject) {
+  _inherits(Line, _NodeObject);
+
+  function Line(options) {
+    var _this;
+
+    _classCallCheck(this, Line);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Line).call(this, options.nodeConf));
+    Object.assign(_assertThisInitialized(_this), options.coordinates);
+    return _this;
+  }
+
+  _createClass(Line, [{
+    key: "createGraphics",
+    value: function createGraphics(attrs) {
+      var _graphics = new PIXI.Graphics();
+
+      _graphics.lineStyle(2, attrs.fillStyle);
+
+      _graphics.moveTo(this.x1 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, this.y1 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize);
+
+      _graphics.lineTo(this.x2 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, this.y2 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize);
+
+      _graphics.interactive = true;
+      _graphics.buttonMode = true;
+
+      _graphics.on("mouseover", function (e) {
+        _graphics.tint = attrs.fillStyle;
+      });
+
+      _graphics.on("mouseout", function () {
+        _graphics.tint = "0xFFFFFF";
+      });
+
+      return _graphics;
+    }
+  }, {
+    key: "graphics",
+    get: function get() {
+      if (!this._graphics) {
+        this._graphics = this.createGraphics(this.node.attrs);
+      }
+
+      return this._graphics;
+    }
+  }, {
+    key: "maxX",
+    get: function get() {
+      return Math.max(this.x1, this.x2);
+    }
+  }, {
+    key: "maxY",
+    get: function get() {
+      return Math.max(this.y1, this.y2);
+    }
+  }]);
+
+  return Line;
+}(_node_object__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (Line);
+
+/***/ }),
+
 /***/ "./js/models/Mesh.js":
 /*!***************************!*\
   !*** ./js/models/Mesh.js ***!
@@ -1500,20 +1666,76 @@ function () {
     * @private
     */
 
-    this._linePoints = null; //assigning the options configuration to the node
+    this._linePoints = null;
+    var variables = options.variables;
+    delete options.variables; //assigning the options configuration to the node
 
-    Object.assign(this, options); //incrementing the _id for next object
+    Object.assign(this, options); //setting up node nodeObjects
+
+    this.setNodeObjects(variables); //incrementing the _id for next object
 
     _id++;
   }
-  /**
-  * attrs is  attributes of node contains its coordinates, size, color, border. These are used to draw the node
-  * @type {object}
-  * @public
-  */
-
 
   _createClass(Node, [{
+    key: "setNodeObjects",
+    value: function setNodeObjects(variables) {
+      var _this = this;
+
+      this.nodeObjects = this.step.tracer.nodeStructure.map(function (obj) {
+        var nodeConf = JSON.parse(JSON.stringify(obj));
+        delete nodeConf.variables;
+        nodeConf.node = _this;
+        var coordinates = {};
+        Object.keys(obj.variables).forEach(function (key) {
+          coordinates[key] = variables[obj.variables[key]];
+        });
+        var options = {
+          nodeConf: nodeConf,
+          coordinates: coordinates
+        };
+
+        switch (obj.type) {
+          case "rectangle":
+            return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Rectangle', options);
+
+          case "circle":
+            return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Circle', options);
+
+          case "line":
+            return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Line', options);
+        }
+      });
+    }
+  }, {
+    key: "hideUnPersistedPart",
+    value: function hideUnPersistedPart() {
+      this.unPersistedObjects.forEach(function (nodeObject) {
+        return nodeObject.hide();
+      });
+      this._backgroundHighlight.visible = false;
+    }
+    /**
+    * attrs is  attributes of node contains its coordinates, size, color, border. These are used to draw the node
+    * @type {object}
+    * @public
+    */
+
+  }, {
+    key: "unPersistedObjects",
+    get: function get() {
+      return this.nodeObjects.filter(function (nodeObject) {
+        return !nodeObject.persisted;
+      });
+    }
+  }, {
+    key: "persistedObjects",
+    get: function get() {
+      return this.nodeObjects.filter(function (nodeObject) {
+        return nodeObject.persisted;
+      });
+    }
+  }, {
     key: "attrs",
     get: function get() {
       //getting attributes of node based on its type
@@ -1526,50 +1748,102 @@ function () {
 
       if (this.id == this.step.tracer.destination.node.id) {
         nodeAttrs = _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeAttrs['destination'];
-      } //set x position based on node size in the configuration and x value of the node specified in constructor
+      }
 
-
-      var x = _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize * this.x; //set y position based on node size in the configuration and y value of the node specified in constructor
-
-      var y = _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize * this.y;
       return {
-        x: x,
-        y: y,
-        width: _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize,
-        height: _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize,
         fillStyle: nodeAttrs.fillColor,
         strokeStyle: _config__WEBPACK_IMPORTED_MODULE_1__["default"].borderColor,
         strokeWidth: _config__WEBPACK_IMPORTED_MODULE_1__["default"].borderWidth
       };
     }
     /**
-    * domElement is PIXI.Graphics object that is a rectangle to drawn on canvas using nodeFactory.
+    * graphics is PIXI.Graphics object that is a rectangle to drawn on canvas using nodeFactory.
     * @type {PIXI.Graphics}
     * @public
     */
 
   }, {
-    key: "domElement",
+    key: "graphics",
     get: function get() {
-      var x, y;
-
-      if (!this._domElement) {
-        this._domElement = Object(_utils_node_factory__WEBPACK_IMPORTED_MODULE_3__["default"])(this.attrs, this.values);
+      if (!this._graphics) {
+        var container = new PIXI.Container();
+        this.nodeObjects.forEach(function (nodeObject) {
+          return container.addChild(nodeObject.graphics);
+        });
+        container.addChild(this.backgroundHighlight);
+        this._graphics = container;
       }
 
-      return this._domElement;
+      return this._graphics;
+    }
+  }, {
+    key: "lineNodeObjects",
+    get: function get() {
+      return this.nodeObjects.filter(function (nodeObject) {
+        return nodeObject.type == "line";
+      });
+    }
+  }, {
+    key: "backgroundHighlight",
+    get: function get() {
+      if (!this._backgroundHighlight) {
+        var polygonPoints = [];
+        this.lineNodeObjects.forEach(function (line) {
+          var point = [line.x1, line.y1];
+          var pointPresent = polygonPoints.some(function (pt) {
+            return pt.x == point[0] && pt.y == point[1];
+          });
+
+          if (!pointPresent) {
+            polygonPoints.push(point);
+          }
+
+          point = [line.x2, line.y2];
+          pointPresent = polygonPoints.some(function (pt) {
+            return pt[0] == point[0] && pt[1] == point[1];
+          });
+
+          if (!pointPresent) {
+            polygonPoints.push(point);
+          }
+        });
+        polygonPoints = polygonPoints.flat().map(function (pt) {
+          return pt * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+        });
+        var polygon = new PIXI.Graphics();
+        polygon.lineStyle(1, this.attrs.strokeStyle);
+        polygon.beginFill(this.attrs.fillStyle);
+        polygon.alpha = 0.5;
+        polygon.drawPolygon(polygonPoints);
+        polygon.endFill();
+        this._backgroundHighlight = polygon;
+      }
+
+      return this._backgroundHighlight;
+    }
+  }, {
+    key: "maxX",
+    get: function get() {
+      return Math.max.apply(Math, this.nodeObjects.map(function (nodeObject) {
+        return nodeObject.maxX;
+      }));
+    }
+  }, {
+    key: "maxY",
+    get: function get() {
+      return Math.max.apply(Math, this.nodeObjects.map(function (nodeObject) {
+        return nodeObject.maxY;
+      }));
     }
     /**
     * step is corresponding step object for this node in the algorithm.
     * @type {Step}
     * public
     */
+    // get step(){
+    //   return Store.data.Step[this.stepId];
+    // }
 
-  }, {
-    key: "step",
-    get: function get() {
-      return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].data.Step[this.stepId];
-    }
     /**
     * parentNode is parent node
     * @type {Node}
@@ -1579,7 +1853,7 @@ function () {
   }, {
     key: "parentNode",
     get: function get() {
-      var _this = this;
+      var _this2 = this;
 
       if (!this.pId) {
         return null;
@@ -1587,12 +1861,19 @@ function () {
 
       var pNode = null;
       Object.values(_services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].data.Node).forEach(function (node) {
-        if (node.id == _this.pId) {
+        if (node.id == _this2.pId) {
           pNode = node;
           return;
         }
       });
       return pNode;
+    }
+  }, {
+    key: "pathNodeObject",
+    get: function get() {
+      return this.nodeObjects.find(function (nodeObject) {
+        return nodeObject.drawPath;
+      });
     }
     /**
     * center is ceter position of the current node.
@@ -1603,10 +1884,7 @@ function () {
   }, {
     key: "center",
     get: function get() {
-      return {
-        x: _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize * (this.x + 0.5),
-        y: _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize * (this.y + 0.5)
-      };
+      return this.pathNodeObject.center;
     }
     /**
     * linePoints returns cache of array of points from this node to the source node.
@@ -1667,6 +1945,116 @@ function () {
 
 /***/ }),
 
+/***/ "./js/models/Rectangle.js":
+/*!********************************!*\
+  !*** ./js/models/Rectangle.js ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+var _id = 1;
+
+var Rectangle =
+/*#__PURE__*/
+function (_NodeObject) {
+  _inherits(Rectangle, _NodeObject);
+
+  function Rectangle(options) {
+    var _this;
+
+    _classCallCheck(this, Rectangle);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Rectangle).call(this, options.nodeConf));
+    Object.assign(_assertThisInitialized(_this), options.coordinates);
+    return _this;
+  }
+
+  _createClass(Rectangle, [{
+    key: "createGraphics",
+    value: function createGraphics(attrs) {
+      var _graphics = new PIXI.Graphics();
+
+      _graphics.lineStyle(1, attrs.strokeStyle);
+
+      _graphics.beginFill(attrs.fillStyle);
+
+      _graphics.drawRect(this.x, this.y, _config__WEBPACK_IMPORTED_MODULE_1__["default"].width, _config__WEBPACK_IMPORTED_MODULE_1__["default"].height);
+
+      _graphics.endFill();
+
+      _graphics.interactive = true;
+      _graphics.buttonMode = true;
+
+      _graphics.on("mouseover", function (e) {
+        _graphics.tint = attrs.fillStyle;
+      });
+
+      _graphics.on("mouseout", function () {
+        _graphics.tint = "0xFFFFFF";
+      });
+
+      return _graphics;
+    }
+  }, {
+    key: "graphics",
+    get: function get() {
+      if (!this._graphics) {
+        this._graphics = this.createGraphics(this.node.attrs);
+      }
+
+      return this._graphics;
+    }
+  }, {
+    key: "center",
+    get: function get() {
+      return {
+        x: _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize * (this.x + 0.5),
+        y: _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize * (this.y + 0.5)
+      };
+    }
+  }, {
+    key: "maxX",
+    get: function get() {
+      return this.x;
+    }
+  }, {
+    key: "maxY",
+    get: function get() {
+      return this.y;
+    }
+  }]);
+
+  return Rectangle;
+}(_node_object__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (Rectangle);
+
+/***/ }),
+
 /***/ "./js/models/Step.js":
 /*!***************************!*\
   !*** ./js/models/Step.js ***!
@@ -1711,9 +2099,11 @@ function () {
     * @public
     */
 
-    this.type = options.type; //adding step id in the options to refer in the node.
+    this.type = options.type;
+    this.tracer = options.tracer; //adding step id in the options to refer in the node.
 
     options['stepId'] = _id;
+    options['step'] = this;
     /**
     * node is Node object created corresponding to this step.
     * @type {Node}
@@ -2012,6 +2402,23 @@ function () {
 
 
   _createClass(Tracer, [{
+    key: "checkMax",
+    value: function checkMax(node) {
+      if (node.maxX > this.maxX) {
+        this.maxX = node.maxX;
+      }
+
+      if (node.maxY > this.maxY) {
+        this.maxY = node.maxY;
+      }
+    }
+    /**
+    * width returns width required for visualising the tracer.
+    * @type {number}
+    * @public
+    */
+
+  }, {
     key: "debugJson",
     get: function get() {
       if (!this._debugJson) {
@@ -2040,18 +2447,13 @@ function () {
 
       if (!this._steps) {
         this._steps = this.debugJson.then(function (json) {
+          _this.nodeStructure = json.nodeStructure;
           var eventsList = json.eventList;
           eventsList.forEach(function (event) {
-            if (event.x > _this.maxX) {
-              _this.maxX = event.x;
-            }
-
-            if (event.y > _this.maxY) {
-              _this.maxY = event.y;
-            }
-
+            event.tracer = _this;
             var step = _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Step', event);
-            step.tracer = _this;
+
+            _this.checkMax(step.node);
 
             if (event.type == "source") {
               _this.source = step;
@@ -2067,12 +2469,6 @@ function () {
 
       return this._steps;
     }
-    /**
-    * width returns width required for visualising the tracer.
-    * @type {number}
-    * @public
-    */
-
   }, {
     key: "width",
     get: function get() {
@@ -2112,6 +2508,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Mesh__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Mesh */ "./js/models/Mesh.js");
 /* harmony import */ var _Node__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Node */ "./js/models/Node.js");
 /* harmony import */ var _Step__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Step */ "./js/models/Step.js");
+/* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
+/* harmony import */ var _Circle__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Circle */ "./js/models/Circle.js");
+/* harmony import */ var _Rectangle__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Rectangle */ "./js/models/Rectangle.js");
+/* harmony import */ var _Line__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Line */ "./js/models/Line.js");
+
+
+
+
 
 
 
@@ -2119,10 +2523,66 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var models = function models() {
-  return [_Tracer__WEBPACK_IMPORTED_MODULE_0__["default"], _Grid__WEBPACK_IMPORTED_MODULE_1__["default"], _Mesh__WEBPACK_IMPORTED_MODULE_2__["default"], _Node__WEBPACK_IMPORTED_MODULE_3__["default"], _Step__WEBPACK_IMPORTED_MODULE_4__["default"]];
+  return [_Tracer__WEBPACK_IMPORTED_MODULE_0__["default"], _Grid__WEBPACK_IMPORTED_MODULE_1__["default"], _Mesh__WEBPACK_IMPORTED_MODULE_2__["default"], _Node__WEBPACK_IMPORTED_MODULE_3__["default"], _Step__WEBPACK_IMPORTED_MODULE_4__["default"], _node_object__WEBPACK_IMPORTED_MODULE_5__["default"], _Circle__WEBPACK_IMPORTED_MODULE_6__["default"], _Rectangle__WEBPACK_IMPORTED_MODULE_7__["default"], _Line__WEBPACK_IMPORTED_MODULE_8__["default"]];
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (models);
+
+/***/ }),
+
+/***/ "./js/models/node-object.js":
+/*!**********************************!*\
+  !*** ./js/models/node-object.js ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/Store */ "./js/services/Store.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
+/* harmony import */ var _utils_node_color__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/node-color */ "./js/utils/node-color.js");
+/* harmony import */ var _utils_node_factory__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/node-factory */ "./js/utils/node-factory.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+
+var _id = 1;
+
+var NodeObject =
+/*#__PURE__*/
+function () {
+  function NodeObject(options) {
+    _classCallCheck(this, NodeObject);
+
+    Object.assign(this, options);
+  }
+
+  _createClass(NodeObject, [{
+    key: "hide",
+    value: function hide() {
+      this.graphics.visible = false;
+    }
+  }, {
+    key: "show",
+    value: function show() {
+      this.graphics.visible = true;
+    } // get node(){
+    //   return Store.data.Node[this.nodeId];
+    // }
+
+  }]);
+
+  return NodeObject;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (NodeObject);
 
 /***/ }),
 
@@ -2335,6 +2795,113 @@ var FloatboxService = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___
 
 /***/ }),
 
+/***/ "./js/services/frontier.js":
+/*!*********************************!*\
+  !*** ./js/services/frontier.js ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
+/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
+/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
+/* harmony import */ var _utils_remove_node__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/remove-node */ "./js/utils/remove-node.js");
+
+
+
+
+var FrontierService = {
+  init: function init(context) {
+    this.context = context; //history => This is array of all the frontier nodes at each step of the algorithm
+
+    this.history = []; //current => This is list of graphics object that are currently rendered on the screen.
+
+    this.current = [];
+  },
+
+  get currentId() {
+    return this.context.currentId;
+  },
+
+  /**
+  * @function add
+  * This function checks if the node can be frontier. If so, it adds it changes it creates a new node with frontier color and node attributes and renders it on the screen. Additionally, it adds it to the current and history as well.
+  * @param {Node} node
+  */
+  add: function add(node) {
+    if (node.step.changeColor) {
+      var attrs = node.attrs;
+      attrs['fillStyle'] = _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeAttrs['frontier'].fillColor;
+      var graphicsContainer = new PIXI.Container();
+      node.nodeObjects.forEach(function (nodeObject) {
+        var graphics = nodeObject.createGraphics(attrs);
+        graphicsContainer.addChild(graphics);
+      });
+      Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(this.context, graphicsContainer);
+      this.current.push(graphicsContainer);
+    }
+
+    this.history[this.currentId] = this.current.slice();
+  },
+
+  /**
+  * @function clearCurrent
+  * This function remove all the current from the screen, current and history.
+  */
+  clearCurrent: function clearCurrent() {
+    this.clean();
+    this.current = [];
+    this.history[this.currentId] = [];
+  },
+  clean: function clean() {
+    var _this = this;
+
+    this.current.forEach(function (graphicsContainer) {
+      Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(_this.context, graphicsContainer);
+    });
+  },
+  clearFuture: function clearFuture() {
+    this.history.length = this.currentId;
+  },
+  reset: function reset() {
+    this.current = [];
+    this.history = [];
+  },
+  retraceHistory: function retraceHistory(id) {
+    var _this2 = this;
+
+    this.current = this.history[id];
+    this.current.forEach(function (graphicsContainer) {
+      Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(_this2.context, graphicsContainer);
+    });
+  },
+  stepBackward: function stepBackward() {
+    var _this3 = this;
+
+    var frontiers = this.history.pop();
+    var prevFrontiers = this.history[this.currentId - 1];
+    this.current = prevFrontiers;
+
+    if (frontiers.length) {
+      var difference = frontiers.filter(function (x) {
+        return !prevFrontiers.includes(x);
+      });
+      difference.forEach(function (graphicsContainer) {
+        Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(_this3.context, graphicsContainer);
+      });
+    } else if (prevFrontiers.length) {
+      prevFrontiers.forEach(function (graphicsContainer) {
+        Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(_this3.context, graphicsContainer);
+      });
+    }
+  }
+};
+/* harmony default export */ __webpack_exports__["default"] = (FrontierService);
+
+/***/ }),
+
 /***/ "./js/services/grid.js":
 /*!*****************************!*\
   !*** ./js/services/grid.js ***!
@@ -2473,6 +3040,90 @@ __webpack_require__.r(__webpack_exports__);
     }
   }
 });
+
+/***/ }),
+
+/***/ "./js/services/history.js":
+/*!********************************!*\
+  !*** ./js/services/history.js ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
+/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
+/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
+/* harmony import */ var _utils_remove_node__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/remove-node */ "./js/utils/remove-node.js");
+
+
+
+
+var HistoryService = {
+  init: function init(context) {
+    this.context = context; //history => History is array of all the nodes at each step of the algorithm
+
+    this.history = [];
+  },
+
+  get currentId() {
+    return this.context.currentId;
+  },
+
+  /**
+  * @function updateNodes
+  * This function adds the node graphicsContainer as the current history node identified by the current id.
+  */
+  update: function update() {
+    //hide non persisted previous step node
+    if (this.currentId > 1) {
+      var previousStep = this.context.steps[this.currentId - 1];
+      previousStep.node.hideUnPersistedPart();
+    }
+
+    var step = this.context.steps[this.currentId];
+    var node = step.node;
+    var graphicsContainer = node.graphics;
+    Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(this.context, graphicsContainer);
+    this.history[this.currentId] = node.graphics;
+    return step;
+  },
+
+  /**
+  * @function updateId
+  * This function increments the running currentId
+  */
+  updateId: function updateId() {
+    this.context.currentId += 1;
+  },
+  retraceHistory: function retraceHistory(id) {
+    for (var i = 1; i <= id; i++) {
+      var graphicsContainer = this.history[i];
+      Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(this.context, graphicsContainer);
+    }
+
+    this.context.currentId = id + 1;
+  },
+  clearFuture: function clearFuture() {
+    this.history.length = this.currentId;
+  },
+  clean: function clean() {
+    for (var i = 1; i <= this.currentId; i++) {
+      var graphicsContainer = this.history[i];
+      Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, graphicsContainer);
+    }
+  },
+  reset: function reset() {
+    this.context.currentId = 1;
+    this.history = [];
+  },
+  stepBackward: function stepBackward() {
+    var graphicsContainer = this.history.pop();
+    Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, graphicsContainer);
+  }
+};
+/* harmony default export */ __webpack_exports__["default"] = (HistoryService);
 
 /***/ }),
 
@@ -2834,90 +3485,16 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
-/* harmony import */ var _utils_draw_line__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/draw-line */ "./js/utils/draw-line.js");
-/* harmony import */ var _utils_node_factory__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/node-factory */ "./js/utils/node-factory.js");
-/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
-
+/* harmony import */ var _services_frontier__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/frontier */ "./js/services/frontier.js");
+/* harmony import */ var _services_search_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../services/search-path */ "./js/services/search-path.js");
+/* harmony import */ var _services_history__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/history */ "./js/services/history.js");
 
 
  //history
 //clear the canvas
 //trace all the nodes till now
 //create the frontier nodes as per the array of frontier nodes.
-
-/**
-* @function addFrontierNode
-* This function checks if the node can be frontier. If so, it adds it changes it creates a new node with frontier color and node attributes and renders it on the screen. Additionally, it adds it to the frontierRects and frontierHistory as well.
-* @param {Controller} controller
-* @param {Node} node
-*/
-
-var addFrontierNode = function addFrontierNode(controller, node) {
-  var id = controller.currentId;
-
-  if (node.step.changeColor) {
-    var attrs = node.attrs;
-    attrs['fillStyle'] = _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeAttrs['frontier'].fillColor;
-    var rectangle = Object(_utils_node_factory__WEBPACK_IMPORTED_MODULE_2__["default"])(attrs, node.values);
-    Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_3__["default"])(controller, rectangle);
-    controller.frontierRects.push(rectangle);
-  }
-
-  controller.frontierHistory[id] = controller.frontierRects.slice();
-};
-/**
-* @function clearFrontierNodes
-* This function remove all the frontierNodes from the screen, frontierRects and frontierHistory.
-* @param {Controller} controller
-*/
-
-
-var clearFrontierNodes = function clearFrontierNodes(controller) {
-  var id = controller.currentId;
-  controller.frontierRects.forEach(function (rect) {
-    controller.stage.removeChild(rect);
-  });
-  controller.frontierRects = [];
-  controller.frontierHistory[id] = [];
-};
-/**
-* @function updateHistory
-* This function adds the node domElement as the current history node identified by the current id.
-* @param {Controller} controller
-* @param {PIXI.Graphics} rectangle
-*/
-
-
-var updateHistory = function updateHistory(controller, rectangle) {
-  var id = controller.currentId;
-  controller.history[id] = rectangle;
-};
-/**
-* @function updateLine
-* This function removes the previous line drawn and adds the current line on the screen. Line is from source to the current node.
-* @param {Controller} controller
-* @param {Node} node
-*/
-
-
-var updateLine = function updateLine(controller, node) {
-  var id = controller.currentId;
-  controller.stage.removeChild(controller.lines[id - 1]);
-  controller.line = Object(_utils_draw_line__WEBPACK_IMPORTED_MODULE_1__["default"])(controller, node);
-  controller.lines[id] = controller.line;
-};
-/**
-* @function updateId
-* This function increments the running currentId
-* @param {Controller} controller
-*/
-
-
-var updateId = function updateId(controller) {
-  var id = controller.currentId;
-  controller.currentId = id + 1;
-}; //put rectangles that are extra - this includes. removing the frontier nodes as well - only when closing
+//put rectangles that are extra - this includes. removing the frontier nodes as well - only when closing
 //when generating/updating - first opened node and then frontier node
 //source, destination, expanding, frontier, opened, closed
 //source and destination remain untouched
@@ -2934,7 +3511,6 @@ var updateId = function updateId(controller) {
 * @returns {function} runner - returns the runner function
 */
 
-
 var runnerFactory = function runnerFactory(steps) {
   var self = this;
   var startTime = new Date();
@@ -2946,30 +3522,89 @@ var runnerFactory = function runnerFactory(steps) {
       var endTime = new Date();
       alert(endTime - startTime);
       return;
-    }
-
-    var step = steps[id];
-    var node = step.node;
-    var rectangle = node.domElement;
-    Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_3__["default"])(controller, rectangle);
-    addFrontierNode(self, node);
-
-    if (step.type == 'closing') {
-      clearFrontierNodes(self);
     } //update history
 
 
-    updateHistory(self, rectangle); //update line
+    var step = _services_history__WEBPACK_IMPORTED_MODULE_2__["default"].update();
+    _services_frontier__WEBPACK_IMPORTED_MODULE_0__["default"].add(step.node);
 
-    updateLine(self, node); //update id
+    if (step.type == 'closing') {
+      _services_frontier__WEBPACK_IMPORTED_MODULE_0__["default"].clearCurrent();
+    } //update search path
 
-    updateId(self);
+
+    _services_search_path__WEBPACK_IMPORTED_MODULE_1__["default"].update(step.node); //update id
+
+    _services_history__WEBPACK_IMPORTED_MODULE_2__["default"].updateId();
   };
 
   return runner;
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (runnerFactory);
+
+/***/ }),
+
+/***/ "./js/services/search-path.js":
+/*!************************************!*\
+  !*** ./js/services/search-path.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
+/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
+/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
+/* harmony import */ var _utils_remove_node__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/remove-node */ "./js/utils/remove-node.js");
+/* harmony import */ var _utils_draw_line__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/draw-line */ "./js/utils/draw-line.js");
+
+
+
+
+
+var SearchPathService = {
+  init: function init(context) {
+    this.context = context; //history => history is history of lines drawn at each step.
+
+    this.history = []; //current => The current is line PIXI.Graphics object which is basically a line drawn from current node to the source.
+
+    this.current = null;
+  },
+
+  get currentId() {
+    return this.context.currentId;
+  },
+
+  /**
+  * @function update
+  * This function removes the previous line drawn and adds the current line on the screen. Line is from source to the current node.
+  * @param {Node} node
+  */
+  update: function update(node) {
+    Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, this.history[this.currentId - 1]);
+    this.current = Object(_utils_draw_line__WEBPACK_IMPORTED_MODULE_4__["default"])(this.context, node);
+    this.history[this.currentId] = this.current;
+  },
+  retraceHistory: function retraceHistory(id) {
+    Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, this.current);
+    this.current = this.history[id];
+    Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(this.context, this.current);
+  },
+  clearFuture: function clearFuture() {
+    this.history.length = this.currentId;
+  },
+  clean: function clean() {
+    Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, this.current);
+  },
+  stepBackward: function stepBackward() {
+    var line = this.history.pop();
+    Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, line);
+    Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(this.context, this.history[this.history.length - 1]);
+  }
+};
+/* harmony default export */ __webpack_exports__["default"] = (SearchPathService);
 
 /***/ }),
 
@@ -3036,7 +3671,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = (function (context, node) {
   var line = new PIXI.Graphics();
-  line.lineStyle(1, _config__WEBPACK_IMPORTED_MODULE_0__["default"].lineColor);
+  line.lineStyle(3, _config__WEBPACK_IMPORTED_MODULE_0__["default"].lineColor);
   node.linePoints.forEach(function (point, index) {
     if (index == 0) {
       line.moveTo(point.x, point.y);
@@ -3087,10 +3722,10 @@ __webpack_require__.r(__webpack_exports__);
  * @function insertNode
  * This function add the Graphics object to the stage and renders it.
  * @param {Controller} context
- * @param {PIXI.Graphics} rectangle
+ * @param {PIXI.Graphics} graphics
 */
-/* harmony default export */ __webpack_exports__["default"] = (function (context, rectangle) {
-  context.stage.addChild(rectangle);
+/* harmony default export */ __webpack_exports__["default"] = (function (context, graphics) {
+  context.stage.addChild(graphics);
 });
 
 /***/ }),
@@ -3195,6 +3830,27 @@ __webpack_require__.r(__webpack_exports__);
   return polygon;
 });
 ;
+
+/***/ }),
+
+/***/ "./js/utils/remove-node.js":
+/*!*********************************!*\
+  !*** ./js/utils/remove-node.js ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/**
+ * @function removeNode
+ * This function removes the Graphics object from the stage.
+ * @param {Controller} context
+ * @param {PIXI.Graphics} graphics
+*/
+/* harmony default export */ __webpack_exports__["default"] = (function (context, graphics) {
+  context.stage.removeChild(graphics);
+});
 
 /***/ }),
 

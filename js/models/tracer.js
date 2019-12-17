@@ -82,16 +82,12 @@ class Tracer {
   get steps() {
     if(!this._steps){
       this._steps = this.debugJson.then((json) => {
+        this.nodeStructure = json.nodeStructure;
         let eventsList = json.eventList;
         eventsList.forEach((event) => {
-          if(event.x > this.maxX){
-            this.maxX = event.x;
-          }
-          if(event.y > this.maxY){
-            this.maxY = event.y;
-          }
+          event.tracer = this;
           let step = Store.createRecord('Step', event);
-          step.tracer = this;
+          this.checkMax(step.node);
           if(event.type=="source"){
             this.source = step;
           }
@@ -103,6 +99,15 @@ class Tracer {
       });
     }
     return this._steps;
+  }
+
+  checkMax(node){
+    if(node.maxX > this.maxX){
+      this.maxX = node.maxX;
+    }
+    if(node.maxY > this.maxY){
+      this.maxY = node.maxY;
+    }
   }
 
   /**

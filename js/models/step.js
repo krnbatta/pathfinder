@@ -22,8 +22,12 @@ class Step {
     * @public
     */
     this.type = options.type;
+
+    this.tracer = options.tracer;
+    
     //adding step id in the options to refer in the node.
     options['stepId'] = _id;
+    options['step'] = this;
     /**
     * node is Node object created corresponding to this step.
     * @type {Node}
