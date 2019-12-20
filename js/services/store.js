@@ -17,7 +17,7 @@ let getModel = function(modelName) {
 
 let instance = null;
 
-/** @module services/mouse-tracker
+/** @module services/store
 * this is data store implementation. Store is a singleton class. the values are stored in data. and it has common functions like createRecord, findAll, findBy, find, getRecord, relationships(hasMany, belongsTo)
 */
 class StoreSingleton {
@@ -28,6 +28,7 @@ class StoreSingleton {
         }
         return instance;
     }
+
     createRecord(modelName, attributes) {
         this.data[modelName] = this.data[modelName] || {};
         let model = getModel(modelName);
@@ -35,6 +36,7 @@ class StoreSingleton {
         this.data[modelName][record._id] = record;
         return record;
     }
+
     find(modelName){
       try{
         return this.data[modelName][0];
@@ -42,6 +44,10 @@ class StoreSingleton {
       catch(e){
         return null;
       }
+    }
+
+    where(modelName, condition){
+      return Object.values(this.data[modelName]).filter(record => Object.keys(condition).every(key => record[key] == condition[key]));
     }
 }
 let Store = new StoreSingleton();

@@ -19,6 +19,7 @@ export default {
       let gridReader = new FileReader();
 
       gridReader.addEventListener("load", function(event) {
+        //TODO: Take only first 2 lines and leave the rest as such.
         let textFile = event.target;
         const data = textFile.result.split(/\n|\r\n/);
 
@@ -54,6 +55,9 @@ export default {
     gridStr: null,
 
     build(gridData, callback) {
+      //Is object creation required?
+      //Is Promises required?
+      //Draw white background. Draw only black obstacles later.
       this.gridStr = gridData.gridStr;
       this.width = gridData.width;
       this.height = gridData.height;
@@ -98,6 +102,7 @@ export default {
   */
   drawer: {
     draw() {
+      let mapContainer = new PIXI.Container();
       let grid = Store.find('Grid');
       grid.cells.then((cells) => {
         Controller.setupRenderer();
@@ -105,8 +110,9 @@ export default {
           cells.forEach((cell) => {
             cell.isMap = true;
             let cellElement = nodeFactory(cell);
-            insertNode(Controller, cellElement);
+            mapContainer.addChild(cellElement);
           });
+          insertNode(Controller, mapContainer);
         });
       }, (err) => {
         errorNotifier(err);

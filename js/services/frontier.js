@@ -28,7 +28,9 @@ let FrontierService = {
       let graphicsContainer = new PIXI.Container();
       node.nodeObjects.forEach((nodeObject) => {
         let graphics = nodeObject.createGraphics(attrs);
-        graphicsContainer.addChild(graphics);
+        if(graphics){
+          graphicsContainer.addChild(graphics);          
+        }
       });
       insertNode(this.context, graphicsContainer);
       this.current.push(graphicsContainer);

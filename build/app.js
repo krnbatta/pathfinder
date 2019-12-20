@@ -943,11 +943,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./config */ "./js/config.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_10__);
-/* harmony import */ var _utils_draw_line__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./utils/draw-line */ "./js/utils/draw-line.js");
-/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./utils/insert-node */ "./js/utils/insert-node.js");
-/* harmony import */ var _services_runner__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./services/runner */ "./js/services/runner.js");
-/* harmony import */ var _services_renderer__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./services/renderer */ "./js/services/renderer.js");
-/* harmony import */ var _services_mouse_tracker__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/mouse-tracker */ "./js/services/mouse-tracker.js");
+/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./utils/insert-node */ "./js/utils/insert-node.js");
+/* harmony import */ var _services_runner__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./services/runner */ "./js/services/runner.js");
+/* harmony import */ var _services_renderer__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./services/renderer */ "./js/services/renderer.js");
+/* harmony import */ var _services_mouse_tracker__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./services/mouse-tracker */ "./js/services/mouse-tracker.js");
+/* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/injector */ "./js/services/injector.js");
 
 
 
@@ -1005,7 +1005,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     * This function is called when the Controller is initiated(init transition) i.e. none to ready state. It initiates all the components on the page.
     */
     onInit: function onInit() {
-      Object(_services_mouse_tracker__WEBPACK_IMPORTED_MODULE_15__["default"])(this);
+      Object(_services_mouse_tracker__WEBPACK_IMPORTED_MODULE_14__["default"])(this);
       _components__WEBPACK_IMPORTED_MODULE_1__["default"].forEach(function (component) {
         component.init();
       });
@@ -1036,7 +1036,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
         _this.steps = steps;
         that.setupRenderer();
         _this.totalSteps = Object.keys(_this.steps).length;
-        that.runner = _services_runner__WEBPACK_IMPORTED_MODULE_13__["default"].call(that, steps);
+        that.runner = _services_runner__WEBPACK_IMPORTED_MODULE_12__["default"].call(that, steps);
         _services_playback__WEBPACK_IMPORTED_MODULE_3__["default"].init();
         _services_floatbox__WEBPACK_IMPORTED_MODULE_4__["default"].init();
       });
@@ -1061,7 +1061,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
           height = this.tracer.height;
         }
 
-        _services_renderer__WEBPACK_IMPORTED_MODULE_14__["default"].render(this, width, height);
+        _services_renderer__WEBPACK_IMPORTED_MODULE_13__["default"].render(this, width, height);
       }
     },
 
@@ -1165,6 +1165,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     }
   }
 });
+_services_injector__WEBPACK_IMPORTED_MODULE_15__["default"].register('controller', Controller);
 window.controller = Controller;
 /* harmony default export */ __webpack_exports__["default"] = (Controller);
 
@@ -1215,6 +1216,11 @@ function init() {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
+/* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/injector */ "./js/services/injector.js");
+/* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/Store */ "./js/services/Store.js");
+/* harmony import */ var _utils_debounce__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/debounce */ "./js/utils/debounce.js");
+/* harmony import */ var _utils_draw_line__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/draw-line */ "./js/utils/draw-line.js");
+/* harmony import */ var _utils_remove_node__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/remove-node */ "./js/utils/remove-node.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1235,6 +1241,11 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+
+
+
+
 var _id = 1;
 
 var Circle =
@@ -1248,14 +1259,18 @@ function (_NodeObject) {
     _classCallCheck(this, Circle);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Circle).call(this, options.nodeConf));
+    _this._id = _id;
     Object.assign(_assertThisInitialized(_this), options.coordinates);
     _this.r = 0.25 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+    _id++;
     return _this;
   }
 
   _createClass(Circle, [{
     key: "createGraphics",
     value: function createGraphics(attrs) {
+      var self = this;
+
       var _graphics = new PIXI.Graphics();
 
       _graphics.lineStyle(1, attrs.strokeStyle);
@@ -1268,6 +1283,7 @@ function (_NodeObject) {
 
       _graphics.interactive = true;
       _graphics.buttonMode = true;
+      _services_injector__WEBPACK_IMPORTED_MODULE_2__["default"].inject(this, ['controller', 'renderer']);
 
       _graphics.on("mouseover", function (e) {
         _graphics.tint = attrs.fillStyle;
@@ -1277,7 +1293,36 @@ function (_NodeObject) {
         _graphics.tint = "0xFFFFFF";
       });
 
-      return _graphics;
+      self.nodesHidden = true;
+      var toggleNodes = Object(_utils_debounce__WEBPACK_IMPORTED_MODULE_4__["default"])(function () {
+        var circles = _services_Store__WEBPACK_IMPORTED_MODULE_3__["default"].where("Circle", {
+          cx: self.cx,
+          cy: self.cy
+        });
+
+        if (self.nodesHidden) {
+          circles.forEach(function (circle) {
+            circle.node.showUnPersistedPart();
+          });
+          self.line = Object(_utils_draw_line__WEBPACK_IMPORTED_MODULE_5__["default"])(self.controller, self.node);
+          self.nodesHidden = false;
+        } else {
+          circles.forEach(function (circle) {
+            circle.node.hideUnPersistedPart();
+          });
+          Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_6__["default"])(self.controller, self.line);
+          self.nodesHidden = true;
+        }
+      });
+
+      _graphics.on("click", function () {
+        toggleNodes();
+      });
+
+      var texture = this.renderer.generateTexture(_graphics);
+      var circleSprite = new PIXI.Sprite(texture);
+      circleSprite = _graphics;
+      return circleSprite;
     }
   }, {
     key: "graphics",
@@ -1455,6 +1500,7 @@ function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
+/* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/injector */ "./js/services/injector.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1472,6 +1518,7 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -1499,10 +1546,16 @@ function (_NodeObject) {
 
       _graphics.lineStyle(2, attrs.fillStyle);
 
+      _graphics.beginFill(attrs.fillStyle); // _graphics.drawPolygon(this.x1*config.nodeSize, this.y1*config.nodeSize, this.x2*config.nodeSize, this.y2*config.nodeSize);
+
+
       _graphics.moveTo(this.x1 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, this.y1 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize);
 
       _graphics.lineTo(this.x2 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, this.y2 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize);
 
+      _graphics.endFill();
+
+      _graphics.hitArea = new PIXI.Polygon([this.x1 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, this.y1 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize - 1, this.x1 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, this.y1 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize + 1, this.x2 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, this.y2 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize - 1, this.x2 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, this.y2 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize + 1]);
       _graphics.interactive = true;
       _graphics.buttonMode = true;
 
@@ -1514,14 +1567,19 @@ function (_NodeObject) {
         _graphics.tint = "0xFFFFFF";
       });
 
-      return _graphics;
+      _services_injector__WEBPACK_IMPORTED_MODULE_2__["default"].inject(this, ['renderer']);
+      var texture = this.renderer.generateTexture(_graphics);
+      var lineSprite = new PIXI.Sprite(texture);
+      lineSprite = _graphics;
+      return lineSprite;
     }
   }, {
     key: "graphics",
     get: function get() {
       if (!this._graphics) {
         this._graphics = this.createGraphics(this.node.attrs);
-      }
+      } // return null;
+
 
       return this._graphics;
     }
@@ -1631,11 +1689,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _utils_node_color__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/node-color */ "./js/utils/node-color.js");
 /* harmony import */ var _utils_node_factory__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/node-factory */ "./js/utils/node-factory.js");
+/* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../services/injector */ "./js/services/injector.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -1688,7 +1748,14 @@ function () {
         nodeConf.node = _this;
         var coordinates = {};
         Object.keys(obj.variables).forEach(function (key) {
-          coordinates[key] = variables[obj.variables[key]];
+          if (key == "points") {
+            coordinates['points'] = [];
+            obj.variables['points'].forEach(function (pt) {
+              coordinates['points'].push(variables[pt]);
+            });
+          } else {
+            coordinates[key] = variables[obj.variables[key]];
+          }
         });
         var options = {
           nodeConf: nodeConf,
@@ -1704,6 +1771,9 @@ function () {
 
           case "line":
             return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Line', options);
+
+          case "polygon":
+            return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Polygon', options);
         }
       });
     }
@@ -1713,7 +1783,13 @@ function () {
       this.unPersistedObjects.forEach(function (nodeObject) {
         return nodeObject.hide();
       });
-      this._backgroundHighlight.visible = false;
+    }
+  }, {
+    key: "showUnPersistedPart",
+    value: function showUnPersistedPart() {
+      this.unPersistedObjects.forEach(function (nodeObject) {
+        return nodeObject.show();
+      });
     }
     /**
     * attrs is  attributes of node contains its coordinates, size, color, border. These are used to draw the node
@@ -1768,9 +1844,10 @@ function () {
       if (!this._graphics) {
         var container = new PIXI.Container();
         this.nodeObjects.forEach(function (nodeObject) {
-          return container.addChild(nodeObject.graphics);
+          if (nodeObject.graphics) {
+            container.addChild(nodeObject.graphics);
+          }
         });
-        container.addChild(this.backgroundHighlight);
         this._graphics = container;
       }
 
@@ -1782,44 +1859,6 @@ function () {
       return this.nodeObjects.filter(function (nodeObject) {
         return nodeObject.type == "line";
       });
-    }
-  }, {
-    key: "backgroundHighlight",
-    get: function get() {
-      if (!this._backgroundHighlight) {
-        var polygonPoints = [];
-        this.lineNodeObjects.forEach(function (line) {
-          var point = [line.x1, line.y1];
-          var pointPresent = polygonPoints.some(function (pt) {
-            return pt.x == point[0] && pt.y == point[1];
-          });
-
-          if (!pointPresent) {
-            polygonPoints.push(point);
-          }
-
-          point = [line.x2, line.y2];
-          pointPresent = polygonPoints.some(function (pt) {
-            return pt[0] == point[0] && pt[1] == point[1];
-          });
-
-          if (!pointPresent) {
-            polygonPoints.push(point);
-          }
-        });
-        polygonPoints = polygonPoints.flat().map(function (pt) {
-          return pt * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
-        });
-        var polygon = new PIXI.Graphics();
-        polygon.lineStyle(1, this.attrs.strokeStyle);
-        polygon.beginFill(this.attrs.fillStyle);
-        polygon.alpha = 0.5;
-        polygon.drawPolygon(polygonPoints);
-        polygon.endFill();
-        this._backgroundHighlight = polygon;
-      }
-
-      return this._backgroundHighlight;
     }
   }, {
     key: "maxX",
@@ -1945,6 +1984,141 @@ function () {
 
 /***/ }),
 
+/***/ "./js/models/Polygon.js":
+/*!******************************!*\
+  !*** ./js/models/Polygon.js ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
+/* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/injector */ "./js/services/injector.js");
+/* harmony import */ var _services_floatbox__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/floatbox */ "./js/services/floatbox.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+
+var _id = 1;
+
+var Polygon =
+/*#__PURE__*/
+function (_NodeObject) {
+  _inherits(Polygon, _NodeObject);
+
+  function Polygon(options) {
+    var _this;
+
+    _classCallCheck(this, Polygon);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Polygon).call(this, options.nodeConf));
+    Object.assign(_assertThisInitialized(_this), options.coordinates);
+    return _this;
+  }
+
+  _createClass(Polygon, [{
+    key: "createGraphics",
+    value: function createGraphics(attrs) {
+      var self = this;
+
+      var _graphics = new PIXI.Graphics();
+
+      _graphics.lineStyle(2, attrs.fillStyle);
+
+      _graphics.beginFill(attrs.fillStyle);
+
+      _graphics.drawPolygon(this.points.map(function (pt) {
+        return pt * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+      }));
+
+      _graphics.endFill();
+
+      _graphics.alpha = 0.5;
+      _graphics.interactive = true;
+      _graphics.buttonMode = true;
+      _services_injector__WEBPACK_IMPORTED_MODULE_2__["default"].inject(this, ['controller', 'renderer']);
+
+      _graphics.on("mouseover", function (e) {
+        _graphics.tint = attrs.fillStyle;
+        var position = {
+          x: self.controller.x,
+          y: self.controller.y
+        };
+        _services_floatbox__WEBPACK_IMPORTED_MODULE_3__["default"].execute(e, self.node.values, position);
+      });
+
+      _graphics.on("mouseout", function () {
+        _graphics.tint = "0xFFFFFF";
+      });
+
+      var texture = this.renderer.generateTexture(_graphics);
+      var polygonSprite = new PIXI.Sprite(texture);
+      polygonSprite = _graphics;
+      return polygonSprite;
+    }
+  }, {
+    key: "graphics",
+    get: function get() {
+      if (!this._graphics) {
+        this._graphics = this.createGraphics(this.node.attrs);
+      } // return null;
+
+
+      return this._graphics;
+    }
+  }, {
+    key: "maxX",
+    get: function get() {
+      var xcoords = this.points.filter(function (a, i) {
+        return i % 2 === 0;
+      });
+      return Math.max.apply(Math, _toConsumableArray(xcoords));
+    }
+  }, {
+    key: "maxY",
+    get: function get() {
+      var ycoords = this.points.filter(function (a, i) {
+        return i % 2 === 1;
+      });
+      return Math.max.apply(Math, _toConsumableArray(ycoords));
+    }
+  }]);
+
+  return Polygon;
+}(_node_object__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (Polygon);
+
+/***/ }),
+
 /***/ "./js/models/Rectangle.js":
 /*!********************************!*\
   !*** ./js/models/Rectangle.js ***!
@@ -1956,6 +2130,7 @@ function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
+/* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/injector */ "./js/services/injector.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1973,6 +2148,7 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -2017,7 +2193,10 @@ function (_NodeObject) {
         _graphics.tint = "0xFFFFFF";
       });
 
-      return _graphics;
+      _services_injector__WEBPACK_IMPORTED_MODULE_2__["default"].inject(this, ['renderer']);
+      var texture = this.renderer.generateTexture(_graphics);
+      var rectangleSprite = new PIXI.Sprite(texture);
+      return rectangleSprite;
     }
   }, {
     key: "graphics",
@@ -2512,6 +2691,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Circle__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Circle */ "./js/models/Circle.js");
 /* harmony import */ var _Rectangle__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Rectangle */ "./js/models/Rectangle.js");
 /* harmony import */ var _Line__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Line */ "./js/models/Line.js");
+/* harmony import */ var _Polygon__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Polygon */ "./js/models/Polygon.js");
+
 
 
 
@@ -2523,7 +2704,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var models = function models() {
-  return [_Tracer__WEBPACK_IMPORTED_MODULE_0__["default"], _Grid__WEBPACK_IMPORTED_MODULE_1__["default"], _Mesh__WEBPACK_IMPORTED_MODULE_2__["default"], _Node__WEBPACK_IMPORTED_MODULE_3__["default"], _Step__WEBPACK_IMPORTED_MODULE_4__["default"], _node_object__WEBPACK_IMPORTED_MODULE_5__["default"], _Circle__WEBPACK_IMPORTED_MODULE_6__["default"], _Rectangle__WEBPACK_IMPORTED_MODULE_7__["default"], _Line__WEBPACK_IMPORTED_MODULE_8__["default"]];
+  return [_Tracer__WEBPACK_IMPORTED_MODULE_0__["default"], _Grid__WEBPACK_IMPORTED_MODULE_1__["default"], _Mesh__WEBPACK_IMPORTED_MODULE_2__["default"], _Node__WEBPACK_IMPORTED_MODULE_3__["default"], _Step__WEBPACK_IMPORTED_MODULE_4__["default"], _node_object__WEBPACK_IMPORTED_MODULE_5__["default"], _Circle__WEBPACK_IMPORTED_MODULE_6__["default"], _Rectangle__WEBPACK_IMPORTED_MODULE_7__["default"], _Line__WEBPACK_IMPORTED_MODULE_8__["default"], _Polygon__WEBPACK_IMPORTED_MODULE_9__["default"]];
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (models);
@@ -2620,7 +2801,7 @@ var getModel = function getModel(modelName) {
 };
 
 var instance = null;
-/** @module services/mouse-tracker
+/** @module services/store
 * this is data store implementation. Store is a singleton class. the values are stored in data. and it has common functions like createRecord, findAll, findBy, find, getRecord, relationships(hasMany, belongsTo)
 */
 
@@ -2655,6 +2836,15 @@ function () {
       } catch (e) {
         return null;
       }
+    }
+  }, {
+    key: "where",
+    value: function where(modelName, condition) {
+      return Object.values(this.data[modelName]).filter(function (record) {
+        return Object.keys(condition).every(function (key) {
+          return record[key] == condition[key];
+        });
+      });
     }
   }]);
 
@@ -2837,7 +3027,10 @@ var FrontierService = {
       var graphicsContainer = new PIXI.Container();
       node.nodeObjects.forEach(function (nodeObject) {
         var graphics = nodeObject.createGraphics(attrs);
-        graphicsContainer.addChild(graphics);
+
+        if (graphics) {
+          graphicsContainer.addChild(graphics);
+        }
       });
       Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(this.context, graphicsContainer);
       this.current.push(graphicsContainer);
@@ -2938,6 +3131,7 @@ __webpack_require__.r(__webpack_exports__);
     parse: function parse(file, callback) {
       var gridReader = new FileReader();
       gridReader.addEventListener("load", function (event) {
+        //TODO: Take only first 2 lines and leave the rest as such.
         var textFile = event.target;
         var data = textFile.result.split(/\n|\r\n/);
         data.shift();
@@ -2972,6 +3166,9 @@ __webpack_require__.r(__webpack_exports__);
     build: function build(gridData, callback) {
       var _this = this;
 
+      //Is object creation required?
+      //Is Promises required?
+      //Draw white background. Draw only black obstacles later.
       this.gridStr = gridData.gridStr;
       this.width = gridData.width;
       this.height = gridData.height;
@@ -3024,6 +3221,7 @@ __webpack_require__.r(__webpack_exports__);
   */
   drawer: {
     draw: function draw() {
+      var mapContainer = new PIXI.Container();
       var grid = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Grid');
       grid.cells.then(function (cells) {
         _controller__WEBPACK_IMPORTED_MODULE_6__["default"].setupRenderer();
@@ -3031,8 +3229,9 @@ __webpack_require__.r(__webpack_exports__);
           cells.forEach(function (cell) {
             cell.isMap = true;
             var cellElement = Object(_utils_node_factory__WEBPACK_IMPORTED_MODULE_4__["default"])(cell);
-            Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], cellElement);
+            mapContainer.addChild(cellElement);
           });
+          Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], mapContainer);
         });
       }, function (err) {
         Object(_error_notifier__WEBPACK_IMPORTED_MODULE_3__["default"])(err);
@@ -3124,6 +3323,54 @@ var HistoryService = {
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (HistoryService);
+
+/***/ }),
+
+/***/ "./js/services/injector.js":
+/*!*********************************!*\
+  !*** ./js/services/injector.js ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var InjectorService =
+/*#__PURE__*/
+function () {
+  function InjectorService() {
+    _classCallCheck(this, InjectorService);
+
+    this.dependencies = {};
+  }
+
+  _createClass(InjectorService, [{
+    key: "register",
+    value: function register(key, value) {
+      this.dependencies[key] = value;
+    }
+  }, {
+    key: "inject",
+    value: function inject(context, keys) {
+      var _this = this;
+
+      keys.forEach(function (key) {
+        context[key] = _this.dependencies[key];
+      });
+    }
+  }]);
+
+  return InjectorService;
+}();
+
+var Injector = new InjectorService();
+/* harmony default export */ __webpack_exports__["default"] = (Injector);
 
 /***/ }),
 
@@ -3447,6 +3694,8 @@ var PlaybackService = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _injector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./injector */ "./js/services/injector.js");
+
 
 /** @module services/renderer
 * This service is responsible for rendering the canvas onto the DOM.
@@ -3465,12 +3714,15 @@ __webpack_require__.r(__webpack_exports__);
       width: width,
       height: height,
       view: context.canvas,
-      transparent: true
+      transparent: true // antialias: true
+
     });
     context.renderer = context.app.renderer;
-    context.stage = context.app.stage;
-    context.renderer.render(context.stage);
+    context.stage = new PIXI.Container();
+    context.renderer.render(context.app.stage);
+    context.app.stage.addChild(context.stage);
     context.rendered = true;
+    _injector__WEBPACK_IMPORTED_MODULE_1__["default"].register('renderer', context.renderer);
   }
 });
 
@@ -3849,7 +4101,10 @@ __webpack_require__.r(__webpack_exports__);
  * @param {PIXI.Graphics} graphics
 */
 /* harmony default export */ __webpack_exports__["default"] = (function (context, graphics) {
-  context.stage.removeChild(graphics);
+  if (graphics) {
+    graphics.visible = false;
+  } // context.stage.removeChild(graphics);
+
 });
 
 /***/ }),

@@ -2,6 +2,7 @@ import Store from '../services/Store'
 import config from '../config'
 import nodeColor from '../utils/node-color';
 import nodeFactory from '../utils/node-factory';
+import Injector from '../services/injector';
 
 let _id = 1;
 
@@ -46,16 +47,26 @@ class Node {
       nodeConf.node = this;
       let coordinates = {};
       Object.keys(obj.variables).forEach((key) => {
-        coordinates[key] = variables[obj.variables[key]];
+        if(key=="points"){
+          coordinates['points'] = [];
+          obj.variables['points'].forEach((pt) => {
+            coordinates['points'].push(variables[pt]);
+          });
+        }
+        else{
+          coordinates[key] = variables[obj.variables[key]];
+        }
       });
       let options = {nodeConf: nodeConf, coordinates: coordinates};
       switch (obj.type) {
         case "rectangle":
-          return Store.createRecord('Rectangle', options)
+          return Store.createRecord('Rectangle', options);
         case "circle":
-          return Store.createRecord('Circle', options)
+          return Store.createRecord('Circle', options);
         case "line":
-          return Store.createRecord('Line', options)
+          return Store.createRecord('Line', options);
+        case "polygon":
+          return Store.createRecord('Polygon', options);
       }
     });
   }
@@ -70,7 +81,10 @@ class Node {
 
   hideUnPersistedPart(){
     this.unPersistedObjects.forEach((nodeObject) => nodeObject.hide());
-    this._backgroundHighlight.visible = false;
+  }
+
+  showUnPersistedPart(){
+    this.unPersistedObjects.forEach((nodeObject) => nodeObject.show());
   }
 
   /**
@@ -105,8 +119,11 @@ class Node {
   get graphics() {
     if (!this._graphics){
       let container = new PIXI.Container();
-      this.nodeObjects.forEach((nodeObject) => container.addChild(nodeObject.graphics));
-      container.addChild(this.backgroundHighlight);
+      this.nodeObjects.forEach((nodeObject) => {
+        if(nodeObject.graphics){
+          container.addChild(nodeObject.graphics)
+        }
+      });
       this._graphics = container;
     }
     return this._graphics;
@@ -114,33 +131,6 @@ class Node {
 
   get lineNodeObjects(){
     return this.nodeObjects.filter((nodeObject) => (nodeObject.type == "line"));
-  }
-
-  get backgroundHighlight(){
-    if(!this._backgroundHighlight){
-      let polygonPoints = [];
-      this.lineNodeObjects.forEach((line) => {
-        let point = [line.x1, line.y1];
-        let pointPresent = polygonPoints.some((pt) => (pt.x == point[0] && pt.y == point[1]));
-        if(!pointPresent){
-            polygonPoints.push(point);
-        }
-        point = [line.x2, line.y2];
-        pointPresent = polygonPoints.some((pt) => (pt[0] == point[0] && pt[1] == point[1]));
-        if(!pointPresent){
-            polygonPoints.push(point);
-        }
-      });
-      polygonPoints = polygonPoints.flat().map((pt) => pt*config.nodeSize);
-      let polygon = new PIXI.Graphics();
-      polygon.lineStyle(1, this.attrs.strokeStyle);
-      polygon.beginFill(this.attrs.fillStyle);
-      polygon.alpha = 0.5;
-      polygon.drawPolygon(polygonPoints);
-      polygon.endFill();
-      this._backgroundHighlight = polygon;
-    }
-    return this._backgroundHighlight;
   }
 
   get maxX(){

@@ -1,0 +1,58 @@
+<head>
+  <script src="pixi.min.js" type="text/javascript"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        canvas = document.createElement("canvas");
+        canvas.id = "canvas";
+        document.body.appendChild(canvas);
+        app = new PIXI.Application({
+          width: 500,
+          height: 500,
+          view: canvas,
+          transparent: true
+        });
+        renderer = app.renderer;
+        stage = app.stage;
+        renderer.render(stage);
+        container = new PIXI.Container();
+        let _graphics = new PIXI.Graphics();
+        _graphics.lineStyle(1, 0xCDCDCD);
+        _graphics.beginFill(0x000000);
+        _graphics.drawCircle(25, 25, 25);
+        _graphics.endFill();
+        _graphics.interactive=true;
+        _graphics.buttonMode=true;
+        _graphics.on("mouseover", (e) => {
+          _graphics.tint=0x000000;
+        });
+        _graphics.on("mouseout", () => {
+          _graphics.tint="0xFFFFFF";
+        });
+        //This is on demand
+        texture = renderer.generateTexture(_graphics);
+        circleSprite = new PIXI.Sprite(texture);
+        container.addChild(circleSprite);
+        _graphics = new PIXI.Graphics();
+        _graphics.lineStyle(1, 0xCDCDCD);
+        _graphics.beginFill(0x000000);
+        _graphics.drawCircle(100, 100, 25);
+        _graphics.endFill();
+        _graphics.interactive=true;
+        _graphics.buttonMode=true;
+        _graphics.on("mouseover", (e) => {
+          _graphics.tint=0x000000;
+        });
+        _graphics.on("mouseout", () => {
+          _graphics.tint="0xFFFFFF";
+        });
+        //This is on demand
+        container.addChild(_graphics);
+        stage.addChild(container);
+    }, false);
+  </script>
+</head>
+<body>
+  Random figures tests -> 250,000
+  Existing Solution, PIXI Lighweight solution?, Canvas
+  <canvas></canvas>
+</body>

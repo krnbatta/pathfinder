@@ -5,5 +5,8 @@
  * @param {PIXI.Graphics} graphics
 */
 export default function(context, graphics) {
-  context.stage.removeChild(graphics);
+  if(graphics){
+    graphics.visible = false;
+  }
+  // context.stage.removeChild(graphics);
 }

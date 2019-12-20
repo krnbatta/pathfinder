@@ -1,5 +1,6 @@
 import NodeObject from './node-object';
-import config from '../config'
+import config from '../config';
+import Injector from '../services/injector';
 
 let _id = 1;
 
@@ -22,7 +23,10 @@ class Rectangle extends NodeObject {
     _graphics.on("mouseout", () => {
       _graphics.tint="0xFFFFFF";
     });
-    return _graphics;
+    Injector.inject(this, ['renderer']);
+    let texture = this.renderer.generateTexture(_graphics);
+    let rectangleSprite = new PIXI.Sprite(texture);
+    return rectangleSprite;
   }
   get graphics(){
     if(!this._graphics){

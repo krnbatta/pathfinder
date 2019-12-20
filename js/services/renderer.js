@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import Injector from './injector';
 
 /** @module services/renderer
 * This service is responsible for rendering the canvas onto the DOM.
@@ -17,10 +18,13 @@ export default {
       height: height,
       view: context.canvas,
       transparent: true
+      // antialias: true
     });
     context.renderer = context.app.renderer;
-    context.stage = context.app.stage;
-    context.renderer.render(context.stage);
+    context.stage = new PIXI.Container();
+    context.renderer.render(context.app.stage);
+    context.app.stage.addChild(context.stage);
     context.rendered = true;
+    Injector.register('renderer', context.renderer);
   }
 }
