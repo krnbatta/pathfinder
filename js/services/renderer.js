@@ -17,8 +17,9 @@ export default {
       width: width,
       height: height,
       view: context.canvas,
-      transparent: true
-      // antialias: true
+      transparent: true,
+      forceCanvas: true,
+      antialias: true
     });
     context.renderer = context.app.renderer;
     context.stage = new PIXI.Container();

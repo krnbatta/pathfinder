@@ -1,4 +1,4 @@
-{"eventList":[
+{"drawType": "grid/anya/xy", "eventList":[
 {"type":"source","id":1736,"x":8,"y":15},
 {"type":"destination","id":4419,"x":3,"y":43},
 {"type":"generating","id":1736,"x":8,"y":15,"g":0,"f":0.000300711,"pId":null},

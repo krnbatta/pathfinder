@@ -18,6 +18,14 @@ html, body {
 }
 #canvas{
   transform: translateZ(0);
+  position: absolute;
+  z-index: 1;
+}
+#map-canvas{
+  transform: translateZ(0);
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 #events-list-component{
   position: absolute;
@@ -78,6 +86,7 @@ html, body {
 #context-menu{
   display:none;
   position:fixed;
+  z-index: 2;
   border:1px solid #B2B2B2;
   width:150px;
   background:#F9F9F9;

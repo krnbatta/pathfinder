@@ -448,11 +448,11 @@ var MapComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___def
         if (fileType == "grid") {
           _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Grid', file);
           _this.map = _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].find('Grid');
-          _services_grid__WEBPACK_IMPORTED_MODULE_8__["default"].drawer.draw();
+          _services_grid__WEBPACK_IMPORTED_MODULE_8__["default"].drawer.draw(); // GridService.process();
         } else if (fileType == "mesh") {
           _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Mesh', file);
           _this.mesh = _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].find('Mesh');
-          _services_mesh__WEBPACK_IMPORTED_MODULE_9__["default"].drawer.draw();
+          _services_mesh__WEBPACK_IMPORTED_MODULE_9__["default"].drawer.draw(); // MeshService.process();
         }
 
         jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map-component").hide();
@@ -889,7 +889,7 @@ var config = {
   pathColor: 0xFFFFFF,
   borderColor: 0x000000,
   borderWidth: 0.1,
-  nodeSize: 15,
+  nodeSize: 20,
   nodeAttrs: {
     source: {
       fillColor: 0x00DD00 //green :) 43
@@ -1049,8 +1049,9 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     setupRenderer: function setupRenderer() {
       if (!this.rendered) {
         var width, height; //TODO
+        // let map = Store.find('Grid');
 
-        var map = _services_Store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Grid'); // let map = Store.find('Mesh');
+        var map = _services_Store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Mesh');
 
         if (map) {
           this.map = map;
@@ -3140,8 +3141,8 @@ __webpack_require__.r(__webpack_exports__);
         data.shift();
         var gridStr = data.reduce(function (f, e) {
           return f + e;
-        }, '');
-        console.log("gridData", width, height, gridStr);
+        }, ''); // console.log("gridData", width, height, gridStr);
+
         var gridData = {
           height: height,
           width: width,
@@ -3237,6 +3238,96 @@ __webpack_require__.r(__webpack_exports__);
         Object(_error_notifier__WEBPACK_IMPORTED_MODULE_3__["default"])(err);
       });
     }
+  },
+  process: function process() {
+    var grid = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Grid');
+    grid.gridData.then(function (gridData) {
+      var height = gridData.height;
+      var width = gridData.width;
+      var gridStr = gridData.gridStr;
+      _controller__WEBPACK_IMPORTED_MODULE_6__["default"].setupRenderer();
+      canvas = document.createElement("canvas");
+      canvas.id = "map-canvas";
+      var screen = document.getElementsByClassName("screen")[0];
+      screen.appendChild(canvas);
+      var canvas = document.getElementById("map-canvas");
+      var webglCanvas = document.getElementById("canvas");
+      canvas.style.position = 'absolute';
+      canvas.width = width * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+      canvas.height = height * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+      canvas.style.top = 0;
+      canvas.style.left = 0;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "black";
+
+      for (var y = 0; y <= height; y++) {
+        for (var x = 0; x <= width; x++) {
+          var stringIndex = y * width + x;
+
+          if (gridStr[stringIndex] == '@') {
+            ctx.fillRect(x * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, y * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize);
+          }
+        }
+      }
+
+      for (var i = 0; i <= width; i++) {
+        var line = new PIXI.Graphics();
+        var x1 = void 0,
+            x2 = void 0,
+            y1 = void 0,
+            y2 = void 0;
+        x1 = i * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+        x2 = i * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+        y1 = 0;
+        y2 = height * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+
+        if (i == 0) {
+          x1 += 1;
+          x2 += 1;
+        }
+
+        if (i == width) {
+          x1 -= 1;
+          x2 -= 1;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+
+      for (var i = 0; i <= height; i++) {
+        var _line = new PIXI.Graphics();
+
+        var _x = void 0,
+            _x2 = void 0,
+            _y = void 0,
+            _y2 = void 0;
+
+        _y = i * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+        _y2 = i * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+        _x = 0;
+        _x2 = width * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+
+        if (i == 0) {
+          _y += 1;
+          _y2 += 1;
+        }
+
+        if (i == height) {
+          _y -= 1;
+          _y2 -= 1;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(_x, _y);
+        ctx.lineTo(_x2, _y2);
+        ctx.stroke();
+      }
+    });
   }
 });
 
@@ -3391,6 +3482,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
 /* harmony import */ var _utils_insert_edges__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/insert-edges */ "./js/utils/insert-edges.js");
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 
 
 
@@ -3515,6 +3614,93 @@ __webpack_require__.r(__webpack_exports__);
         Object(_error_notifier__WEBPACK_IMPORTED_MODULE_3__["default"])(err);
       });
     }
+  },
+  createCanvas: function createCanvas(id, width, height) {
+    var canvasId = "map-canvas".concat(id);
+    var canvas = document.createElement("canvas");
+    canvas.id = canvasId;
+    var screen = document.getElementsByClassName("screen")[0];
+    screen.appendChild(canvas);
+    canvas.width = width;
+    canvas.height = height;
+    canvas.style.position = "absolute";
+    canvas.style.top = 0;
+    canvas.style.left = 0;
+    return canvas;
+  },
+  paintCanvas: function paintCanvas(index, width, height, chunk, type) {
+    var canvas = this.createCanvas(index, width, height);
+    var offscreen = canvas.transferControlToOffscreen();
+    var worker = new Worker("data:application/x-javascript;base64, b25tZXNzYWdlID0gZnVuY3Rpb24oZXZ0KSB7CiAgaW1wb3J0U2NyaXB0cyhldnQuZGF0YS5zY3JpcHRVcmwpOwogIHBvc3RNZXNzYWdlKG1haW4oZXZ0LmRhdGEucGFyYW1zKSk7Cn07Cg==");
+    worker.postMessage({
+      scriptUrl: "file:///Users/krnbatta/Projects/monash/intern/pathfinder/js/workers/".concat(type, "Polygons.js"),
+      params: {
+        canvas: offscreen,
+        width: width,
+        height: height,
+        polygonsArr: chunk,
+        nodeSize: _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize
+      }
+    }, [offscreen]);
+  },
+  process: function process() {
+    var _this3 = this;
+
+    var mesh = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Mesh');
+    mesh.meshData.then(function (meshData) {
+      var maxX = meshData.maxX;
+      var maxY = meshData.maxY;
+      var polygonsArr = meshData.polygonsArr;
+      _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
+      var webglCanvas = document.getElementById("canvas");
+      var width = maxX * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+      var height = maxY * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+      var turfPolygons = [];
+      polygonsArr.forEach(function (polygonArr) {
+        if (polygonArr.length) {
+          turfPolygons.push([].concat(_toConsumableArray(polygonArr), [polygonArr[0]]));
+        }
+      });
+      var dissolvedPolygons = [];
+      var totalCores = navigator.hardwareConcurrency || 4;
+      var chunkSize = Math.ceil(turfPolygons.length / 100);
+      var chunkedTurfPolygons = new Array(Math.ceil(turfPolygons.length / chunkSize)).fill().map(function (_, i) {
+        return turfPolygons.slice(i * chunkSize, i * chunkSize + chunkSize);
+      });
+      var workers = {};
+      var promises = [];
+      chunkedTurfPolygons.forEach(function (chunkedTurfPolygon, index) {
+        var promise = new Promise(function (resolve, reject) {
+          workers[index] = new Worker("data:application/x-javascript;base64,b25tZXNzYWdlID0gZnVuY3Rpb24oZXZ0KSB7CiAgaW1wb3J0U2NyaXB0cyhldnQuZGF0YS5zY3JpcHRVcmwpOwogIHBvc3RNZXNzYWdlKG1haW4oZXZ0LmRhdGEucGFyYW1zKSk7Cn07Cg==");
+          workers[index].postMessage({
+            scriptUrl: "file:///Users/krnbatta/Projects/monash/intern/pathfinder/js/workers/dissolvePolygon.js",
+            params: {
+              turfPolygons: chunkedTurfPolygon,
+              scriptUrl: "file:///Users/krnbatta/Projects/monash/intern/pathfinder/vendor/js/turf.min.js"
+            }
+          });
+
+          workers[index].onmessage = function (event) {
+            resolve(event.data);
+            workers[index].terminate();
+          };
+        });
+        promises.push(promise);
+      });
+      Promise.all(promises).then(function (res) {
+        res.forEach(function (c, index) {
+          var x = c.map(function (r) {
+            return r[0].slice(0, r[0].length - 1);
+          });
+
+          _this3.paintCanvas(index, width, height, x, "fill");
+        }); // let chunkSize = Math.ceil(polygonsArr.length/totalCores);
+        // let chunks = new Array(Math.ceil(polygonsArr.length / chunkSize)).fill().map((_,i) => polygonsArr.slice(i*chunkSize,i*chunkSize+chunkSize));
+        // chunks.forEach((chunk, index) => {
+        //   this.paintCanvas(-index, width, height, chunk, "stroke");
+        // });
+      });
+    });
   }
 });
 
@@ -3714,8 +3900,9 @@ __webpack_require__.r(__webpack_exports__);
       width: width,
       height: height,
       view: context.canvas,
-      transparent: true // antialias: true
-
+      transparent: true,
+      forceCanvas: true,
+      antialias: true
     });
     context.renderer = context.app.renderer;
     context.stage = new PIXI.Container();
@@ -4102,9 +4289,8 @@ __webpack_require__.r(__webpack_exports__);
 */
 /* harmony default export */ __webpack_exports__["default"] = (function (context, graphics) {
   if (graphics) {
-    graphics.visible = false;
-  } // context.stage.removeChild(graphics);
-
+    context.stage.removeChild(graphics); // graphics.visible = false;
+  }
 });
 
 /***/ }),

@@ -29,7 +29,7 @@ export default {
         const width = Number(data.shift().split(' ').pop());
         data.shift();
         const gridStr = data.reduce((f, e) => f + e, '');
-        console.log("gridData", width, height, gridStr);
+        // console.log("gridData", width, height, gridStr);
 
         const gridData = {
           height: height,
@@ -118,5 +118,80 @@ export default {
         errorNotifier(err);
       });
     }
+  },
+
+  process(){
+    let grid = Store.find('Grid');
+    grid.gridData.then((gridData) => {
+      let height = gridData.height;
+      let width = gridData.width;
+      let gridStr = gridData.gridStr;
+      Controller.setupRenderer();
+      canvas = document.createElement("canvas");
+      canvas.id = "map-canvas";
+      let screen = document.getElementsByClassName("screen")[0];
+      screen.appendChild(canvas);
+      let canvas = document.getElementById("map-canvas");
+      let webglCanvas = document.getElementById("canvas");
+      canvas.style.position = 'absolute';
+      canvas.width = width * config.nodeSize;
+      canvas.height = height * config.nodeSize;
+      canvas.style.top = 0;
+      canvas.style.left = 0;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "black";
+      for (var y = 0; y <= height; y++) {
+        for (var x = 0; x <= width; x++) {
+          var stringIndex = y * width + x;
+          if (gridStr[stringIndex] == '@') {
+            ctx.fillRect(x*config.nodeSize, y*config.nodeSize, config.nodeSize, config.nodeSize);
+          }
+        }
+      }
+
+      for(var i=0; i<=width; i++){
+        let line = new PIXI.Graphics();
+        let x1, x2, y1, y2;
+        x1 = i*config.nodeSize;
+        x2 = i*config.nodeSize;
+        y1 = 0;
+        y2 = height * config.nodeSize;
+        if(i==0){
+          x1 += 1;
+          x2 += 1;
+        }
+        if(i==width){
+          x1 -= 1;
+          x2 -= 1;
+        }
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+
+      for(var i=0; i<=height; i++){
+        let line = new PIXI.Graphics();
+        let x1, x2, y1, y2;
+        y1 = i*config.nodeSize;
+        y2 = i*config.nodeSize;
+        x1 = 0;
+        x2 = width * config.nodeSize;
+        if(i==0){
+          y1 += 1;
+          y2 += 1;
+        }
+        if(i==height){
+          y1 -= 1;
+          y2 -= 1;
+        }
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+    });
   }
 }

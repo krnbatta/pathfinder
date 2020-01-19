@@ -6,7 +6,7 @@
 */
 export default function(context, graphics) {
   if(graphics){
-    graphics.visible = false;
+    context.stage.removeChild(graphics);
+    // graphics.visible = false;
   }
-  // context.stage.removeChild(graphics);
 }

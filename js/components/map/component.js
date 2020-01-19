@@ -45,11 +45,13 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
           Store.createRecord('Grid', file);
           this.map = Store.find('Grid');
           GridService.drawer.draw();
+          // GridService.process();
         }
         else if(fileType == "mesh"){
           Store.createRecord('Mesh', file);
           this.mesh = Store.find('Mesh');
           MeshService.drawer.draw();
+          // MeshService.process();
         }
         $("#map-component").hide();
       });

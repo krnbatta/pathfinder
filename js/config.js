@@ -5,7 +5,7 @@ const config = {
   pathColor: 0xFFFFFF,
   borderColor: 0x000000,
   borderWidth: 0.1,
-  nodeSize: 15,
+  nodeSize: 20,
   nodeAttrs: {
     source: {
       fillColor: 0x00DD00 //green :) 43

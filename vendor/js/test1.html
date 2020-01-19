@@ -1,0 +1,26 @@
+<head>
+  <script src="pixi.min.js" type="text/javascript"></script>
+  <script>
+    function poc(){
+      canvas = document.createElement("canvas");
+      canvas.id = "canvas";
+      document.body.appendChild(canvas);
+      height = 100;
+      width = 100;
+      app = new PIXI.Application({
+        width: width,
+        height: height,
+        view: canvas,
+        transparent: true
+      });
+      renderer = app.renderer;
+      stage = app.stage;
+      renderer.render(stage);
+      container = new PIXI.Container();
+    }
+
+  </script>
+</head>
+<body>
+  <input type="file" id="file-input" />
+</body>
