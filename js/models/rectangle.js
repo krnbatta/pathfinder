@@ -7,13 +7,15 @@ let _id = 1;
 class Rectangle extends NodeObject {
   constructor(options){
     super(options.nodeConf);
+    this._id = _id;
     Object.assign(this, options.coordinates);
+    _id++;
   }
   createGraphics(attrs){
     let _graphics = new PIXI.Graphics();
     _graphics.lineStyle(1, attrs.strokeStyle);
     _graphics.beginFill(attrs.fillStyle);
-    _graphics.drawRect(this.x, this.y, config.width, config.height);
+    _graphics.drawRect(this.x * config.nodeSize, this.y * config.nodeSize, config.nodeSize, config.nodeSize);
     _graphics.endFill();
     _graphics.interactive=true;
     _graphics.buttonMode=true;
@@ -24,9 +26,7 @@ class Rectangle extends NodeObject {
       _graphics.tint="0xFFFFFF";
     });
     Injector.inject(this, ['renderer']);
-    let texture = this.renderer.generateTexture(_graphics);
-    let rectangleSprite = new PIXI.Sprite(texture);
-    return rectangleSprite;
+    return _graphics;
   }
   get graphics(){
     if(!this._graphics){

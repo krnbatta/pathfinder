@@ -5,11 +5,57 @@ import errorNotifier from './error-notifier';
 import nodeFactory from '../utils/node-factory';
 import insertNode from '../utils/insert-node';
 import Controller from '../controller';
+import $ from "jquery";
 
 /** @module services/grid
 * This service is responsible for: parsing grid file, building grid cells and drawing grid on canvas.
 */
 export default {
+  renderMap(){
+    let grid = Store.find("Grid");
+    let map = Store.find("Map");
+    grid.gridData.then((gridData) => {
+      Controller.setupRenderer();
+      let mapSprite = new PIXI.Sprite.from(`${config.clientAddr}/maps/images/${map.mapName}.png`);
+      mapSprite.width = gridData.width * config.nodeSize;
+      mapSprite.height = gridData.height * config.nodeSize;
+      insertNode(Controller, mapSprite);
+    });
+  },
+
+  checkMap(){
+    let map = Store.find("Map");
+    var img = new Image();
+    let self = this;
+    img.onerror = function(){
+      //send request to server
+      self.sendToServer();
+    }
+    img.onload = function(){
+      //load map from image directly
+      self.renderMap();
+      img = null;
+    }
+    img.src = `${config.clientAddr}/maps/images/${map.mapName}.png`;
+  },
+
+  sendToServer(){
+    let grid = Store.find("Grid");
+    let map = Store.find("Map");
+    grid.gridData.then((gridData) => {
+      fetch(config.processGridUrl, {
+        method: "POST",
+        body: JSON.stringify({width: gridData.width, height: gridData.height, gridStr: gridData.gridStr, fileName: map.mapName}),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then((res) => res.json()).then((data) => {
+        if(data.done){
+          this.renderMap();
+        }
+      });
+    });
+  },
   /**
   * Parser parses the grid map file by extracting height, width and structure of map and passing this into callback.
   * @public
@@ -121,23 +167,27 @@ export default {
   },
 
   process(){
+    this.checkMap();
+  },
+
+  processMe(){
     let grid = Store.find('Grid');
     grid.gridData.then((gridData) => {
       let height = gridData.height;
       let width = gridData.width;
       let gridStr = gridData.gridStr;
       Controller.setupRenderer();
-      canvas = document.createElement("canvas");
-      canvas.id = "map-canvas";
-      let screen = document.getElementsByClassName("screen")[0];
-      screen.appendChild(canvas);
-      let canvas = document.getElementById("map-canvas");
+      let canvas = document.createElement("canvas");
+      // canvas.id = "map-canvas";
+      // let screen = document.getElementsByClassName("screen")[0];
+      // screen.appendChild(canvas);
+      // let canvas = document.getElementById("map-canvas");
       let webglCanvas = document.getElementById("canvas");
-      canvas.style.position = 'absolute';
+      // canvas.style.position = 'absolute';
       canvas.width = width * config.nodeSize;
       canvas.height = height * config.nodeSize;
-      canvas.style.top = 0;
-      canvas.style.left = 0;
+      // canvas.style.top = 0;
+      // canvas.style.left = 0;
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = "white";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -150,7 +200,15 @@ export default {
           }
         }
       }
-
+      ctx.fillStyle = "green";
+      for (var y = 0; y <= height; y++) {
+        for (var x = 0; x <= width; x++) {
+          var stringIndex = y * width + x;
+          if (gridStr[stringIndex] == 'T') {
+            ctx.fillRect(x*config.nodeSize, y*config.nodeSize, config.nodeSize, config.nodeSize);
+          }
+        }
+      }
       for(var i=0; i<=width; i++){
         let line = new PIXI.Graphics();
         let x1, x2, y1, y2;
@@ -192,6 +250,21 @@ export default {
         ctx.lineTo(x2, y2);
         ctx.stroke();
       }
+      let data = canvas.toDataURL();
+      let img = new Image();
+      img.src = data;
+      img.onload = function(){
+        let baseTexture = new PIXI.BaseTexture(img);
+        let texture = new PIXI.Texture(baseTexture);
+        let mapSprite = PIXI.Sprite.from(texture);
+        // mapSprite.width = 800;
+        // mapSprite.height = 500;
+        insertNode(Controller, mapSprite);
+        // document.body.appendChild(img);
+      }
+
+      // let mapSprite = PIXI.Sprite.from("maps/tfs.png");
+      // insertNode(Controller, mapSprite);
     });
   }
 }

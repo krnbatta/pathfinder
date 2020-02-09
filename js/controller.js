@@ -91,25 +91,40 @@ let Controller = new StateMachine({
         });
       },
 
+      getMap(){
+        let map = Store.find('Map');
+        if(map && map.mapType == "grid"){
+          map = Store.find('Grid');
+
+        }
+        else if(map && map.mapType == "mesh"){
+          map = Store.find('Mesh');
+        }
+        return map;
+      },
+
+      getDimensions(){
+        let width, height;
+        let map = this.getMap();
+        if(map){
+          this.map = map;
+          width = map.width;
+          height = map.height;
+        }
+        else{
+          width = this.tracer.width;
+          height = this.tracer.height;
+        }
+        return {width, height}
+      },
+
       /**
       * @function setupRenderer
       * This function initiates the canvas by map's height and width if it is uploaded. Otherwise, just algorithm's max width and height used. Renderer service is used to render.
       */
       setupRenderer() {
         if(!this.rendered){
-          let width, height;
-          //TODO
-          // let map = Store.find('Grid');
-          let map = Store.find('Mesh');
-          if(map){
-            this.map = map;
-            width = map.width;
-            height = map.height;
-          }
-          else{
-            width = this.tracer.width;
-            height = this.tracer.height;
-          }
+          let {width, height} = this.getDimensions();
           Renderer.render(this, width, height);
         }
       },

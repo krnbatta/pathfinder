@@ -1,4 +1,5 @@
 import Store from '../services/Store'
+import NodeObjectsProcessor from '../services/node-objects-processor'
 import config from '../config'
 import nodeColor from '../utils/node-color';
 import nodeFactory from '../utils/node-factory';
@@ -26,22 +27,37 @@ class Node {
     */
     this._linePoints = null;
 
+    //assigning the options configuration to the node
     let variables = options.variables;
 
     delete options.variables;
 
-    //assigning the options configuration to the node
     Object.assign(this, options);
 
+    variables = {variables: this.setVariables(variables)};
+
+
+    Object.assign(this, variables);
     //setting up node nodeObjects
-    this.setNodeObjects(variables);
+    this.setNodeObjects();
 
     //incrementing the _id for next object
     _id++;
   }
 
-  setNodeObjects(variables){
-    this.nodeObjects = this.step.tracer.nodeStructure.map((obj) => {
+  setVariables(variables){
+    return variables || this.generatingNode.variables;
+  }
+
+  get generatingNode(){
+    return Store.where("Node", {type: "generating", id: this.id})[0];
+  }
+
+  setNodeObjects(){
+    this.nodeObjects = NodeObjectsProcessor.process(this);
+    return;
+
+    this.step.tracer.nodeStructure.map((obj) => {
       let nodeConf = JSON.parse(JSON.stringify(obj));
       delete nodeConf.variables;
       nodeConf.node = this;

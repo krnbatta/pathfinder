@@ -39,24 +39,91 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     bindEvents() {
       $("#load-map").on('change', (e) => {
+        debugger
+        if(this.validateFiles(e.target.files)){
+          this.processFiles(e.target.files);
+        }
+        else{
+          alert("Invalid format(s)");
+        }
+      });
+    },
+
+    processFiles(files){
+      if(files.length > 0){
+        let file1 = files[0];
+        let file2 = file[1];
+        let file1Name = file1.name.split(".");
+        let file2Name = file2.name.split(".");
+        let file1Type = file1Name.pop();
+        file1Name = file1Name.join("");
+        let file2Type = file2Name.pop();
+        file2Name = file2Name.join("");
+        let fileType = 'roadnetwork';
+        let fileName = file1Type == "gr" ? file1Name : file2Name;
+        let coFile = file1Type == "co" ? file1 : file2;
+        let grFile = file1Type == "gr" ? file1 : file2;
+        let map = Store.createRecord("Map", {fileType, fileName});
+        Store.createRecord('RoadNetwork', {coFile, grFile});
+        RoadNetworkService.process();
+      }
+      else{
         let file = e.target.files[0];
-        let fileType = file.name.split(".").pop();
+        let fileName = file.name.split(".");
+        let fileType = fileName.pop();
+        fileName = fileName.join("");
+        let map = Store.createRecord("Map", {fileType, fileName});
         if(fileType == "grid"){
           Store.createRecord('Grid', file);
-          this.map = Store.find('Grid');
-          GridService.drawer.draw();
-          // GridService.process();
+          GridService.process();
         }
         else if(fileType == "mesh"){
           Store.createRecord('Mesh', file);
-          this.mesh = Store.find('Mesh');
-          MeshService.drawer.draw();
-          // MeshService.process();
+          MeshService.process();
         }
-        $("#map-component").hide();
-      });
+      }
+      $("#map-component").hide();
+    },
+
+    validateFiles(files){
+      if(files.length > 0){
+        let file1 = files[0];
+        let file2 = file[1];
+        let file1Type = file1.name.split(".").pop();
+        let file2Type = file2.name.split(".").pop();
+        let hasCo = false;
+        let hasGr = false;
+        if(file1Type == "co" || file2Type == "co"){
+          hasCo = true;
+        }
+        if(file1Type == "gr" || file2Type == "gr"){
+          hasGr = true;
+        }
+        if(hasCo && hasGr){
+          return true;
+        }
+        else{
+          return false
+        }
+      }
+      else{
+        let file = files[0];
+        let fileType = file.name.split(".").pop();
+        if(fileType == "co" || fileType == "gr"){
+          return false;
+        }
+        return true;
+      }
     }
   }
 }));
 
 export default MapComponent;
+
+/*
+let photo = document.getElementById("image-file").files[0];
+let formData = new FormData();
+
+formData.append("photo", photo);
+fetch('/upload/image', {method: "POST", body: formData});
+*/

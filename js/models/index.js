@@ -1,5 +1,6 @@
 import Tracer from './Tracer';
 import Grid from './Grid';
+import Map from './Map';
 import Mesh from './Mesh';
 import Node from './Node';
 import Step from './Step';
@@ -10,7 +11,7 @@ import Line from './Line';
 import Polygon from './Polygon';
 
 let models = function(){
-  return [Tracer, Grid, Mesh, Node, Step, NodeObject, Circle, Rectangle, Line, Polygon];
+  return [Tracer, Grid, Map, Mesh, Node, Step, NodeObject, Circle, Rectangle, Line, Polygon];
 }
 
 export default models;

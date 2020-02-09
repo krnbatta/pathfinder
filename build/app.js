@@ -442,25 +442,107 @@ var MapComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___def
       var _this = this;
 
       jquery__WEBPACK_IMPORTED_MODULE_3___default()("#load-map").on('change', function (e) {
-        var file = e.target.files[0];
-        var fileType = file.name.split(".").pop();
+        debugger;
 
-        if (fileType == "grid") {
-          _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Grid', file);
-          _this.map = _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].find('Grid');
-          _services_grid__WEBPACK_IMPORTED_MODULE_8__["default"].drawer.draw(); // GridService.process();
-        } else if (fileType == "mesh") {
-          _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Mesh', file);
-          _this.mesh = _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].find('Mesh');
-          _services_mesh__WEBPACK_IMPORTED_MODULE_9__["default"].drawer.draw(); // MeshService.process();
+        if (_this.validateFiles(e.target.files)) {
+          _this.processFiles(e.target.files);
+        } else {
+          alert("Invalid format(s)");
+        }
+      });
+    },
+    processFiles: function processFiles(files) {
+      if (files.length > 0) {
+        var file1 = files[0];
+        var file2 = file[1];
+        var file1Name = file1.name.split(".");
+        var file2Name = file2.name.split(".");
+        var file1Type = file1Name.pop();
+        file1Name = file1Name.join("");
+        var file2Type = file2Name.pop();
+        file2Name = file2Name.join("");
+        var fileType = 'roadnetwork';
+        var fileName = file1Type == "gr" ? file1Name : file2Name;
+        var coFile = file1Type == "co" ? file1 : file2;
+        var grFile = file1Type == "gr" ? file1 : file2;
+        var map = _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord("Map", {
+          fileType: fileType,
+          fileName: fileName
+        });
+        _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('RoadNetwork', {
+          coFile: coFile,
+          grFile: grFile
+        });
+        RoadNetworkService.process();
+      } else {
+        var _file = e.target.files[0];
+
+        var _fileName = _file.name.split(".");
+
+        var _fileType = _fileName.pop();
+
+        _fileName = _fileName.join("");
+
+        var _map = _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord("Map", {
+          fileType: _fileType,
+          fileName: _fileName
+        });
+
+        if (_fileType == "grid") {
+          _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Grid', _file);
+          _services_grid__WEBPACK_IMPORTED_MODULE_8__["default"].process();
+        } else if (_fileType == "mesh") {
+          _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Mesh', _file);
+          _services_mesh__WEBPACK_IMPORTED_MODULE_9__["default"].process();
+        }
+      }
+
+      jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map-component").hide();
+    },
+    validateFiles: function validateFiles(files) {
+      if (files.length > 0) {
+        var file1 = files[0];
+        var file2 = file[1];
+        var file1Type = file1.name.split(".").pop();
+        var file2Type = file2.name.split(".").pop();
+        var hasCo = false;
+        var hasGr = false;
+
+        if (file1Type == "co" || file2Type == "co") {
+          hasCo = true;
         }
 
-        jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map-component").hide();
-      });
+        if (file1Type == "gr" || file2Type == "gr") {
+          hasGr = true;
+        }
+
+        if (hasCo && hasGr) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        var _file2 = files[0];
+
+        var fileType = _file2.name.split(".").pop();
+
+        if (fileType == "co" || fileType == "gr") {
+          return false;
+        }
+
+        return true;
+      }
     }
   }
 }));
 /* harmony default export */ __webpack_exports__["default"] = (MapComponent);
+/*
+let photo = document.getElementById("image-file").files[0];
+let formData = new FormData();
+
+formData.append("photo", photo);
+fetch('/upload/image', {method: "POST", body: formData});
+*/
 
 /***/ }),
 
@@ -477,7 +559,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var template = function template() {
-  return "\n  <label>Map: </label>\n  <input type='file' id='load-map' />\n";
+  return "\n  <label>Map: </label>\n  <input type='file' id='load-map' multiple=true accept='.grid,.mesh,.co,.gr' />\n";
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (template);
@@ -883,13 +965,17 @@ var template = function template() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 var config = {
+  clientAddr: "http://localhost:8001",
+  serverAddr: "http://localhost:8000",
+  processGridUrl: "http://localhost:8000/processGrid",
+  zooming: false,
   operationsPerSecond: 300,
   lineColor: 0x6B3838,
   wallColor: 0xD3D3D3,
   pathColor: 0xFFFFFF,
   borderColor: 0x000000,
   borderWidth: 0.1,
-  nodeSize: 20,
+  nodeSize: 10,
   nodeAttrs: {
     source: {
       fillColor: 0x00DD00 //green :) 43
@@ -1041,6 +1127,35 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
         _services_floatbox__WEBPACK_IMPORTED_MODULE_4__["default"].init();
       });
     },
+    getMap: function getMap() {
+      var map = _services_Store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Map');
+
+      if (map && map.mapType == "grid") {
+        map = _services_Store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Grid');
+      } else if (map && map.mapType == "mesh") {
+        map = _services_Store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Mesh');
+      }
+
+      return map;
+    },
+    getDimensions: function getDimensions() {
+      var width, height;
+      var map = this.getMap();
+
+      if (map) {
+        this.map = map;
+        width = map.width;
+        height = map.height;
+      } else {
+        width = this.tracer.width;
+        height = this.tracer.height;
+      }
+
+      return {
+        width: width,
+        height: height
+      };
+    },
 
     /**
     * @function setupRenderer
@@ -1048,19 +1163,9 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     */
     setupRenderer: function setupRenderer() {
       if (!this.rendered) {
-        var width, height; //TODO
-        // let map = Store.find('Grid');
-
-        var map = _services_Store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Mesh');
-
-        if (map) {
-          this.map = map;
-          width = map.width;
-          height = map.height;
-        } else {
-          width = this.tracer.width;
-          height = this.tracer.height;
-        }
+        var _this$getDimensions = this.getDimensions(),
+            width = _this$getDimensions.width,
+            height = _this$getDimensions.height;
 
         _services_renderer__WEBPACK_IMPORTED_MODULE_13__["default"].render(this, width, height);
       }
@@ -1603,6 +1708,52 @@ function (_NodeObject) {
 
 /***/ }),
 
+/***/ "./js/models/Map.js":
+/*!**************************!*\
+  !*** ./js/models/Map.js ***!
+  \**************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/** Class representing a map for the algorithm */
+var Map =
+/**
+* Create a map for the search algorithm
+* @param {object} mapType - grid/mesh
+*/
+function Map(options) {
+  _classCallCheck(this, Map);
+
+  /**
+  * _id is unique id of the grid that is set to 0.
+  * @type  {number}
+  * @private
+  */
+  this._id = 0;
+  /**
+  * mapType is type of map
+  * @type {string}
+  * @public
+  */
+
+  this.mapType = options.fileType;
+  /**
+  * mapName is name of map
+  * @type {string}
+  * @public
+  */
+
+  this.mapName = options.fileName;
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (Map);
+
+/***/ }),
+
 /***/ "./js/models/Mesh.js":
 /*!***************************!*\
   !*** ./js/models/Mesh.js ***!
@@ -1687,15 +1838,17 @@ function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/Store */ "./js/services/Store.js");
-/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
-/* harmony import */ var _utils_node_color__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/node-color */ "./js/utils/node-color.js");
-/* harmony import */ var _utils_node_factory__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/node-factory */ "./js/utils/node-factory.js");
-/* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../services/injector */ "./js/services/injector.js");
+/* harmony import */ var _services_node_objects_processor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../services/node-objects-processor */ "./js/services/node-objects-processor.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../config */ "./js/config.js");
+/* harmony import */ var _utils_node_color__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/node-color */ "./js/utils/node-color.js");
+/* harmony import */ var _utils_node_factory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/node-factory */ "./js/utils/node-factory.js");
+/* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../services/injector */ "./js/services/injector.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -1727,23 +1880,34 @@ function () {
     * @private
     */
 
-    this._linePoints = null;
+    this._linePoints = null; //assigning the options configuration to the node
+
     var variables = options.variables;
-    delete options.variables; //assigning the options configuration to the node
+    delete options.variables;
+    Object.assign(this, options);
+    variables = {
+      variables: this.setVariables(variables)
+    };
+    Object.assign(this, variables); //setting up node nodeObjects
 
-    Object.assign(this, options); //setting up node nodeObjects
-
-    this.setNodeObjects(variables); //incrementing the _id for next object
+    this.setNodeObjects(); //incrementing the _id for next object
 
     _id++;
   }
 
   _createClass(Node, [{
+    key: "setVariables",
+    value: function setVariables(variables) {
+      return variables || this.generatingNode.variables;
+    }
+  }, {
     key: "setNodeObjects",
-    value: function setNodeObjects(variables) {
+    value: function setNodeObjects() {
       var _this = this;
 
-      this.nodeObjects = this.step.tracer.nodeStructure.map(function (obj) {
+      this.nodeObjects = _services_node_objects_processor__WEBPACK_IMPORTED_MODULE_1__["default"].process(this);
+      return;
+      this.step.tracer.nodeStructure.map(function (obj) {
         var nodeConf = JSON.parse(JSON.stringify(obj));
         delete nodeConf.variables;
         nodeConf.node = _this;
@@ -1799,6 +1963,14 @@ function () {
     */
 
   }, {
+    key: "generatingNode",
+    get: function get() {
+      return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].where("Node", {
+        type: "generating",
+        id: this.id
+      })[0];
+    }
+  }, {
     key: "unPersistedObjects",
     get: function get() {
       return this.nodeObjects.filter(function (nodeObject) {
@@ -1816,21 +1988,21 @@ function () {
     key: "attrs",
     get: function get() {
       //getting attributes of node based on its type
-      var nodeAttrs = _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeAttrs[_utils_node_color__WEBPACK_IMPORTED_MODULE_2__["default"][this.type]]; //if current node is source, disregard if it is being opened/updated/closed. retain its color
+      var nodeAttrs = _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeAttrs[_utils_node_color__WEBPACK_IMPORTED_MODULE_3__["default"][this.type]]; //if current node is source, disregard if it is being opened/updated/closed. retain its color
 
       if (this.id == this.step.tracer.source.node.id) {
-        nodeAttrs = _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeAttrs['source'];
+        nodeAttrs = _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeAttrs['source'];
       } //if current node is destination, disregard if it is being opened/updated/closed. retain its color
 
 
       if (this.id == this.step.tracer.destination.node.id) {
-        nodeAttrs = _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeAttrs['destination'];
+        nodeAttrs = _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeAttrs['destination'];
       }
 
       return {
         fillStyle: nodeAttrs.fillColor,
-        strokeStyle: _config__WEBPACK_IMPORTED_MODULE_1__["default"].borderColor,
-        strokeWidth: _config__WEBPACK_IMPORTED_MODULE_1__["default"].borderWidth
+        strokeStyle: _config__WEBPACK_IMPORTED_MODULE_2__["default"].borderColor,
+        strokeWidth: _config__WEBPACK_IMPORTED_MODULE_2__["default"].borderWidth
       };
     }
     /**
@@ -2166,7 +2338,9 @@ function (_NodeObject) {
     _classCallCheck(this, Rectangle);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Rectangle).call(this, options.nodeConf));
+    _this._id = _id;
     Object.assign(_assertThisInitialized(_this), options.coordinates);
+    _id++;
     return _this;
   }
 
@@ -2179,7 +2353,7 @@ function (_NodeObject) {
 
       _graphics.beginFill(attrs.fillStyle);
 
-      _graphics.drawRect(this.x, this.y, _config__WEBPACK_IMPORTED_MODULE_1__["default"].width, _config__WEBPACK_IMPORTED_MODULE_1__["default"].height);
+      _graphics.drawRect(this.x * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, this.y * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize);
 
       _graphics.endFill();
 
@@ -2195,9 +2369,7 @@ function (_NodeObject) {
       });
 
       _services_injector__WEBPACK_IMPORTED_MODULE_2__["default"].inject(this, ['renderer']);
-      var texture = this.renderer.generateTexture(_graphics);
-      var rectangleSprite = new PIXI.Sprite(texture);
-      return rectangleSprite;
+      return _graphics;
     }
   }, {
     key: "graphics",
@@ -2685,14 +2857,16 @@ function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Tracer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Tracer */ "./js/models/Tracer.js");
 /* harmony import */ var _Grid__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Grid */ "./js/models/Grid.js");
-/* harmony import */ var _Mesh__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Mesh */ "./js/models/Mesh.js");
-/* harmony import */ var _Node__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Node */ "./js/models/Node.js");
-/* harmony import */ var _Step__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Step */ "./js/models/Step.js");
-/* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
-/* harmony import */ var _Circle__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Circle */ "./js/models/Circle.js");
-/* harmony import */ var _Rectangle__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Rectangle */ "./js/models/Rectangle.js");
-/* harmony import */ var _Line__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Line */ "./js/models/Line.js");
-/* harmony import */ var _Polygon__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Polygon */ "./js/models/Polygon.js");
+/* harmony import */ var _Map__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Map */ "./js/models/Map.js");
+/* harmony import */ var _Mesh__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Mesh */ "./js/models/Mesh.js");
+/* harmony import */ var _Node__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Node */ "./js/models/Node.js");
+/* harmony import */ var _Step__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Step */ "./js/models/Step.js");
+/* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
+/* harmony import */ var _Circle__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Circle */ "./js/models/Circle.js");
+/* harmony import */ var _Rectangle__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Rectangle */ "./js/models/Rectangle.js");
+/* harmony import */ var _Line__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Line */ "./js/models/Line.js");
+/* harmony import */ var _Polygon__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./Polygon */ "./js/models/Polygon.js");
+
 
 
 
@@ -2705,7 +2879,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var models = function models() {
-  return [_Tracer__WEBPACK_IMPORTED_MODULE_0__["default"], _Grid__WEBPACK_IMPORTED_MODULE_1__["default"], _Mesh__WEBPACK_IMPORTED_MODULE_2__["default"], _Node__WEBPACK_IMPORTED_MODULE_3__["default"], _Step__WEBPACK_IMPORTED_MODULE_4__["default"], _node_object__WEBPACK_IMPORTED_MODULE_5__["default"], _Circle__WEBPACK_IMPORTED_MODULE_6__["default"], _Rectangle__WEBPACK_IMPORTED_MODULE_7__["default"], _Line__WEBPACK_IMPORTED_MODULE_8__["default"], _Polygon__WEBPACK_IMPORTED_MODULE_9__["default"]];
+  return [_Tracer__WEBPACK_IMPORTED_MODULE_0__["default"], _Grid__WEBPACK_IMPORTED_MODULE_1__["default"], _Map__WEBPACK_IMPORTED_MODULE_2__["default"], _Mesh__WEBPACK_IMPORTED_MODULE_3__["default"], _Node__WEBPACK_IMPORTED_MODULE_4__["default"], _Step__WEBPACK_IMPORTED_MODULE_5__["default"], _node_object__WEBPACK_IMPORTED_MODULE_6__["default"], _Circle__WEBPACK_IMPORTED_MODULE_7__["default"], _Rectangle__WEBPACK_IMPORTED_MODULE_8__["default"], _Line__WEBPACK_IMPORTED_MODULE_9__["default"], _Polygon__WEBPACK_IMPORTED_MODULE_10__["default"]];
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (models);
@@ -3112,6 +3286,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_node_factory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/node-factory */ "./js/utils/node-factory.js");
 /* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_7__);
+
 
 
 
@@ -3124,6 +3301,62 @@ __webpack_require__.r(__webpack_exports__);
 */
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  renderMap: function renderMap() {
+    var grid = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Grid");
+    var map = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Map");
+    grid.gridData.then(function (gridData) {
+      _controller__WEBPACK_IMPORTED_MODULE_6__["default"].setupRenderer();
+      var mapSprite = new PIXI.Sprite.from("".concat(_config__WEBPACK_IMPORTED_MODULE_1__["default"].clientAddr, "/maps/images/").concat(map.mapName, ".png"));
+      mapSprite.width = gridData.width * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+      mapSprite.height = gridData.height * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+      Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], mapSprite);
+    });
+  },
+  checkMap: function checkMap() {
+    var map = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Map");
+    var img = new Image();
+    var self = this;
+
+    img.onerror = function () {
+      //send request to server
+      self.sendToServer();
+    };
+
+    img.onload = function () {
+      //load map from image directly
+      self.renderMap();
+      img = null;
+    };
+
+    img.src = "".concat(_config__WEBPACK_IMPORTED_MODULE_1__["default"].clientAddr, "/maps/images/").concat(map.mapName, ".png");
+  },
+  sendToServer: function sendToServer() {
+    var _this = this;
+
+    var grid = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Grid");
+    var map = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Map");
+    grid.gridData.then(function (gridData) {
+      fetch(_config__WEBPACK_IMPORTED_MODULE_1__["default"].processGridUrl, {
+        method: "POST",
+        body: JSON.stringify({
+          width: gridData.width,
+          height: gridData.height,
+          gridStr: gridData.gridStr,
+          fileName: map.mapName
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(function (res) {
+        return res.json();
+      }).then(function (data) {
+        if (data.done) {
+          _this.renderMap();
+        }
+      });
+    });
+  },
+
   /**
   * Parser parses the grid map file by extracting height, width and structure of map and passing this into callback.
   * @public
@@ -3165,7 +3398,7 @@ __webpack_require__.r(__webpack_exports__);
     height: null,
     gridStr: null,
     build: function build(gridData, callback) {
-      var _this = this;
+      var _this2 = this;
 
       //Is object creation required?
       //Is Promises required?
@@ -3180,22 +3413,22 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       Promise.all(tasks).then(function () {
-        callback(_this.cells.flat());
+        callback(_this2.cells.flat());
       });
     },
     createRowTask: function createRowTask(rowId) {
-      var _this2 = this;
+      var _this3 = this;
 
       return new Promise(function (resolve, reject) {
-        _this2.cells[rowId] = [];
+        _this3.cells[rowId] = [];
 
-        for (var colId = 0; colId < _this2.width; ++colId) {
+        for (var colId = 0; colId < _this3.width; ++colId) {
           var x = colId * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
           var y = rowId * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
-          var stringIndex = rowId * _this2.width + colId;
+          var stringIndex = rowId * _this3.width + colId;
           var fillColor = _config__WEBPACK_IMPORTED_MODULE_1__["default"].pathColor;
 
-          if (_this2.gridStr[stringIndex] == '@') {
+          if (_this3.gridStr[stringIndex] == '@') {
             fillColor = _config__WEBPACK_IMPORTED_MODULE_1__["default"].wallColor;
           }
 
@@ -3208,7 +3441,7 @@ __webpack_require__.r(__webpack_exports__);
             strokeStyle: _config__WEBPACK_IMPORTED_MODULE_1__["default"].borderColor
           };
 
-          _this2.cells[rowId].push(attrs);
+          _this3.cells[rowId].push(attrs);
         }
 
         resolve();
@@ -3240,23 +3473,26 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   process: function process() {
+    this.checkMap();
+  },
+  processMe: function processMe() {
     var grid = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Grid');
     grid.gridData.then(function (gridData) {
       var height = gridData.height;
       var width = gridData.width;
       var gridStr = gridData.gridStr;
       _controller__WEBPACK_IMPORTED_MODULE_6__["default"].setupRenderer();
-      canvas = document.createElement("canvas");
-      canvas.id = "map-canvas";
-      var screen = document.getElementsByClassName("screen")[0];
-      screen.appendChild(canvas);
-      var canvas = document.getElementById("map-canvas");
-      var webglCanvas = document.getElementById("canvas");
-      canvas.style.position = 'absolute';
+      var canvas = document.createElement("canvas"); // canvas.id = "map-canvas";
+      // let screen = document.getElementsByClassName("screen")[0];
+      // screen.appendChild(canvas);
+      // let canvas = document.getElementById("map-canvas");
+
+      var webglCanvas = document.getElementById("canvas"); // canvas.style.position = 'absolute';
+
       canvas.width = width * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
-      canvas.height = height * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
-      canvas.style.top = 0;
-      canvas.style.left = 0;
+      canvas.height = height * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize; // canvas.style.top = 0;
+      // canvas.style.left = 0;
+
       var ctx = canvas.getContext('2d');
       ctx.fillStyle = "white";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -3267,6 +3503,18 @@ __webpack_require__.r(__webpack_exports__);
           var stringIndex = y * width + x;
 
           if (gridStr[stringIndex] == '@') {
+            ctx.fillRect(x * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, y * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize);
+          }
+        }
+      }
+
+      ctx.fillStyle = "green";
+
+      for (var y = 0; y <= height; y++) {
+        for (var x = 0; x <= width; x++) {
+          var stringIndex = y * width + x;
+
+          if (gridStr[stringIndex] == 'T') {
             ctx.fillRect(x * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, y * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize);
           }
         }
@@ -3327,6 +3575,21 @@ __webpack_require__.r(__webpack_exports__);
         ctx.lineTo(_x2, _y2);
         ctx.stroke();
       }
+
+      var data = canvas.toDataURL();
+      var img = new Image();
+      img.src = data;
+
+      img.onload = function () {
+        var baseTexture = new PIXI.BaseTexture(img);
+        var texture = new PIXI.Texture(baseTexture);
+        var mapSprite = PIXI.Sprite.from(texture); // mapSprite.width = 800;
+        // mapSprite.height = 500;
+
+        Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], mapSprite); // document.body.appendChild(img);
+      }; // let mapSprite = PIXI.Sprite.from("maps/tfs.png");
+      // insertNode(Controller, mapSprite);
+
     });
   }
 });
@@ -3482,14 +3745,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
 /* harmony import */ var _utils_insert_edges__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/insert-edges */ "./js/utils/insert-edges.js");
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
 
 
 
@@ -3529,14 +3784,23 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
         var maxY = Math.max.apply(null, pointsArr.map(function (p) {
           return p[1];
         }));
-        var polygonData = data.slice(totalPoints, data.length);
+        var polygonData = data.slice(totalPoints, data.length - 1);
         var polygonsArr = [];
         polygonData.forEach(function (polygonLine) {
           var pts = polygonLine.split(" ");
           var totalPolygonPoints = parseInt(pts[0]);
-          var points = pts.slice(1, totalPolygonPoints + 1).map(function (pt) {
-            return pointsArr[parseInt(pt)];
+          var firstPoint;
+          var points = [];
+          pts.slice(1, totalPolygonPoints + 1).forEach(function (pt, index) {
+            var point = pointsArr[parseInt(pt)];
+
+            if (index == 0) {
+              firstPoint = point;
+            }
+
+            points.push(point[0] * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, point[1] * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize);
           });
+          points.push(firstPoint[0] * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize, firstPoint[1] * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize);
           polygonsArr.push(points);
         });
         console.log("meshData", totalPoints, totalPolygons, pointsArr, polygonsArr, maxX, maxY);
@@ -3615,91 +3879,23 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
       });
     }
   },
-  createCanvas: function createCanvas(id, width, height) {
-    var canvasId = "map-canvas".concat(id);
-    var canvas = document.createElement("canvas");
-    canvas.id = canvasId;
-    var screen = document.getElementsByClassName("screen")[0];
-    screen.appendChild(canvas);
-    canvas.width = width;
-    canvas.height = height;
-    canvas.style.position = "absolute";
-    canvas.style.top = 0;
-    canvas.style.left = 0;
-    return canvas;
-  },
-  paintCanvas: function paintCanvas(index, width, height, chunk, type) {
-    var canvas = this.createCanvas(index, width, height);
-    var offscreen = canvas.transferControlToOffscreen();
-    var worker = new Worker("data:application/x-javascript;base64, b25tZXNzYWdlID0gZnVuY3Rpb24oZXZ0KSB7CiAgaW1wb3J0U2NyaXB0cyhldnQuZGF0YS5zY3JpcHRVcmwpOwogIHBvc3RNZXNzYWdlKG1haW4oZXZ0LmRhdGEucGFyYW1zKSk7Cn07Cg==");
-    worker.postMessage({
-      scriptUrl: "file:///Users/krnbatta/Projects/monash/intern/pathfinder/js/workers/".concat(type, "Polygons.js"),
-      params: {
-        canvas: offscreen,
-        width: width,
-        height: height,
-        polygonsArr: chunk,
-        nodeSize: _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize
-      }
-    }, [offscreen]);
-  },
   process: function process() {
-    var _this3 = this;
-
     var mesh = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Mesh');
     mesh.meshData.then(function (meshData) {
-      var maxX = meshData.maxX;
-      var maxY = meshData.maxY;
-      var polygonsArr = meshData.polygonsArr;
       _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
-      var webglCanvas = document.getElementById("canvas");
-      var width = maxX * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
-      var height = maxY * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
-      var turfPolygons = [];
-      polygonsArr.forEach(function (polygonArr) {
-        if (polygonArr.length) {
-          turfPolygons.push([].concat(_toConsumableArray(polygonArr), [polygonArr[0]]));
-        }
-      });
-      var dissolvedPolygons = [];
-      var totalCores = navigator.hardwareConcurrency || 4;
-      var chunkSize = Math.ceil(turfPolygons.length / 100);
-      var chunkedTurfPolygons = new Array(Math.ceil(turfPolygons.length / chunkSize)).fill().map(function (_, i) {
-        return turfPolygons.slice(i * chunkSize, i * chunkSize + chunkSize);
-      });
-      var workers = {};
-      var promises = [];
-      chunkedTurfPolygons.forEach(function (chunkedTurfPolygon, index) {
-        var promise = new Promise(function (resolve, reject) {
-          workers[index] = new Worker("data:application/x-javascript;base64,b25tZXNzYWdlID0gZnVuY3Rpb24oZXZ0KSB7CiAgaW1wb3J0U2NyaXB0cyhldnQuZGF0YS5zY3JpcHRVcmwpOwogIHBvc3RNZXNzYWdlKG1haW4oZXZ0LmRhdGEucGFyYW1zKSk7Cn07Cg==");
-          workers[index].postMessage({
-            scriptUrl: "file:///Users/krnbatta/Projects/monash/intern/pathfinder/js/workers/dissolvePolygon.js",
-            params: {
-              turfPolygons: chunkedTurfPolygon,
-              scriptUrl: "file:///Users/krnbatta/Projects/monash/intern/pathfinder/vendor/js/turf.min.js"
-            }
-          });
+      var container = new PIXI.Container();
 
-          workers[index].onmessage = function (event) {
-            resolve(event.data);
-            workers[index].terminate();
-          };
-        });
-        promises.push(promise);
-      });
-      Promise.all(promises).then(function (res) {
-        res.forEach(function (c, index) {
-          var x = c.map(function (r) {
-            return r[0].slice(0, r[0].length - 1);
-          });
+      for (var i = 0; i < meshData.polygonsArr.length; ++i) {
+        var points = meshData.polygonsArr[i];
+        var polygon = new PIXI.Graphics();
+        polygon.lineStyle(1, 0x000000);
+        polygon.beginFill(0xFFFFFF);
+        polygon.drawPolygon(points);
+        polygon.endFill();
+        container.addChild(polygon);
+      }
 
-          _this3.paintCanvas(index, width, height, x, "fill");
-        }); // let chunkSize = Math.ceil(polygonsArr.length/totalCores);
-        // let chunks = new Array(Math.ceil(polygonsArr.length / chunkSize)).fill().map((_,i) => polygonsArr.slice(i*chunkSize,i*chunkSize+chunkSize));
-        // chunks.forEach((chunk, index) => {
-        //   this.paintCanvas(-index, width, height, chunk, "stroke");
-        // });
-      });
+      Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], container);
     });
   }
 });
@@ -3725,6 +3921,69 @@ __webpack_require__.r(__webpack_exports__);
   function onMouseUpdate(e) {
     context.x = e.pageX;
     context.y = e.pageY;
+  }
+});
+
+/***/ }),
+
+/***/ "./js/services/node-objects-processor.js":
+/*!***********************************************!*\
+  !*** ./js/services/node-objects-processor.js ***!
+  \***********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Store */ "./js/services/Store.js");
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  process: function process(node) {
+    return node.step.tracer.nodeStructure.map(function (obj) {
+      var nodeConf = JSON.parse(JSON.stringify(obj));
+      delete nodeConf.variables;
+      nodeConf.node = node;
+      var coordinates = {};
+      Object.keys(obj.variables).forEach(function (key) {
+        if (key == "points") {
+          coordinates['points'] = [];
+          obj.variables['points'].forEach(function (pt) {
+            coordinates['points'].push(node.variables[pt]);
+          });
+        } else {
+          if (obj.variables[key].indexOf("parent:") == -1) {
+            coordinates[key] = node.variables[obj.variables[key]];
+          } else {
+            var parentNode = node.parentNode;
+            var prop = obj.variables[key].split("parent:")[1];
+
+            if (parentNode) {
+              coordinates[key] = parentNode.variables[prop];
+            } else {
+              coordinates[key] = node.variables[prop];
+            }
+          }
+        }
+      });
+      var options = {
+        nodeConf: nodeConf,
+        coordinates: coordinates
+      };
+
+      switch (obj.type) {
+        case "rectangle":
+          return _Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Rectangle', options);
+
+        case "circle":
+          return _Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Circle', options);
+
+        case "line":
+          return _Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Line', options);
+
+        case "polygon":
+          return _Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Polygon', options);
+      }
+    });
   }
 });
 
@@ -3881,6 +4140,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _injector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./injector */ "./js/services/injector.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../config */ "./js/config.js");
+
 
 
 /** @module services/renderer
@@ -3904,8 +4165,37 @@ __webpack_require__.r(__webpack_exports__);
       forceCanvas: true,
       antialias: true
     });
+    var viewport;
+
+    if (_config__WEBPACK_IMPORTED_MODULE_2__["default"].zooming) {
+      viewport = new Viewport.Viewport({
+        screenWidth: width,
+        screenHeight: height,
+        worldWidth: width * 2,
+        worldHeight: height * 2,
+        interaction: context.app.renderer.plugins.interaction,
+        stopPropagation: true
+      });
+      viewport.drag().pinch().wheel().decelerate().bounce(); // .on("drag-end", function(){
+      //   if(this.getVisibleBounds().x > 0 || this.getVisibleBounds().y > 0){
+      //     this.ensureVisible(0,0);
+      //   }
+      // })
+      // .on("zoomed", function(){
+      //   if(this.lastViewport.scaleX < 1 || this.lastViewport.scaleY < 1){
+      //     let self = this;
+      //     this.ensureVisible(0,0);
+      //     setTimeout(() => {
+      //       self.fit(false, width, height);
+      //     }, 100);
+      //   }
+      // });
+    } else {
+      viewport = new PIXI.Container();
+    }
+
     context.renderer = context.app.renderer;
-    context.stage = new PIXI.Container();
+    context.stage = viewport;
     context.renderer.render(context.app.stage);
     context.app.stage.addChild(context.stage);
     context.rendered = true;
