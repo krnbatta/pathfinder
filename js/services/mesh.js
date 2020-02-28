@@ -1,4 +1,4 @@
-import Store from './Store';
+import Store from './store';
 import config from '../config';
 import environment from '../environment';
 import errorNotifier from './error-notifier';
@@ -6,6 +6,7 @@ import polygonFactory from '../utils/polygon-factory';
 import insertNode from '../utils/insert-node';
 import insertEdges from '../utils/insert-edges';
 import Controller from '../controller';
+import nodeResize from '../utils/node-resize';
 
 /** @module services/mesh
 * This service is responsible for: parsing mesh file, building grid poylgons and drawing mesh on canvas.
@@ -27,6 +28,8 @@ export default {
           data.shift();
           const totalPoints = Number(data[0].split(' ')[0]);
           const totalPolygons = Number(data[0].split(' ')[1]);
+          nodeResize('mesh', totalPolygons);
+          
           data.shift();
           const pointsArr = data.slice(0, totalPoints).map((pointLine) => pointLine.split(" ").slice(0, 2)).map((pt) => [parseInt(pt[0]), parseInt(pt[1])]);
           let maxX = Math.max.apply(null, pointsArr.map((p) => p[0]));

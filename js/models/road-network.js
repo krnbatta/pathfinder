@@ -1,5 +1,6 @@
 import config from '../config';
-import GridService from '../services/grid';
+import Store from '../services/store';
+import nodeResize from '../utils/node-resize';
 
 /** Class representing a road network */
 class RoadNetwork {
@@ -15,7 +16,7 @@ class RoadNetwork {
     */
     this._id = 0;
     /**
-    * coFile is file of the cooridnates that is set from the param.
+    * coFile is file of the coordinates that is set from the param.
     * @type  {object}
     * @public
     */
@@ -27,11 +28,12 @@ class RoadNetwork {
     */
     this.grFile = grFile;
     this.setupMap();
-  },
+  }
 
   setupMap(){
-    let roadCoordinates = Store.createRecord("RoadCo", this.coFile);
-    let roadGraph = Store.createRecord("RoadGr", this.grFile);
+    nodeResize('roadnetwork');
+    this.roadCoordinates = Store.createRecord("RoadCo", {roadNetwork: this, file: this.coFile});
+    this.roadGraph = Store.createRecord("RoadGr", {roadNetwork: this, file: this.grFile});
   }
 
 }

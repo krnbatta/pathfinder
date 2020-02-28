@@ -1,4 +1,4 @@
-import Store from './Store';
+import Store from './store';
 import config from '../config';
 import environment from '../environment';
 import errorNotifier from './error-notifier';

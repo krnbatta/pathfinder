@@ -1,4 +1,4 @@
-import Store from '../services/Store'
+import Store from '../services/store'
 import config from '../config'
 import nodeColor from '../utils/node-color';
 import nodeFactory from '../utils/node-factory';

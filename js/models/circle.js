@@ -1,7 +1,7 @@
 import NodeObject from './node-object';
 import config from '../config';
 import Injector from '../services/injector';
-import Store from '../services/Store';
+import Store from '../services/store';
 import debounce from '../utils/debounce';
 import drawLine from '../utils/draw-line';
 import removeNode from '../utils/remove-node';
@@ -14,12 +14,17 @@ class Circle extends NodeObject {
     this._id = _id;
     Object.assign(this, options.coordinates);
     this.r = 0.25 * config.nodeSize;
+    this.lineSize = 1;
+    if(config.mapType && config.mapType == 'roadnetwork'){
+      this.r = 2;
+      this.lineSize = 0.75;
+    }
     _id++;
   }
   createGraphics(attrs){
     let self = this;
     let _graphics = new PIXI.Graphics();
-    _graphics.lineStyle(1, attrs.strokeStyle);
+    _graphics.lineStyle(this.lineSize, attrs.strokeStyle);
     _graphics.beginFill(attrs.fillStyle);
     _graphics.drawCircle(this.cx*config.nodeSize, this.cy*config.nodeSize, this.r);
     _graphics.endFill();
@@ -39,7 +44,7 @@ class Circle extends NodeObject {
         circles.forEach((circle) => {
           circle.node.showUnPersistedPart();
         });
-        self.line = drawLine(self.controller, self.node);
+        self.line = drawLine(self.controller, self.node, 0xF9D276);
         self.nodesHidden = false;
       }
       else{
@@ -53,10 +58,9 @@ class Circle extends NodeObject {
     _graphics.on("click", () => {
       toggleNodes();
     });
-    let texture = this.renderer.generateTexture(_graphics);
-    let circleSprite = new PIXI.Sprite(texture);
-    circleSprite = _graphics;
-    return circleSprite;
+    // let texture = this.renderer.generateTexture(_graphics);
+    // let circleSprite = new PIXI.Sprite(texture);
+    return _graphics;
   }
   get graphics(){
     if(!this._graphics){
@@ -65,7 +69,7 @@ class Circle extends NodeObject {
     return this._graphics;
   }
   get center(){
-    return {x: config.nodeSize*(this.cx), y: config.nodeSize*(this.cy)}
+    return {x: config.nodeSize*(this.cx), y: config.nodeSize*(this.cy)};
   }
   get maxX(){
     return this.cx;

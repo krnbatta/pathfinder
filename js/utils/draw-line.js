@@ -7,12 +7,22 @@ import config from '../config';
  * @param {Node} node
  * @return {PIXI.Graphics}
 */
-export default function(context, node){
+let element = document.getElementsByClassName('screen')[0];
+let done = false;
+export default function(context, node, color){
+  if(!element){
+    element = document.getElementsByClassName('screen')[0]
+  }
   let line = new PIXI.Graphics();
-  line.lineStyle(3, config.lineColor);
+  let lineColor = color ? color : config.lineColor;
+  line.lineStyle(1.5, lineColor);
   node.linePoints.forEach((point, index) => {
     if(index == 0){
       line.moveTo(point.x, point.y);
+      if(!done){
+        element.scroll(point.x - 200, point.y - 200);
+        done = true;
+      }
     }
     else{
       line.lineTo(point.x, point.y);

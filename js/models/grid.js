@@ -1,5 +1,6 @@
 import config from '../config';
 import GridService from '../services/grid';
+import nodeResize from '../utils/node-resize';
 
 /** Class representing a grid map */
 class Grid {
@@ -58,6 +59,7 @@ class Grid {
       this._gridData = new Promise((resolve, reject) => {
         try{
           GridService.parser.parse(that.gridFile, (data) => {
+            nodeResize('grid', Math.max(data.width, data.height));
             that.width = data.width * config.nodeSize;
             that.height = data.height * config.nodeSize;
             resolve(data);

@@ -32,7 +32,7 @@ export default {
         interaction: context.app.renderer.plugins.interaction,
         stopPropagation: true
       });
-      viewport.drag().pinch().wheel().decelerate().bounce()
+      viewport.drag().pinch().wheel().decelerate()
               // .on("drag-end", function(){
               //   if(this.getVisibleBounds().x > 0 || this.getVisibleBounds().y > 0){
               //     this.ensureVisible(0,0);

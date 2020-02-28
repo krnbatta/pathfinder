@@ -1,11 +1,18 @@
-import Store from './Store';
+import Store from './store';
+import config from '../config';
 
 export default {
   process(node){
     return node.step.tracer.nodeStructure.map((obj) => {
+      let map = Store.find('Map');
+      let mapType;
+      if(map){
+        mapType = map.mapType;
+      }
       let nodeConf = JSON.parse(JSON.stringify(obj));
       delete nodeConf.variables;
       nodeConf.node = node;
+      this.preprocess(node, mapType);
       let coordinates = {};
       Object.keys(obj.variables).forEach((key) => {
         if(key=="points"){
@@ -28,7 +35,6 @@ export default {
               coordinates[key] = node.variables[prop];
             }
           }
-
         }
       });
       let options = {nodeConf: nodeConf, coordinates: coordinates};
@@ -43,5 +49,19 @@ export default {
           return Store.createRecord('Polygon', options);
       }
     });
+  },
+  preprocess(node, mapType){
+    if(!mapType){
+      return;
+    }
+    if(mapType == 'roadnetwork'){
+      let roadNetwork = Store.find('RoadNetwork');
+      let minX = roadNetwork.minX;
+      let minY = roadNetwork.minY;
+      node.variables.x -= minX;
+      node.variables.y -= minY;
+      node.variables.x *= config.roadNetworkScale;
+      node.variables.y *= config.roadNetworkScale;
+    }
   }
 }

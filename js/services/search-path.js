@@ -39,7 +39,15 @@ let SearchPathService = {
   },
 
   clean(){
-    removeNode(this.context, this.current);
+    for(let i = 1; i<=this.currentId; i++){
+      let line = this.history[i];
+      removeNode(this.context, line);
+    }
+  },
+
+  reset(){
+    this.context.currentId = 1;
+    this.history = [];
   },
 
   stepBackward(){

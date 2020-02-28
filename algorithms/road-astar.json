@@ -1,4 +1,4 @@
-{"nodeStructure": [{"type": "rectangle", "variables": {"x": "x", "y": "y"}, "persisted": true, "drawPath": true}],
+{"nodeStructure": [{"type": "circle", "variables": {"cx": "x", "cy": "y"}, "persisted": true, "drawPath": true},{"type": "line", "variables": {"x1": "parent:x", "y1": "parent:y", "x2": "x", "y2": "y"}, "persisted": true}],
 "eventList":[
 {"type":"source","id":41,"variables":{"x":-73533430,"y":41103106}},
 {"type":"destination","id":141,"variables":{"x":-73589170,"y":41118596}},
@@ -2444,5 +2444,5 @@
 {"type":"generating","id":140,"variables":{"x":-73586970,"y":41120396},"g":0.9588,"f":0.987225,"pId":138},
 {"type":"generating","id":141,"variables":{"x":-73589170,"y":41118596},"g":0.979,"f":0.979,"pId":138},
 {"type":"closing","id":138,"variables":{"x":-73587570,"y":41120696},"g":0.95209,"f":0.978491,"pId":137},
-{"type":"end","id":141}
+{"type":"end","id":141,"variables":{"x":-73589170,"y":41118596},"g":0.979,"f":0.979,"pId":138}
 ]}

@@ -122,7 +122,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var javascript_state_machine__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! javascript-state-machine */ "./node_modules/javascript-state-machine/lib/state-machine.js");
 /* harmony import */ var javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(javascript_state_machine__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _template__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./template */ "./js/components/debugger/template.js");
-/* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../services/Store */ "./js/services/Store.js");
+/* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../services/store */ "./js/services/store.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _base_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../base-component */ "./js/components/base-component.js");
@@ -166,8 +166,8 @@ var DebuggerComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0_
 
       jquery__WEBPACK_IMPORTED_MODULE_3___default()("#load-algo").on('change', function (e) {
         var debugFile = e.target.files[0];
-        _services_Store__WEBPACK_IMPORTED_MODULE_2__["default"].createRecord('Tracer', debugFile);
-        _this.tracer = _services_Store__WEBPACK_IMPORTED_MODULE_2__["default"].find('Tracer');
+        _services_store__WEBPACK_IMPORTED_MODULE_2__["default"].createRecord('Tracer', debugFile);
+        _this.tracer = _services_store__WEBPACK_IMPORTED_MODULE_2__["default"].find('Tracer');
         _controller__WEBPACK_IMPORTED_MODULE_5__["default"].start();
         jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map-component").hide();
         jquery__WEBPACK_IMPORTED_MODULE_3___default()("#debug-component").hide();
@@ -397,9 +397,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _base_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../base-component */ "./js/components/base-component.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../config */ "./js/config.js");
 /* harmony import */ var _environment__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../environment */ "./js/environment.js");
-/* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../services/Store */ "./js/services/Store.js");
+/* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../services/store */ "./js/services/store.js");
 /* harmony import */ var _services_grid__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../services/grid */ "./js/services/grid.js");
 /* harmony import */ var _services_mesh__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../services/mesh */ "./js/services/mesh.js");
+/* harmony import */ var _services_road_network__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../services/road-network */ "./js/services/road-network.js");
+
 
 
 
@@ -442,8 +444,6 @@ var MapComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___def
       var _this = this;
 
       jquery__WEBPACK_IMPORTED_MODULE_3___default()("#load-map").on('change', function (e) {
-        debugger;
-
         if (_this.validateFiles(e.target.files)) {
           _this.processFiles(e.target.files);
         } else {
@@ -452,9 +452,9 @@ var MapComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___def
       });
     },
     processFiles: function processFiles(files) {
-      if (files.length > 0) {
+      if (files.length > 1) {
         var file1 = files[0];
-        var file2 = file[1];
+        var file2 = files[1];
         var file1Name = file1.name.split(".");
         var file2Name = file2.name.split(".");
         var file1Type = file1Name.pop();
@@ -465,44 +465,47 @@ var MapComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___def
         var fileName = file1Type == "gr" ? file1Name : file2Name;
         var coFile = file1Type == "co" ? file1 : file2;
         var grFile = file1Type == "gr" ? file1 : file2;
-        var map = _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord("Map", {
+        var map = _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord("Map", {
           fileType: fileType,
           fileName: fileName
         });
-        _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('RoadNetwork', {
+        _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('RoadNetwork', {
           coFile: coFile,
           grFile: grFile
         });
-        RoadNetworkService.process();
+        _services_road_network__WEBPACK_IMPORTED_MODULE_10__["default"].process();
+        _config__WEBPACK_IMPORTED_MODULE_5__["default"].mapType = 'roadnetwork';
       } else {
-        var _file = e.target.files[0];
+        var file = files[0];
 
-        var _fileName = _file.name.split(".");
+        var _fileName = file.name.split(".");
 
         var _fileType = _fileName.pop();
 
         _fileName = _fileName.join("");
 
-        var _map = _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord("Map", {
+        var _map = _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord("Map", {
           fileType: _fileType,
           fileName: _fileName
         });
 
         if (_fileType == "grid") {
-          _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Grid', _file);
+          _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Grid', file);
           _services_grid__WEBPACK_IMPORTED_MODULE_8__["default"].process();
+          _config__WEBPACK_IMPORTED_MODULE_5__["default"].mapType = 'grid';
         } else if (_fileType == "mesh") {
-          _services_Store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Mesh', _file);
+          _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Mesh', file);
           _services_mesh__WEBPACK_IMPORTED_MODULE_9__["default"].process();
+          _config__WEBPACK_IMPORTED_MODULE_5__["default"].mapType = 'mesh';
         }
       }
 
       jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map-component").hide();
     },
     validateFiles: function validateFiles(files) {
-      if (files.length > 0) {
+      if (files.length > 1) {
         var file1 = files[0];
-        var file2 = file[1];
+        var file2 = files[1];
         var file1Type = file1.name.split(".").pop();
         var file2Type = file2.name.split(".").pop();
         var hasCo = false;
@@ -522,9 +525,8 @@ var MapComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___def
           return false;
         }
       } else {
-        var _file2 = files[0];
-
-        var fileType = _file2.name.split(".").pop();
+        var file = files[0];
+        var fileType = file.name.split(".").pop();
 
         if (fileType == "co" || fileType == "gr") {
           return false;
@@ -968,14 +970,16 @@ var config = {
   clientAddr: "http://localhost:8001",
   serverAddr: "http://localhost:8000",
   processGridUrl: "http://localhost:8000/processGrid",
-  zooming: false,
+  processRoadNetworkUrl: "http://localhost:8000/processRoadNetwork",
+  zooming: true,
   operationsPerSecond: 300,
   lineColor: 0x6B3838,
   wallColor: 0xD3D3D3,
   pathColor: 0xFFFFFF,
   borderColor: 0x000000,
   borderWidth: 0.1,
-  nodeSize: 10,
+  nodeSize: 5,
+  roadNetworkScale: 0.005,
   nodeAttrs: {
     source: {
       fillColor: 0x00DD00 //green :) 43
@@ -1025,7 +1029,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_frontier__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./services/frontier */ "./js/services/frontier.js");
 /* harmony import */ var _services_history__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./services/history */ "./js/services/history.js");
 /* harmony import */ var _services_search_path__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./services/search-path */ "./js/services/search-path.js");
-/* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./services/Store */ "./js/services/Store.js");
+/* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./services/store */ "./js/services/store.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./config */ "./js/config.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_10__);
@@ -1116,7 +1120,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     onStart: function onStart() {
       var _this = this;
 
-      this.tracer = _services_Store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Tracer');
+      this.tracer = _services_store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Tracer');
       var that = this;
       this.tracer.steps.then(function (steps) {
         _this.steps = steps;
@@ -1128,12 +1132,14 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
       });
     },
     getMap: function getMap() {
-      var map = _services_Store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Map');
+      var map = _services_store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Map');
 
       if (map && map.mapType == "grid") {
-        map = _services_Store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Grid');
+        map = _services_store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Grid');
       } else if (map && map.mapType == "mesh") {
-        map = _services_Store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Mesh');
+        map = _services_store__WEBPACK_IMPORTED_MODULE_8__["default"].find('Mesh');
+      } else if (map && map.mapType == "roadnetwork") {
+        map = _services_store__WEBPACK_IMPORTED_MODULE_8__["default"].find('RoadNetwork');
       }
 
       return map;
@@ -1323,7 +1329,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/injector */ "./js/services/injector.js");
-/* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/Store */ "./js/services/Store.js");
+/* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/store */ "./js/services/store.js");
 /* harmony import */ var _utils_debounce__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/debounce */ "./js/utils/debounce.js");
 /* harmony import */ var _utils_draw_line__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/draw-line */ "./js/utils/draw-line.js");
 /* harmony import */ var _utils_remove_node__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/remove-node */ "./js/utils/remove-node.js");
@@ -1368,6 +1374,13 @@ function (_NodeObject) {
     _this._id = _id;
     Object.assign(_assertThisInitialized(_this), options.coordinates);
     _this.r = 0.25 * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
+    _this.lineSize = 1;
+
+    if (_config__WEBPACK_IMPORTED_MODULE_1__["default"].mapType && _config__WEBPACK_IMPORTED_MODULE_1__["default"].mapType == 'roadnetwork') {
+      _this.r = 2;
+      _this.lineSize = 0.75;
+    }
+
     _id++;
     return _this;
   }
@@ -1379,7 +1392,7 @@ function (_NodeObject) {
 
       var _graphics = new PIXI.Graphics();
 
-      _graphics.lineStyle(1, attrs.strokeStyle);
+      _graphics.lineStyle(this.lineSize, attrs.strokeStyle);
 
       _graphics.beginFill(attrs.fillStyle);
 
@@ -1401,7 +1414,7 @@ function (_NodeObject) {
 
       self.nodesHidden = true;
       var toggleNodes = Object(_utils_debounce__WEBPACK_IMPORTED_MODULE_4__["default"])(function () {
-        var circles = _services_Store__WEBPACK_IMPORTED_MODULE_3__["default"].where("Circle", {
+        var circles = _services_store__WEBPACK_IMPORTED_MODULE_3__["default"].where("Circle", {
           cx: self.cx,
           cy: self.cy
         });
@@ -1410,7 +1423,7 @@ function (_NodeObject) {
           circles.forEach(function (circle) {
             circle.node.showUnPersistedPart();
           });
-          self.line = Object(_utils_draw_line__WEBPACK_IMPORTED_MODULE_5__["default"])(self.controller, self.node);
+          self.line = Object(_utils_draw_line__WEBPACK_IMPORTED_MODULE_5__["default"])(self.controller, self.node, 0xF9D276);
           self.nodesHidden = false;
         } else {
           circles.forEach(function (circle) {
@@ -1423,12 +1436,11 @@ function (_NodeObject) {
 
       _graphics.on("click", function () {
         toggleNodes();
-      });
+      }); // let texture = this.renderer.generateTexture(_graphics);
+      // let circleSprite = new PIXI.Sprite(texture);
 
-      var texture = this.renderer.generateTexture(_graphics);
-      var circleSprite = new PIXI.Sprite(texture);
-      circleSprite = _graphics;
-      return circleSprite;
+
+      return _graphics;
     }
   }, {
     key: "graphics",
@@ -1477,11 +1489,13 @@ function (_NodeObject) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _services_grid__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../services/grid */ "./js/services/grid.js");
+/* harmony import */ var _utils_node_resize__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/node-resize */ "./js/utils/node-resize.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -1555,6 +1569,7 @@ function () {
         this._gridData = new Promise(function (resolve, reject) {
           try {
             _services_grid__WEBPACK_IMPORTED_MODULE_1__["default"].parser.parse(that.gridFile, function (data) {
+              Object(_utils_node_resize__WEBPACK_IMPORTED_MODULE_2__["default"])('grid', Math.max(data.width, data.height));
               that.width = data.width * _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize;
               that.height = data.height * _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize;
               resolve(data);
@@ -1648,9 +1663,13 @@ function (_NodeObject) {
   _createClass(Line, [{
     key: "createGraphics",
     value: function createGraphics(attrs) {
+      if (_config__WEBPACK_IMPORTED_MODULE_1__["default"].mapType == 'roadnetwork') {
+        return null;
+      }
+
       var _graphics = new PIXI.Graphics();
 
-      _graphics.lineStyle(2, attrs.fillStyle);
+      _graphics.lineStyle(1, attrs.fillStyle);
 
       _graphics.beginFill(attrs.fillStyle); // _graphics.drawPolygon(this.x1*config.nodeSize, this.y1*config.nodeSize, this.x2*config.nodeSize, this.y2*config.nodeSize);
 
@@ -1673,11 +1692,10 @@ function (_NodeObject) {
         _graphics.tint = "0xFFFFFF";
       });
 
-      _services_injector__WEBPACK_IMPORTED_MODULE_2__["default"].inject(this, ['renderer']);
-      var texture = this.renderer.generateTexture(_graphics);
-      var lineSprite = new PIXI.Sprite(texture);
-      lineSprite = _graphics;
-      return lineSprite;
+      _services_injector__WEBPACK_IMPORTED_MODULE_2__["default"].inject(this, ['renderer']); // let texture = this.renderer.generateTexture(_graphics);
+      // let lineSprite = new PIXI.Sprite(texture);
+
+      return _graphics;
     }
   }, {
     key: "graphics",
@@ -1765,11 +1783,13 @@ function Map(options) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _services_mesh__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../services/mesh */ "./js/services/mesh.js");
+/* harmony import */ var _utils_node_resize__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/node-resize */ "./js/utils/node-resize.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -1837,7 +1857,7 @@ function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/Store */ "./js/services/Store.js");
+/* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/store */ "./js/services/store.js");
 /* harmony import */ var _services_node_objects_processor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../services/node-objects-processor */ "./js/services/node-objects-processor.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _utils_node_color__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/node-color */ "./js/utils/node-color.js");
@@ -1929,16 +1949,16 @@ function () {
 
         switch (obj.type) {
           case "rectangle":
-            return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Rectangle', options);
+            return _services_store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Rectangle', options);
 
           case "circle":
-            return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Circle', options);
+            return _services_store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Circle', options);
 
           case "line":
-            return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Line', options);
+            return _services_store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Line', options);
 
           case "polygon":
-            return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Polygon', options);
+            return _services_store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Polygon', options);
         }
       });
     }
@@ -1965,7 +1985,7 @@ function () {
   }, {
     key: "generatingNode",
     get: function get() {
-      return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].where("Node", {
+      return _services_store__WEBPACK_IMPORTED_MODULE_0__["default"].where("Node", {
         type: "generating",
         id: this.id
       })[0];
@@ -2072,7 +2092,7 @@ function () {
       }
 
       var pNode = null;
-      Object.values(_services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].data.Node).forEach(function (node) {
+      Object.values(_services_store__WEBPACK_IMPORTED_MODULE_0__["default"].data.Node).forEach(function (node) {
         if (node.id == _this2.pId) {
           pNode = node;
           return;
@@ -2147,6 +2167,19 @@ function () {
     key: "h",
     get: function get() {
       return this.f + this.g;
+    }
+  }, {
+    key: "text",
+    get: function get() {
+      if (!this._text) {
+        if (this.type == "source" || this.type == "destination") {
+          this._text = "".concat(this.type.toUpperCase(), " Node(id: ").concat(this.id, ", x: ").concat(this.variables.x, ", y: ").concat(this.variables.y, ")");
+        } else {
+          this._text = "".concat(this.type.toUpperCase(), " Node(id: ").concat(this.id, ", x: ").concat(this.variables.x, ", y: ").concat(this.variables.y, ", f: ").concat(this.f, ", g: ").concat(this.g, ", h: ").concat(this.h, ", pId: ").concat(this.pId, ")");
+        }
+      }
+
+      return this._text;
     }
   }]);
 
@@ -2224,7 +2257,7 @@ function (_NodeObject) {
 
       var _graphics = new PIXI.Graphics();
 
-      _graphics.lineStyle(2, attrs.fillStyle);
+      _graphics.lineStyle(1, attrs.fillStyle);
 
       _graphics.beginFill(attrs.fillStyle);
 
@@ -2304,6 +2337,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/injector */ "./js/services/injector.js");
+/* harmony import */ var _services_floatbox__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/floatbox */ "./js/services/floatbox.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2321,6 +2355,7 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -2347,6 +2382,8 @@ function (_NodeObject) {
   _createClass(Rectangle, [{
     key: "createGraphics",
     value: function createGraphics(attrs) {
+      var self = this;
+
       var _graphics = new PIXI.Graphics();
 
       _graphics.lineStyle(1, attrs.strokeStyle);
@@ -2362,13 +2399,18 @@ function (_NodeObject) {
 
       _graphics.on("mouseover", function (e) {
         _graphics.tint = attrs.fillStyle;
+        var position = {
+          x: self.controller.x,
+          y: self.controller.y
+        };
+        _services_floatbox__WEBPACK_IMPORTED_MODULE_3__["default"].execute(e, self.node.values, position);
       });
 
       _graphics.on("mouseout", function () {
         _graphics.tint = "0xFFFFFF";
       });
 
-      _services_injector__WEBPACK_IMPORTED_MODULE_2__["default"].inject(this, ['renderer']);
+      _services_injector__WEBPACK_IMPORTED_MODULE_2__["default"].inject(this, ['controller', 'renderer']);
       return _graphics;
     }
   }, {
@@ -2416,7 +2458,7 @@ function (_NodeObject) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/Store */ "./js/services/Store.js");
+/* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/store */ "./js/services/store.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2462,7 +2504,7 @@ function () {
     * @public
     */
 
-    this.node = _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Node', options); //incrementing the _id for next object
+    this.node = _services_store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Node', options); //incrementing the _id for next object
 
     _id++;
   }
@@ -2619,7 +2661,7 @@ function () {
     get: function get() {
       if (!this._previousStep) {
         if (!this.isFirstStep) {
-          this._previousStep = _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].data.Step[this._id - 1];
+          this._previousStep = _services_store__WEBPACK_IMPORTED_MODULE_0__["default"].data.Step[this._id - 1];
         }
 
         this._previousStep = null;
@@ -2645,17 +2687,7 @@ function () {
   }, {
     key: "text",
     get: function get() {
-      if (!this._text) {
-        var node = this.node;
-
-        if (this.type == "source" || this.type == "destination") {
-          this._text = "".concat(this.type.toUpperCase(), " Node(id: ").concat(node.id, ", x: ").concat(node.x, ", y: ").concat(node.y, ")");
-        } else {
-          this._text = "".concat(this.type.toUpperCase(), " Node(id: ").concat(node.id, ", x: ").concat(node.x, ", y: ").concat(node.y, ", f: ").concat(node.f, ", g: ").concat(node.g, ", h: ").concat(node.h, ", pId: ").concat(node.pId, ")");
-        }
-      }
-
-      return this._text;
+      return this.node.text;
     }
   }]);
 
@@ -2675,7 +2707,7 @@ function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/Store */ "./js/services/Store.js");
+/* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/store */ "./js/services/store.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _utils_tracer_parser__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/tracer-parser */ "./js/utils/tracer-parser.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
@@ -2803,7 +2835,7 @@ function () {
           var eventsList = json.eventList;
           eventsList.forEach(function (event) {
             event.tracer = _this;
-            var step = _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Step', event);
+            var step = _services_store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Step', event);
 
             _this.checkMax(step.node);
 
@@ -2815,7 +2847,7 @@ function () {
               _this.destination = step;
             }
           });
-          return _services_Store__WEBPACK_IMPORTED_MODULE_0__["default"].data.Step;
+          return _services_store__WEBPACK_IMPORTED_MODULE_0__["default"].data.Step;
         });
       }
 
@@ -2864,8 +2896,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_object__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./node-object */ "./js/models/node-object.js");
 /* harmony import */ var _Circle__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Circle */ "./js/models/Circle.js");
 /* harmony import */ var _Rectangle__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Rectangle */ "./js/models/Rectangle.js");
-/* harmony import */ var _Line__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Line */ "./js/models/Line.js");
-/* harmony import */ var _Polygon__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./Polygon */ "./js/models/Polygon.js");
+/* harmony import */ var _road_network__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./road-network */ "./js/models/road-network.js");
+/* harmony import */ var _road_co__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./road-co */ "./js/models/road-co.js");
+/* harmony import */ var _road_gr__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./road-gr */ "./js/models/road-gr.js");
+/* harmony import */ var _Line__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./Line */ "./js/models/Line.js");
+/* harmony import */ var _Polygon__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./Polygon */ "./js/models/Polygon.js");
+
+
+
 
 
 
@@ -2879,7 +2917,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var models = function models() {
-  return [_Tracer__WEBPACK_IMPORTED_MODULE_0__["default"], _Grid__WEBPACK_IMPORTED_MODULE_1__["default"], _Map__WEBPACK_IMPORTED_MODULE_2__["default"], _Mesh__WEBPACK_IMPORTED_MODULE_3__["default"], _Node__WEBPACK_IMPORTED_MODULE_4__["default"], _Step__WEBPACK_IMPORTED_MODULE_5__["default"], _node_object__WEBPACK_IMPORTED_MODULE_6__["default"], _Circle__WEBPACK_IMPORTED_MODULE_7__["default"], _Rectangle__WEBPACK_IMPORTED_MODULE_8__["default"], _Line__WEBPACK_IMPORTED_MODULE_9__["default"], _Polygon__WEBPACK_IMPORTED_MODULE_10__["default"]];
+  return [_Tracer__WEBPACK_IMPORTED_MODULE_0__["default"], _Grid__WEBPACK_IMPORTED_MODULE_1__["default"], _Map__WEBPACK_IMPORTED_MODULE_2__["default"], _Mesh__WEBPACK_IMPORTED_MODULE_3__["default"], _Node__WEBPACK_IMPORTED_MODULE_4__["default"], _Step__WEBPACK_IMPORTED_MODULE_5__["default"], _node_object__WEBPACK_IMPORTED_MODULE_6__["default"], _Circle__WEBPACK_IMPORTED_MODULE_7__["default"], _Rectangle__WEBPACK_IMPORTED_MODULE_8__["default"], _road_network__WEBPACK_IMPORTED_MODULE_9__["default"], _road_co__WEBPACK_IMPORTED_MODULE_10__["default"], _road_gr__WEBPACK_IMPORTED_MODULE_11__["default"], _Line__WEBPACK_IMPORTED_MODULE_12__["default"], _Polygon__WEBPACK_IMPORTED_MODULE_13__["default"]];
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (models);
@@ -2895,7 +2933,7 @@ var models = function models() {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _services_Store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/Store */ "./js/services/Store.js");
+/* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/store */ "./js/services/store.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _utils_node_color__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/node-color */ "./js/utils/node-color.js");
 /* harmony import */ var _utils_node_factory__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/node-factory */ "./js/utils/node-factory.js");
@@ -2942,16 +2980,17 @@ function () {
 
 /***/ }),
 
-/***/ "./js/services/Store.js":
+/***/ "./js/models/road-co.js":
 /*!******************************!*\
-  !*** ./js/services/Store.js ***!
+  !*** ./js/models/road-co.js ***!
   \******************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../models */ "./js/models/index.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
+/* harmony import */ var _services_road_network__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../services/road-network */ "./js/services/road-network.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -2960,75 +2999,263 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-var getModel = function getModel(modelName) {
-  var referredModel;
-  Object(_models__WEBPACK_IMPORTED_MODULE_0__["default"])().forEach(function (model) {
-    if (model.name == modelName) {
-      referredModel = model;
-      return;
-    }
-  });
+/** Class representing a road coordinates */
 
-  if (referredModel) {
-    return referredModel;
-  } else {//throw error saying wrong model name passed
-  }
-};
-
-var instance = null;
-/** @module services/store
-* this is data store implementation. Store is a singleton class. the values are stored in data. and it has common functions like createRecord, findAll, findBy, find, getRecord, relationships(hasMany, belongsTo)
-*/
-
-var StoreSingleton =
+var RoadCo =
 /*#__PURE__*/
 function () {
-  function StoreSingleton() {
-    _classCallCheck(this, StoreSingleton);
+  /**
+  * Create roadCoordinates
+  * @param {object} file - roadCoordinates file uploaded by the user
+  */
+  function RoadCo(_ref) {
+    var roadNetwork = _ref.roadNetwork,
+        file = _ref.file;
 
-    if (!instance) {
-      instance = this;
-      this.data = {};
+    _classCallCheck(this, RoadCo);
+
+    /**
+    * _id is unique id of the road coordinates that is set to 0.
+    * @type  {number}
+    * @private
+    */
+    this._id = 0;
+    /**
+    * roadNetwork is roadNetwork map.
+    * @type  {object}
+    * @public
+    */
+
+    this.roadNetwork = roadNetwork;
+    /**
+    * file is file of the coordinates that is set from the param.
+    * @type  {object}
+    * @public
+    */
+
+    this.file = file;
+    /**
+    * _coData is cache and promise object that resolves to data contained in co file.
+    * @type {Promise}
+    * @private
+    */
+
+    this._coData = null;
+  }
+  /**
+  * coData returns _coData if it is resolved. Else, sets it.
+  * @type {object}
+  * @public
+  */
+
+
+  _createClass(RoadCo, [{
+    key: "coData",
+    get: function get() {
+      if (!this._coData) {
+        var that = this;
+        this._coData = new Promise(function (resolve, reject) {
+          try {
+            _services_road_network__WEBPACK_IMPORTED_MODULE_1__["default"].parser.coParse(that.file, function (data) {
+              that.roadNetwork.maxX = data.maxX;
+              that.roadNetwork.maxY = data.maxY;
+              that.roadNetwork.minX = data.minX;
+              that.roadNetwork.minY = data.minY;
+              that.roadNetwork.width = data.maxX * _config__WEBPACK_IMPORTED_MODULE_0__["default"].roadNetworkScale;
+              that.roadNetwork.height = data.maxY * _config__WEBPACK_IMPORTED_MODULE_0__["default"].roadNetworkScale;
+              resolve(data);
+            });
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }
+
+      return this._coData;
     }
+  }]);
 
-    return instance;
+  return RoadCo;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (RoadCo);
+
+/***/ }),
+
+/***/ "./js/models/road-gr.js":
+/*!******************************!*\
+  !*** ./js/models/road-gr.js ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
+/* harmony import */ var _services_road_network__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../services/road-network */ "./js/services/road-network.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+/** Class representing a road graph */
+
+var RoadGr =
+/*#__PURE__*/
+function () {
+  /**
+  * Create roadGraph
+  * @param {object} file - roadGraph file uploaded by the user
+  */
+  function RoadGr(_ref) {
+    var roadNetwork = _ref.roadNetwork,
+        file = _ref.file;
+
+    _classCallCheck(this, RoadGr);
+
+    /**
+    * _id is unique id of the road graph that is set to 0.
+    * @type  {number}
+    * @private
+    */
+    this._id = 0;
+    /**
+    * roadNetwork is roadNetwork map.
+    * @type  {object}
+    * @public
+    */
+
+    this.roadNetwork = roadNetwork;
+    /**
+    * file is file of the road graph that is set from the param.
+    * @type  {object}
+    * @public
+    */
+
+    this.file = file;
+    /**
+    * _grData is cache and promise object that resolves to data contained in gr file.
+    * @type {Promise}
+    * @private
+    */
+
+    this._grData = null;
+  }
+  /**
+  * grData returns _grData if it is resolved. Else, sets it.
+  * @type {object}
+  * @public
+  */
+
+
+  _createClass(RoadGr, [{
+    key: "grData",
+    get: function get() {
+      if (!this._grData) {
+        var that = this;
+        this._grData = new Promise(function (resolve, reject) {
+          try {
+            _services_road_network__WEBPACK_IMPORTED_MODULE_1__["default"].parser.grParse(that.file, function (data) {
+              resolve(data);
+            });
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }
+
+      return this._grData;
+    }
+  }]);
+
+  return RoadGr;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (RoadGr);
+
+/***/ }),
+
+/***/ "./js/models/road-network.js":
+/*!***********************************!*\
+  !*** ./js/models/road-network.js ***!
+  \***********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
+/* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../services/store */ "./js/services/store.js");
+/* harmony import */ var _utils_node_resize__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/node-resize */ "./js/utils/node-resize.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+/** Class representing a road network */
+
+var RoadNetwork =
+/*#__PURE__*/
+function () {
+  /**
+  * Create a grid
+  * @param {object} files - RoadNetwork files(co and gr) uploaded by the user
+  */
+  function RoadNetwork(_ref) {
+    var coFile = _ref.coFile,
+        grFile = _ref.grFile;
+
+    _classCallCheck(this, RoadNetwork);
+
+    /**
+    * _id is unique id of the road network that is set to 0.
+    * @type  {number}
+    * @private
+    */
+    this._id = 0;
+    /**
+    * coFile is file of the coordinates that is set from the param.
+    * @type  {object}
+    * @public
+    */
+
+    this.coFile = coFile;
+    /**
+    * grFile is file of the graph that is set from the param.
+    * @type  {object}
+    * @public
+    */
+
+    this.grFile = grFile;
+    this.setupMap();
   }
 
-  _createClass(StoreSingleton, [{
-    key: "createRecord",
-    value: function createRecord(modelName, attributes) {
-      this.data[modelName] = this.data[modelName] || {};
-      var model = getModel(modelName);
-      var record = new model(attributes);
-      this.data[modelName][record._id] = record;
-      return record;
-    }
-  }, {
-    key: "find",
-    value: function find(modelName) {
-      try {
-        return this.data[modelName][0];
-      } catch (e) {
-        return null;
-      }
-    }
-  }, {
-    key: "where",
-    value: function where(modelName, condition) {
-      return Object.values(this.data[modelName]).filter(function (record) {
-        return Object.keys(condition).every(function (key) {
-          return record[key] == condition[key];
-        });
+  _createClass(RoadNetwork, [{
+    key: "setupMap",
+    value: function setupMap() {
+      Object(_utils_node_resize__WEBPACK_IMPORTED_MODULE_2__["default"])('roadnetwork');
+      this.roadCoordinates = _services_store__WEBPACK_IMPORTED_MODULE_1__["default"].createRecord("RoadCo", {
+        roadNetwork: this,
+        file: this.coFile
+      });
+      this.roadGraph = _services_store__WEBPACK_IMPORTED_MODULE_1__["default"].createRecord("RoadGr", {
+        roadNetwork: this,
+        file: this.grFile
       });
     }
   }]);
 
-  return StoreSingleton;
+  return RoadNetwork;
 }();
 
-var Store = new StoreSingleton();
-window.store = Store;
-/* harmony default export */ __webpack_exports__["default"] = (Store);
+/* harmony default export */ __webpack_exports__["default"] = (RoadNetwork);
 
 /***/ }),
 
@@ -3279,7 +3506,7 @@ var FrontierService = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Store */ "./js/services/Store.js");
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./store */ "./js/services/store.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _environment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../environment */ "./js/environment.js");
 /* harmony import */ var _error_notifier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./error-notifier */ "./js/services/error-notifier.js");
@@ -3302,8 +3529,8 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   renderMap: function renderMap() {
-    var grid = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Grid");
-    var map = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Map");
+    var grid = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Grid");
+    var map = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Map");
     grid.gridData.then(function (gridData) {
       _controller__WEBPACK_IMPORTED_MODULE_6__["default"].setupRenderer();
       var mapSprite = new PIXI.Sprite.from("".concat(_config__WEBPACK_IMPORTED_MODULE_1__["default"].clientAddr, "/maps/images/").concat(map.mapName, ".png"));
@@ -3313,7 +3540,7 @@ __webpack_require__.r(__webpack_exports__);
     });
   },
   checkMap: function checkMap() {
-    var map = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Map");
+    var map = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Map");
     var img = new Image();
     var self = this;
 
@@ -3333,8 +3560,8 @@ __webpack_require__.r(__webpack_exports__);
   sendToServer: function sendToServer() {
     var _this = this;
 
-    var grid = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Grid");
-    var map = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Map");
+    var grid = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Grid");
+    var map = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Map");
     grid.gridData.then(function (gridData) {
       fetch(_config__WEBPACK_IMPORTED_MODULE_1__["default"].processGridUrl, {
         method: "POST",
@@ -3456,7 +3683,7 @@ __webpack_require__.r(__webpack_exports__);
   drawer: {
     draw: function draw() {
       var mapContainer = new PIXI.Container();
-      var grid = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Grid');
+      var grid = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Grid');
       grid.cells.then(function (cells) {
         _controller__WEBPACK_IMPORTED_MODULE_6__["default"].setupRenderer();
         grid.gridData.then(function (gridData) {
@@ -3476,7 +3703,7 @@ __webpack_require__.r(__webpack_exports__);
     this.checkMap();
   },
   processMe: function processMe() {
-    var grid = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Grid');
+    var grid = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Grid');
     grid.gridData.then(function (gridData) {
       var height = gridData.height;
       var width = gridData.width;
@@ -3737,7 +3964,7 @@ var Injector = new InjectorService();
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Store */ "./js/services/Store.js");
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./store */ "./js/services/store.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _environment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../environment */ "./js/environment.js");
 /* harmony import */ var _error_notifier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./error-notifier */ "./js/services/error-notifier.js");
@@ -3745,6 +3972,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
 /* harmony import */ var _utils_insert_edges__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/insert-edges */ "./js/utils/insert-edges.js");
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
+/* harmony import */ var _utils_node_resize__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../utils/node-resize */ "./js/utils/node-resize.js");
+
 
 
 
@@ -3772,6 +4001,7 @@ __webpack_require__.r(__webpack_exports__);
         data.shift();
         var totalPoints = Number(data[0].split(' ')[0]);
         var totalPolygons = Number(data[0].split(' ')[1]);
+        Object(_utils_node_resize__WEBPACK_IMPORTED_MODULE_8__["default"])('mesh', totalPolygons);
         data.shift();
         var pointsArr = data.slice(0, totalPoints).map(function (pointLine) {
           return pointLine.split(" ").slice(0, 2);
@@ -3865,7 +4095,7 @@ __webpack_require__.r(__webpack_exports__);
   */
   drawer: {
     draw: function draw() {
-      var mesh = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Mesh');
+      var mesh = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Mesh');
       mesh.meshPolygons.then(function (meshPolygons) {
         _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
         mesh.meshData.then(function (meshData) {
@@ -3880,7 +4110,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   process: function process() {
-    var mesh = _Store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Mesh');
+    var mesh = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Mesh');
     mesh.meshData.then(function (meshData) {
       _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
       var container = new PIXI.Container();
@@ -3935,14 +4165,28 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Store */ "./js/services/Store.js");
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./store */ "./js/services/store.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./js/config.js");
+
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   process: function process(node) {
+    var _this = this;
+
     return node.step.tracer.nodeStructure.map(function (obj) {
+      var map = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Map');
+      var mapType;
+
+      if (map) {
+        mapType = map.mapType;
+      }
+
       var nodeConf = JSON.parse(JSON.stringify(obj));
       delete nodeConf.variables;
       nodeConf.node = node;
+
+      _this.preprocess(node, mapType);
+
       var coordinates = {};
       Object.keys(obj.variables).forEach(function (key) {
         if (key == "points") {
@@ -3972,18 +4216,33 @@ __webpack_require__.r(__webpack_exports__);
 
       switch (obj.type) {
         case "rectangle":
-          return _Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Rectangle', options);
+          return _store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Rectangle', options);
 
         case "circle":
-          return _Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Circle', options);
+          return _store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Circle', options);
 
         case "line":
-          return _Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Line', options);
+          return _store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Line', options);
 
         case "polygon":
-          return _Store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Polygon', options);
+          return _store__WEBPACK_IMPORTED_MODULE_0__["default"].createRecord('Polygon', options);
       }
     });
+  },
+  preprocess: function preprocess(node, mapType) {
+    if (!mapType) {
+      return;
+    }
+
+    if (mapType == 'roadnetwork') {
+      var roadNetwork = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('RoadNetwork');
+      var minX = roadNetwork.minX;
+      var minY = roadNetwork.minY;
+      node.variables.x -= minX;
+      node.variables.y -= minY;
+      node.variables.x *= _config__WEBPACK_IMPORTED_MODULE_1__["default"].roadNetworkScale;
+      node.variables.y *= _config__WEBPACK_IMPORTED_MODULE_1__["default"].roadNetworkScale;
+    }
   }
 });
 
@@ -4176,7 +4435,7 @@ __webpack_require__.r(__webpack_exports__);
         interaction: context.app.renderer.plugins.interaction,
         stopPropagation: true
       });
-      viewport.drag().pinch().wheel().decelerate().bounce(); // .on("drag-end", function(){
+      viewport.drag().pinch().wheel().decelerate(); // .on("drag-end", function(){
       //   if(this.getVisibleBounds().x > 0 || this.getVisibleBounds().y > 0){
       //     this.ensureVisible(0,0);
       //   }
@@ -4200,6 +4459,237 @@ __webpack_require__.r(__webpack_exports__);
     context.app.stage.addChild(context.stage);
     context.rendered = true;
     _injector__WEBPACK_IMPORTED_MODULE_1__["default"].register('renderer', context.renderer);
+  }
+});
+
+/***/ }),
+
+/***/ "./js/services/road-network.js":
+/*!*************************************!*\
+  !*** ./js/services/road-network.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./store */ "./js/services/store.js");
+/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
+/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../config */ "./js/config.js");
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  parser: {
+    coParse: function coParse(file, callback) {
+      var coReader = new FileReader();
+      coReader.addEventListener("load", function (event) {
+        var textFile = event.target;
+        var data = textFile.result.split(/\n|\r\n/);
+        var coordinates = [];
+        var minX, minY;
+        var maxX, maxY;
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = data[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var line = _step.value;
+
+            if (line[0] == 'v') {
+              var vline = line.split(" ");
+              var x = Number(vline[2]);
+              var y = Number(vline[3]);
+
+              if (!minX || minX > x) {
+                minX = x;
+              }
+
+              if (!minY || minY > y) {
+                minY = y;
+              }
+
+              if (!maxX || maxX < x) {
+                maxX = x;
+              }
+
+              if (!maxY || maxY < y) {
+                maxY = y;
+              }
+
+              coordinates.push({
+                x: x,
+                y: y
+              });
+            }
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return != null) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+
+        maxX -= minX;
+        maxY -= minY;
+        coordinates = coordinates.map(function (c) {
+          return {
+            x: c.x - minX,
+            y: c.y - minY
+          };
+        });
+        coordinates.unshift(-1);
+        callback({
+          maxX: maxX,
+          maxY: maxY,
+          minX: minX,
+          minY: minY,
+          coordinates: coordinates
+        });
+      });
+      coReader.readAsText(file);
+    },
+    grParse: function grParse(file, callback) {
+      var grReader = new FileReader();
+      grReader.addEventListener("load", function (event) {
+        var textFile = event.target;
+        var data = textFile.result.split(/\n|\r\n/);
+        var lines = [];
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
+
+        try {
+          for (var _iterator2 = data[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var line = _step2.value;
+
+            if (line[0] == 'a') {
+              var aline = line.split(" ");
+              var from = aline[1];
+              var to = aline[2];
+              lines.push([from, to]);
+            }
+          }
+        } catch (err) {
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+              _iterator2.return();
+            }
+          } finally {
+            if (_didIteratorError2) {
+              throw _iteratorError2;
+            }
+          }
+        }
+
+        callback({
+          lines: lines
+        });
+      });
+      grReader.readAsText(file);
+    }
+  },
+  renderMap: function renderMap() {
+    var roadNetwork = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('RoadNetwork');
+    roadNetwork.roadCoordinates.coData.then(function (coData) {
+      roadNetwork.roadGraph.grData.then(function (grData) {
+        _controller__WEBPACK_IMPORTED_MODULE_1__["default"].setupRenderer();
+        var mapSprite = new PIXI.Sprite.from("".concat(_config__WEBPACK_IMPORTED_MODULE_3__["default"].clientAddr, "/maps/images/ny.png"));
+        mapSprite.width = _controller__WEBPACK_IMPORTED_MODULE_1__["default"].getDimensions().width;
+        mapSprite.height = _controller__WEBPACK_IMPORTED_MODULE_1__["default"].getDimensions().height;
+        mapSprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+        mapSprite.texture.baseTexture.mipmap = true;
+        Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(_controller__WEBPACK_IMPORTED_MODULE_1__["default"], mapSprite);
+      });
+    });
+  },
+  sendToServer: function sendToServer() {
+    var _this = this;
+
+    // this.renderMap();
+    // return;
+    var roadNetwork = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('RoadNetwork');
+    roadNetwork.roadCoordinates.coData.then(function (coData) {
+      roadNetwork.roadGraph.grData.then(function (grData) {
+        fetch(_config__WEBPACK_IMPORTED_MODULE_3__["default"].processRoadNetworkUrl, {
+          method: "POST",
+          body: JSON.stringify({
+            coData: coData,
+            grData: grData
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(function (res) {
+          return res.json();
+        }).then(function (data) {
+          if (data.done) {
+            _this.renderMap();
+          }
+        });
+      });
+    });
+  },
+  checkMap: function checkMap() {
+    var map = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find("Map");
+    var img = new Image();
+    var self = this;
+
+    img.onerror = function () {
+      //send request to server
+      self.sendToServer();
+    };
+
+    img.onload = function () {
+      //load map from image directly
+      self.renderMap();
+      img = null;
+    };
+
+    img.src = "".concat(_config__WEBPACK_IMPORTED_MODULE_3__["default"].clientAddr, "/maps/images/ny.png");
+  },
+  process: function process() {
+    this.checkMap();
+    return;
+    var roadNetwork = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('RoadNetwork');
+    var container = new PIXI.Container();
+    roadNetwork.roadCoordinates.coData.then(function (coData) {
+      roadNetwork.roadGraph.grData.then(function (grData) {
+        _controller__WEBPACK_IMPORTED_MODULE_1__["default"].setupRenderer();
+        var point = new PIXI.Graphics();
+        coData.coordinates.forEach(function (p) {
+          point.lineStyle(1, 0x000000);
+          point.beginFill(0x000000);
+          point.drawCircle(p.x * 0.01, p.y * 0.01, 0.5);
+          point.endFill();
+        });
+        container.addChild(point);
+        var line = new PIXI.Graphics();
+        line.lineStyle(0.25, 0x000000);
+        grData.lines.forEach(function (l) {
+          var from = coData.coordinates[l[0]];
+          var to = coData.coordinates[l[1]];
+          line.moveTo(from.x * 0.01, from.y * 0.01);
+          line.lineTo(to.x * 0.01, to.y * 0.01);
+        });
+        container.addChild(line);
+        Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(_controller__WEBPACK_IMPORTED_MODULE_1__["default"], container);
+      });
+    });
   }
 });
 
@@ -4325,7 +4815,14 @@ var SearchPathService = {
     this.history.length = this.currentId;
   },
   clean: function clean() {
-    Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, this.current);
+    for (var i = 1; i <= this.currentId; i++) {
+      var line = this.history[i];
+      Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, line);
+    }
+  },
+  reset: function reset() {
+    this.context.currentId = 1;
+    this.history = [];
   },
   stepBackward: function stepBackward() {
     var line = this.history.pop();
@@ -4334,6 +4831,96 @@ var SearchPathService = {
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (SearchPathService);
+
+/***/ }),
+
+/***/ "./js/services/store.js":
+/*!******************************!*\
+  !*** ./js/services/store.js ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../models */ "./js/models/index.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var getModel = function getModel(modelName) {
+  var referredModel;
+  Object(_models__WEBPACK_IMPORTED_MODULE_0__["default"])().forEach(function (model) {
+    if (model.name == modelName) {
+      referredModel = model;
+      return;
+    }
+  });
+
+  if (referredModel) {
+    return referredModel;
+  } else {//throw error saying wrong model name passed
+  }
+};
+
+var instance = null;
+/** @module services/store
+* this is data store implementation. Store is a singleton class. the values are stored in data. and it has common functions like createRecord, findAll, findBy, find, getRecord, relationships(hasMany, belongsTo)
+*/
+
+var StoreSingleton =
+/*#__PURE__*/
+function () {
+  function StoreSingleton() {
+    _classCallCheck(this, StoreSingleton);
+
+    if (!instance) {
+      instance = this;
+      this.data = {};
+    }
+
+    return instance;
+  }
+
+  _createClass(StoreSingleton, [{
+    key: "createRecord",
+    value: function createRecord(modelName, attributes) {
+      this.data[modelName] = this.data[modelName] || {};
+      var model = getModel(modelName);
+      var record = new model(attributes);
+      this.data[modelName][record._id] = record;
+      return record;
+    }
+  }, {
+    key: "find",
+    value: function find(modelName) {
+      try {
+        return this.data[modelName][0];
+      } catch (e) {
+        return null;
+      }
+    }
+  }, {
+    key: "where",
+    value: function where(modelName, condition) {
+      return Object.values(this.data[modelName]).filter(function (record) {
+        return Object.keys(condition).every(function (key) {
+          return record[key] == condition[key];
+        });
+      });
+    }
+  }]);
+
+  return StoreSingleton;
+}();
+
+var Store = new StoreSingleton();
+window.store = Store;
+/* harmony default export */ __webpack_exports__["default"] = (Store);
 
 /***/ }),
 
@@ -4398,12 +4985,24 @@ __webpack_require__.r(__webpack_exports__);
  * @return {PIXI.Graphics}
 */
 
-/* harmony default export */ __webpack_exports__["default"] = (function (context, node) {
+var element = document.getElementsByClassName('screen')[0];
+var done = false;
+/* harmony default export */ __webpack_exports__["default"] = (function (context, node, color) {
+  if (!element) {
+    element = document.getElementsByClassName('screen')[0];
+  }
+
   var line = new PIXI.Graphics();
-  line.lineStyle(3, _config__WEBPACK_IMPORTED_MODULE_0__["default"].lineColor);
+  var lineColor = color ? color : _config__WEBPACK_IMPORTED_MODULE_0__["default"].lineColor;
+  line.lineStyle(1.5, lineColor);
   node.linePoints.forEach(function (point, index) {
     if (index == 0) {
       line.moveTo(point.x, point.y);
+
+      if (!done) {
+        element.scroll(point.x - 200, point.y - 200);
+        done = true;
+      }
     } else {
       line.lineTo(point.x, point.y);
     }
@@ -4532,6 +5131,49 @@ __webpack_require__.r(__webpack_exports__);
   return rectangle;
 });
 ;
+
+/***/ }),
+
+/***/ "./js/utils/node-resize.js":
+/*!*********************************!*\
+  !*** ./js/utils/node-resize.js ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
+
+/* harmony default export */ __webpack_exports__["default"] = (function (mapType, dimension) {
+  if (mapType == 'grid') {
+    if (dimension <= 128) {
+      _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize = 20;
+    } else if (dimension <= 256) {
+      _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize = 15;
+    } else if (dimension <= 512) {
+      _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize = 10;
+    } else {
+      _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize = 5;
+    }
+  }
+
+  if (mapType == 'mesh') {
+    if (dimension <= 5000) {
+      _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize = 20;
+    } else if (dimension <= 10000) {
+      _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize = 15;
+    } else if (dimension <= 15000) {
+      _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize = 10;
+    } else {
+      _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize = 5;
+    }
+  }
+
+  if (mapType == 'roadnetwork') {
+    _config__WEBPACK_IMPORTED_MODULE_0__["default"].nodeSize = 1;
+  }
+});
 
 /***/ }),
 

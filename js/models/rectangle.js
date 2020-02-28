@@ -1,6 +1,7 @@
 import NodeObject from './node-object';
 import config from '../config';
 import Injector from '../services/injector';
+import FloatboxService from '../services/floatbox';
 
 let _id = 1;
 
@@ -12,6 +13,7 @@ class Rectangle extends NodeObject {
     _id++;
   }
   createGraphics(attrs){
+    let self = this;
     let _graphics = new PIXI.Graphics();
     _graphics.lineStyle(1, attrs.strokeStyle);
     _graphics.beginFill(attrs.fillStyle);
@@ -21,11 +23,16 @@ class Rectangle extends NodeObject {
     _graphics.buttonMode=true;
     _graphics.on("mouseover", (e) => {
       _graphics.tint=attrs.fillStyle;
+      let position  = {
+        x: self.controller.x,
+        y: self.controller.y
+      }
+      FloatboxService.execute(e, self.node.values, position);
     });
     _graphics.on("mouseout", () => {
       _graphics.tint="0xFFFFFF";
     });
-    Injector.inject(this, ['renderer']);
+    Injector.inject(this, ['controller', 'renderer']);
     return _graphics;
   }
   get graphics(){

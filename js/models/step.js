@@ -1,4 +1,4 @@
-import Store from '../services/Store';
+import Store from '../services/store';
 import config from '../config'
 
 var _id = 1;
@@ -24,7 +24,7 @@ class Step {
     this.type = options.type;
 
     this.tracer = options.tracer;
-    
+
     //adding step id in the options to refer in the node.
     options['stepId'] = _id;
     options['step'] = this;
@@ -175,16 +175,7 @@ class Step {
   * text is text corresponding to this step of the algorithm. It contains node id, coordinates, parent, f, g and h value.
   */
   get text() {
-    if(!this._text){
-      let node = this.node;
-      if(this.type == "source" || this.type == "destination"){
-        this._text = `${this.type.toUpperCase()} Node(id: ${node.id}, x: ${node.x}, y: ${node.y})`;
-      }
-      else{
-        this._text = `${this.type.toUpperCase()} Node(id: ${node.id}, x: ${node.x}, y: ${node.y}, f: ${node.f}, g: ${node.g}, h: ${node.h}, pId: ${node.pId})`;
-      }
-    }
-    return this._text;
+    return this.node.text;
   }
 
 }

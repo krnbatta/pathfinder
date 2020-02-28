@@ -1,4 +1,4 @@
-import Store from '../services/Store';
+import Store from '../services/store';
 import config from '../config';
 import tracerParser from '../utils/tracer-parser';
 import $ from 'jquery';

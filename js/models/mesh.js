@@ -1,5 +1,6 @@
 import config from '../config';
 import MeshService from '../services/mesh';
+import nodeResize from '../utils/node-resize';
 
 class Mesh {
   constructor(meshFile) {

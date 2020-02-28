@@ -10,8 +10,11 @@ class Line extends NodeObject {
     Object.assign(this, options.coordinates);
   }
   createGraphics(attrs){
+    if(config.mapType=='roadnetwork'){
+      return null;
+    }
     let _graphics = new PIXI.Graphics();
-    _graphics.lineStyle(2, attrs.fillStyle);
+    _graphics.lineStyle(1, attrs.fillStyle);
     _graphics.beginFill(attrs.fillStyle);
     // _graphics.drawPolygon(this.x1*config.nodeSize, this.y1*config.nodeSize, this.x2*config.nodeSize, this.y2*config.nodeSize);
     _graphics.moveTo(this.x1*config.nodeSize, this.y1*config.nodeSize);
@@ -32,10 +35,9 @@ class Line extends NodeObject {
       _graphics.tint="0xFFFFFF";
     });
     Injector.inject(this, ['renderer']);
-    let texture = this.renderer.generateTexture(_graphics);
-    let lineSprite = new PIXI.Sprite(texture);
-    lineSprite = _graphics;
-    return lineSprite;
+    // let texture = this.renderer.generateTexture(_graphics);
+    // let lineSprite = new PIXI.Sprite(texture);
+    return _graphics;
   }
   get graphics(){
     if(!this._graphics){

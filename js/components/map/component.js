@@ -6,9 +6,10 @@ import $ from 'jquery';
 import BaseComponent from '../base-component';
 import config from '../../config';
 import environment from '../../environment';
-import Store from '../../services/Store';
+import Store from '../../services/store';
 import GridService from '../../services/grid';
 import MeshService from '../../services/mesh';
+import RoadNetworkService from '../../services/road-network';
 
 /**
 * @module components/map
@@ -39,7 +40,6 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     bindEvents() {
       $("#load-map").on('change', (e) => {
-        debugger
         if(this.validateFiles(e.target.files)){
           this.processFiles(e.target.files);
         }
@@ -50,9 +50,9 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
     },
 
     processFiles(files){
-      if(files.length > 0){
+      if(files.length > 1){
         let file1 = files[0];
-        let file2 = file[1];
+        let file2 = files[1];
         let file1Name = file1.name.split(".");
         let file2Name = file2.name.split(".");
         let file1Type = file1Name.pop();
@@ -66,9 +66,10 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
         let map = Store.createRecord("Map", {fileType, fileName});
         Store.createRecord('RoadNetwork', {coFile, grFile});
         RoadNetworkService.process();
+        config.mapType = 'roadnetwork';
       }
       else{
-        let file = e.target.files[0];
+        let file = files[0];
         let fileName = file.name.split(".");
         let fileType = fileName.pop();
         fileName = fileName.join("");
@@ -76,19 +77,21 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
         if(fileType == "grid"){
           Store.createRecord('Grid', file);
           GridService.process();
+          config.mapType = 'grid';
         }
         else if(fileType == "mesh"){
           Store.createRecord('Mesh', file);
           MeshService.process();
+          config.mapType = 'mesh';
         }
       }
       $("#map-component").hide();
     },
 
     validateFiles(files){
-      if(files.length > 0){
+      if(files.length > 1){
         let file1 = files[0];
-        let file2 = file[1];
+        let file2 = files[1];
         let file1Type = file1.name.split(".").pop();
         let file2Type = file2.name.split(".").pop();
         let hasCo = false;

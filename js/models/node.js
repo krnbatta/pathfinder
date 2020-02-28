@@ -1,4 +1,4 @@
-import Store from '../services/Store'
+import Store from '../services/store'
 import NodeObjectsProcessor from '../services/node-objects-processor'
 import config from '../config'
 import nodeColor from '../utils/node-color';
@@ -239,6 +239,17 @@ class Node {
     return this.f + this.g;
   }
 
+  get text() {
+    if(!this._text){
+      if(this.type == "source" || this.type == "destination"){
+        this._text = `${this.type.toUpperCase()} Node(id: ${this.id}, x: ${this.variables.x}, y: ${this.variables.y})`;
+      }
+      else{
+        this._text = `${this.type.toUpperCase()} Node(id: ${this.id}, x: ${this.variables.x}, y: ${this.variables.y}, f: ${this.f}, g: ${this.g}, h: ${this.h}, pId: ${this.pId})`;
+      }
+    }
+    return this._text;
+  }
 }
 
 export default Node;

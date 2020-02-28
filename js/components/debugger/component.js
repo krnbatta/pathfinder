@@ -1,7 +1,7 @@
 import StateMachine from "javascript-state-machine";
 
 import template from './template';
-import Store from '../../services/Store';
+import Store from '../../services/store';
 import $ from 'jquery';
 import BaseComponent from '../base-component';
 import Controller from '../../controller';

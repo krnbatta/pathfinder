@@ -6,7 +6,7 @@ import FloatboxService from './services/floatbox';
 import FrontierService from './services/frontier';
 import HistoryService from './services/history';
 import SearchPathService from './services/search-path';
-import Store from './services/Store';
+import Store from './services/store';
 import config from './config';
 import $ from 'jquery';
 import insertNode from './utils/insert-node';
@@ -99,6 +99,9 @@ let Controller = new StateMachine({
         }
         else if(map && map.mapType == "mesh"){
           map = Store.find('Mesh');
+        }
+        else if(map && map.mapType == "roadnetwork"){
+          map = Store.find('RoadNetwork');
         }
         return map;
       },

@@ -13,7 +13,7 @@ class Polygon extends NodeObject {
   createGraphics(attrs){
     let self = this;
     let _graphics = new PIXI.Graphics();
-    _graphics.lineStyle(2, attrs.fillStyle);
+    _graphics.lineStyle(1, attrs.fillStyle);
     _graphics.beginFill(attrs.fillStyle);
     _graphics.drawPolygon(this.points.map((pt) => pt*config.nodeSize));
     _graphics.endFill();
