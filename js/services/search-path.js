@@ -1,7 +1,6 @@
 import config from '../config';
 import Controller from '../controller';
-import insertNode from '../utils/insert-node';
-import removeNode from '../utils/remove-node';
+import GraphicsManager from '../services/graphics-manager';
 import drawLine from '../utils/draw-line';
 
 let SearchPathService = {
@@ -23,15 +22,15 @@ let SearchPathService = {
   * @param {Node} node
   */
   update(node){
-    removeNode(this.context, this.history[this.currentId-1]);
+    GraphicsManager.remove(this.context, this.history[this.currentId-1]);
     this.current = drawLine(this.context, node);
     this.history[this.currentId] = this.current;
   },
 
   retraceHistory(id){
-    removeNode(this.context, this.current);
+    GraphicsManager.remove(this.context, this.current);
     this.current = this.history[id];
-    insertNode(this.context, this.current);
+    GraphicsManager.insert(this.context, this.current);
   },
 
   clearFuture(){
@@ -41,7 +40,7 @@ let SearchPathService = {
   clean(){
     for(let i = 1; i<=this.currentId; i++){
       let line = this.history[i];
-      removeNode(this.context, line);
+      GraphicsManager.remove(this.context, line);
     }
   },
 
@@ -52,8 +51,8 @@ let SearchPathService = {
 
   stepBackward(){
     let line = this.history.pop();
-    removeNode(this.context, line);
-    insertNode(this.context, this.history[this.history.length-1])
+    GraphicsManager.remove(this.context, line);
+    GraphicsManager.insert(this.context, this.history[this.history.length-1]);
   }
 }
 

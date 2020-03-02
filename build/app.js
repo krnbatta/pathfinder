@@ -366,6 +366,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _remote_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./remote/component */ "./js/components/remote/component.js");
 /* harmony import */ var _stats_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./stats/component */ "./js/components/stats/component.js");
 /* harmony import */ var _tablet_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./tablet/component */ "./js/components/tablet/component.js");
+/* harmony import */ var _time_travel_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./time-travel/component */ "./js/components/time-travel/component.js");
 
 
 
@@ -374,7 +375,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var Components = [_monitor_component__WEBPACK_IMPORTED_MODULE_3__["default"], _tablet_component__WEBPACK_IMPORTED_MODULE_7__["default"], _debugger_component__WEBPACK_IMPORTED_MODULE_0__["default"], _events_list_component__WEBPACK_IMPORTED_MODULE_1__["default"], _map_component__WEBPACK_IMPORTED_MODULE_2__["default"], _playback_controls_component__WEBPACK_IMPORTED_MODULE_4__["default"], _stats_component__WEBPACK_IMPORTED_MODULE_6__["default"]];
+
+var Components = [_monitor_component__WEBPACK_IMPORTED_MODULE_3__["default"], _tablet_component__WEBPACK_IMPORTED_MODULE_7__["default"], _debugger_component__WEBPACK_IMPORTED_MODULE_0__["default"], _events_list_component__WEBPACK_IMPORTED_MODULE_1__["default"], _map_component__WEBPACK_IMPORTED_MODULE_2__["default"], _playback_controls_component__WEBPACK_IMPORTED_MODULE_4__["default"], _stats_component__WEBPACK_IMPORTED_MODULE_6__["default"], _time_travel_component__WEBPACK_IMPORTED_MODULE_8__["default"]];
 /* harmony default export */ __webpack_exports__["default"] = (Components);
 
 /***/ }),
@@ -957,6 +959,90 @@ var template = function template() {
 
 /***/ }),
 
+/***/ "./js/components/time-travel/component.js":
+/*!************************************************!*\
+  !*** ./js/components/time-travel/component.js ***!
+  \************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var javascript_state_machine__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! javascript-state-machine */ "./node_modules/javascript-state-machine/lib/state-machine.js");
+/* harmony import */ var javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(javascript_state_machine__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _template__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./template */ "./js/components/time-travel/template.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _base_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../base-component */ "./js/components/base-component.js");
+/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../controller */ "./js/controller.js");
+/* harmony import */ var _services_time_travel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../services/time-travel */ "./js/services/time-travel.js");
+
+
+
+
+
+
+/**
+* @module components/playback-controls
+* This component handles the playback controls buttons.
+*/
+
+var TimeTravelComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a(jquery__WEBPACK_IMPORTED_MODULE_2___default.a.extend({}, _base_component__WEBPACK_IMPORTED_MODULE_3__["default"], {
+  methods: {
+    /**
+    * @function onBeforeInit
+    * This function creates component div container and appends it to the page.
+    */
+    onBeforeInit: function onBeforeInit() {
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#pathfinder").append("<div id='time-travel-component'></div>");
+    },
+
+    /**
+    * @function onLeaveNone
+    * This function fills the component container with the template file and initiates event binding.
+    */
+    onLeaveNone: function onLeaveNone() {
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#time-travel-component").html(_template__WEBPACK_IMPORTED_MODULE_1__["default"]);
+      this.bindEvents();
+    },
+
+    /**
+    * @function bindEvents
+    * This function calls the PlaybackService callbacks as per the button clicked
+    */
+    bindEvents: function bindEvents() {
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-backward").on('click', function (e) {
+        var backVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-backward-input').val();
+        _services_time_travel__WEBPACK_IMPORTED_MODULE_5__["default"].goBackwards(_controller__WEBPACK_IMPORTED_MODULE_4__["default"], backVal);
+      });
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-forward").on('click', function (e) {
+        var frontVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-forward-input').val();
+        _services_time_travel__WEBPACK_IMPORTED_MODULE_5__["default"].goForwards(_controller__WEBPACK_IMPORTED_MODULE_4__["default"], frontVal);
+      });
+    }
+  }
+}));
+/* harmony default export */ __webpack_exports__["default"] = (TimeTravelComponent);
+
+/***/ }),
+
+/***/ "./js/components/time-travel/template.js":
+/*!***********************************************!*\
+  !*** ./js/components/time-travel/template.js ***!
+  \***********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var template = function template() {
+  return "\n  <div id='time-travel'>\n  <input type=\"number\" id=\"travel-backward-input\" min=\"1\">\n  <button id='travel-backward' title='Travel Back'><i class='fas fa-fast-backward'/></button>\n  <input type=\"number\" id=\"travel-forward-input\" min=\"1\">\n  <button id='travel-forward' title='Travel Forward'><i class='fas fa-fast-forward'/></button>\n  </div>\n";
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (template);
+
+/***/ }),
+
 /***/ "./js/config.js":
 /*!**********************!*\
   !*** ./js/config.js ***!
@@ -978,7 +1064,7 @@ var config = {
   pathColor: 0xFFFFFF,
   borderColor: 0x000000,
   borderWidth: 0.1,
-  nodeSize: 5,
+  nodeSize: 20,
   roadNetworkScale: 0.005,
   nodeAttrs: {
     source: {
@@ -1033,12 +1119,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./config */ "./js/config.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_10__);
-/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./utils/insert-node */ "./js/utils/insert-node.js");
-/* harmony import */ var _services_runner__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./services/runner */ "./js/services/runner.js");
-/* harmony import */ var _services_renderer__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./services/renderer */ "./js/services/renderer.js");
-/* harmony import */ var _services_mouse_tracker__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./services/mouse-tracker */ "./js/services/mouse-tracker.js");
-/* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/injector */ "./js/services/injector.js");
-
+/* harmony import */ var _services_runner__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./services/runner */ "./js/services/runner.js");
+/* harmony import */ var _services_renderer__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./services/renderer */ "./js/services/renderer.js");
+/* harmony import */ var _services_mouse_tracker__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./services/mouse-tracker */ "./js/services/mouse-tracker.js");
+/* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./services/injector */ "./js/services/injector.js");
 
 
 
@@ -1087,7 +1171,8 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     //stage => app.stage
     stage: null,
     //canvas => DOM element canvas
-    canvas: null
+    canvas: null,
+    timeTravelling: false
   },
   methods: {
     /**
@@ -1095,7 +1180,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     * This function is called when the Controller is initiated(init transition) i.e. none to ready state. It initiates all the components on the page.
     */
     onInit: function onInit() {
-      Object(_services_mouse_tracker__WEBPACK_IMPORTED_MODULE_14__["default"])(this);
+      Object(_services_mouse_tracker__WEBPACK_IMPORTED_MODULE_13__["default"])(this);
       _components__WEBPACK_IMPORTED_MODULE_1__["default"].forEach(function (component) {
         component.init();
       });
@@ -1126,7 +1211,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
         _this.steps = steps;
         that.setupRenderer();
         _this.totalSteps = Object.keys(_this.steps).length;
-        that.runner = _services_runner__WEBPACK_IMPORTED_MODULE_12__["default"].call(that, steps);
+        that.runner = _services_runner__WEBPACK_IMPORTED_MODULE_11__["default"].call(that, steps);
         _services_playback__WEBPACK_IMPORTED_MODULE_3__["default"].init();
         _services_floatbox__WEBPACK_IMPORTED_MODULE_4__["default"].init();
       });
@@ -1173,7 +1258,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
             width = _this$getDimensions.width,
             height = _this$getDimensions.height;
 
-        _services_renderer__WEBPACK_IMPORTED_MODULE_13__["default"].render(this, width, height);
+        _services_renderer__WEBPACK_IMPORTED_MODULE_12__["default"].render(this, width, height);
       }
     },
 
@@ -1277,7 +1362,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     }
   }
 });
-_services_injector__WEBPACK_IMPORTED_MODULE_15__["default"].register('controller', Controller);
+_services_injector__WEBPACK_IMPORTED_MODULE_14__["default"].register('controller', Controller);
 window.controller = Controller;
 /* harmony default export */ __webpack_exports__["default"] = (Controller);
 
@@ -1332,7 +1417,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/store */ "./js/services/store.js");
 /* harmony import */ var _utils_debounce__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/debounce */ "./js/utils/debounce.js");
 /* harmony import */ var _utils_draw_line__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/draw-line */ "./js/utils/draw-line.js");
-/* harmony import */ var _utils_remove_node__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/remove-node */ "./js/utils/remove-node.js");
+/* harmony import */ var _services_graphics_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../services/graphics-manager */ "./js/services/graphics-manager.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1429,7 +1514,7 @@ function (_NodeObject) {
           circles.forEach(function (circle) {
             circle.node.hideUnPersistedPart();
           });
-          Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_6__["default"])(self.controller, self.line);
+          _services_graphics_manager__WEBPACK_IMPORTED_MODULE_6__["default"].remove(self.controller, self.line);
           self.nodesHidden = true;
         }
       });
@@ -3398,9 +3483,7 @@ var FloatboxService = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
-/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
-/* harmony import */ var _utils_remove_node__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/remove-node */ "./js/utils/remove-node.js");
-
+/* harmony import */ var _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/graphics-manager */ "./js/services/graphics-manager.js");
 
 
 
@@ -3434,7 +3517,7 @@ var FrontierService = {
           graphicsContainer.addChild(graphics);
         }
       });
-      Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(this.context, graphicsContainer);
+      _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, graphicsContainer);
       this.current.push(graphicsContainer);
     }
 
@@ -3454,7 +3537,7 @@ var FrontierService = {
     var _this = this;
 
     this.current.forEach(function (graphicsContainer) {
-      Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(_this.context, graphicsContainer);
+      _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(_this.context, graphicsContainer);
     });
   },
   clearFuture: function clearFuture() {
@@ -3469,7 +3552,7 @@ var FrontierService = {
 
     this.current = this.history[id];
     this.current.forEach(function (graphicsContainer) {
-      Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(_this2.context, graphicsContainer);
+      _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(_this2.context, graphicsContainer);
     });
   },
   stepBackward: function stepBackward() {
@@ -3484,16 +3567,65 @@ var FrontierService = {
         return !prevFrontiers.includes(x);
       });
       difference.forEach(function (graphicsContainer) {
-        Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(_this3.context, graphicsContainer);
+        _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(_this3.context, graphicsContainer);
       });
     } else if (prevFrontiers.length) {
       prevFrontiers.forEach(function (graphicsContainer) {
-        Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(_this3.context, graphicsContainer);
+        _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(_this3.context, graphicsContainer);
       });
     }
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (FrontierService);
+
+/***/ }),
+
+/***/ "./js/services/graphics-manager.js":
+/*!*****************************************!*\
+  !*** ./js/services/graphics-manager.js ***!
+  \*****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  currentBuffer: null,
+  insert: function insert(context, graphics) {
+    if (!graphics) {
+      return;
+    }
+
+    if (context.timeTravelling) {
+      if (!this.currentBuffer) {
+        this.currentBuffer = new PIXI.Container();
+      }
+
+      this.currentBuffer.addChild(graphics);
+    } else {
+      context.stage.addChild(graphics);
+    }
+  },
+  remove: function remove(context, graphics) {
+    if (!graphics) {
+      return;
+    }
+
+    if (graphics.parent) {
+      graphics.parent.removeChild(graphics);
+    } else {
+      context.stage.removeChild(graphics);
+    }
+  },
+  flushBuffer: function flushBuffer(context) {
+    if (!this.currentBuffer) {
+      return;
+    }
+
+    context.stage.addChild(this.currentBuffer);
+    this.currentBuffer = null;
+  }
+});
 
 /***/ }),
 
@@ -3511,7 +3643,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _environment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../environment */ "./js/environment.js");
 /* harmony import */ var _error_notifier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./error-notifier */ "./js/services/error-notifier.js");
 /* harmony import */ var _utils_node_factory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/node-factory */ "./js/utils/node-factory.js");
-/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
+/* harmony import */ var _services_graphics_manager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../services/graphics-manager */ "./js/services/graphics-manager.js");
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_7__);
@@ -3536,7 +3668,7 @@ __webpack_require__.r(__webpack_exports__);
       var mapSprite = new PIXI.Sprite.from("".concat(_config__WEBPACK_IMPORTED_MODULE_1__["default"].clientAddr, "/maps/images/").concat(map.mapName, ".png"));
       mapSprite.width = gridData.width * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
       mapSprite.height = gridData.height * _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeSize;
-      Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], mapSprite);
+      _services_graphics_manager__WEBPACK_IMPORTED_MODULE_5__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], mapSprite);
     });
   },
   checkMap: function checkMap() {
@@ -3692,7 +3824,7 @@ __webpack_require__.r(__webpack_exports__);
             var cellElement = Object(_utils_node_factory__WEBPACK_IMPORTED_MODULE_4__["default"])(cell);
             mapContainer.addChild(cellElement);
           });
-          Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], mapContainer);
+          _services_graphics_manager__WEBPACK_IMPORTED_MODULE_5__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], mapContainer);
         });
       }, function (err) {
         Object(_error_notifier__WEBPACK_IMPORTED_MODULE_3__["default"])(err);
@@ -3813,9 +3945,9 @@ __webpack_require__.r(__webpack_exports__);
         var mapSprite = PIXI.Sprite.from(texture); // mapSprite.width = 800;
         // mapSprite.height = 500;
 
-        Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], mapSprite); // document.body.appendChild(img);
+        _services_graphics_manager__WEBPACK_IMPORTED_MODULE_5__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], mapSprite); // document.body.appendChild(img);
       }; // let mapSprite = PIXI.Sprite.from("maps/tfs.png");
-      // insertNode(Controller, mapSprite);
+      // GraphicsManager.insert(Controller, mapSprite);
 
     });
   }
@@ -3834,9 +3966,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
-/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
-/* harmony import */ var _utils_remove_node__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/remove-node */ "./js/utils/remove-node.js");
-
+/* harmony import */ var _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/graphics-manager */ "./js/services/graphics-manager.js");
 
 
 
@@ -3865,7 +3995,7 @@ var HistoryService = {
     var step = this.context.steps[this.currentId];
     var node = step.node;
     var graphicsContainer = node.graphics;
-    Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(this.context, graphicsContainer);
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, graphicsContainer);
     this.history[this.currentId] = node.graphics;
     return step;
   },
@@ -3880,7 +4010,7 @@ var HistoryService = {
   retraceHistory: function retraceHistory(id) {
     for (var i = 1; i <= id; i++) {
       var graphicsContainer = this.history[i];
-      Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(this.context, graphicsContainer);
+      _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, graphicsContainer);
     }
 
     this.context.currentId = id + 1;
@@ -3891,7 +4021,7 @@ var HistoryService = {
   clean: function clean() {
     for (var i = 1; i <= this.currentId; i++) {
       var graphicsContainer = this.history[i];
-      Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, graphicsContainer);
+      _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, graphicsContainer);
     }
   },
   reset: function reset() {
@@ -3900,7 +4030,7 @@ var HistoryService = {
   },
   stepBackward: function stepBackward() {
     var graphicsContainer = this.history.pop();
-    Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, graphicsContainer);
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, graphicsContainer);
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (HistoryService);
@@ -3969,11 +4099,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _environment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../environment */ "./js/environment.js");
 /* harmony import */ var _error_notifier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./error-notifier */ "./js/services/error-notifier.js");
 /* harmony import */ var _utils_polygon_factory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/polygon-factory */ "./js/utils/polygon-factory.js");
-/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
-/* harmony import */ var _utils_insert_edges__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/insert-edges */ "./js/utils/insert-edges.js");
-/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
-/* harmony import */ var _utils_node_resize__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../utils/node-resize */ "./js/utils/node-resize.js");
-
+/* harmony import */ var _services_graphics_manager__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../services/graphics-manager */ "./js/services/graphics-manager.js");
+/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
+/* harmony import */ var _utils_node_resize__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../utils/node-resize */ "./js/utils/node-resize.js");
 
 
 
@@ -4001,7 +4129,7 @@ __webpack_require__.r(__webpack_exports__);
         data.shift();
         var totalPoints = Number(data[0].split(' ')[0]);
         var totalPolygons = Number(data[0].split(' ')[1]);
-        Object(_utils_node_resize__WEBPACK_IMPORTED_MODULE_8__["default"])('mesh', totalPolygons);
+        Object(_utils_node_resize__WEBPACK_IMPORTED_MODULE_7__["default"])('mesh', totalPolygons);
         data.shift();
         var pointsArr = data.slice(0, totalPoints).map(function (pointLine) {
           return pointLine.split(" ").slice(0, 2);
@@ -4097,11 +4225,11 @@ __webpack_require__.r(__webpack_exports__);
     draw: function draw() {
       var mesh = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Mesh');
       mesh.meshPolygons.then(function (meshPolygons) {
-        _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
+        _controller__WEBPACK_IMPORTED_MODULE_6__["default"].setupRenderer();
         mesh.meshData.then(function (meshData) {
           meshPolygons.forEach(function (polygonObj) {
             var polygon = Object(_utils_polygon_factory__WEBPACK_IMPORTED_MODULE_4__["default"])(polygonObj);
-            Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], polygon);
+            _services_graphics_manager__WEBPACK_IMPORTED_MODULE_5__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], polygon);
           });
         });
       }, function (err) {
@@ -4112,7 +4240,7 @@ __webpack_require__.r(__webpack_exports__);
   process: function process() {
     var mesh = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Mesh');
     mesh.meshData.then(function (meshData) {
-      _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
+      _controller__WEBPACK_IMPORTED_MODULE_6__["default"].setupRenderer();
       var container = new PIXI.Container();
 
       for (var i = 0; i < meshData.polygonsArr.length; ++i) {
@@ -4125,7 +4253,7 @@ __webpack_require__.r(__webpack_exports__);
         container.addChild(polygon);
       }
 
-      Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_5__["default"])(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], container);
+      _services_graphics_manager__WEBPACK_IMPORTED_MODULE_5__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_6__["default"], container);
     });
   }
 });
@@ -4475,7 +4603,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./store */ "./js/services/store.js");
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
-/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
+/* harmony import */ var _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/graphics-manager */ "./js/services/graphics-manager.js");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../config */ "./js/config.js");
 
 
@@ -4613,7 +4741,7 @@ __webpack_require__.r(__webpack_exports__);
         mapSprite.height = _controller__WEBPACK_IMPORTED_MODULE_1__["default"].getDimensions().height;
         mapSprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
         mapSprite.texture.baseTexture.mipmap = true;
-        Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(_controller__WEBPACK_IMPORTED_MODULE_1__["default"], mapSprite);
+        _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_1__["default"], mapSprite);
       });
     });
   },
@@ -4687,7 +4815,7 @@ __webpack_require__.r(__webpack_exports__);
           line.lineTo(to.x * 0.01, to.y * 0.01);
         });
         container.addChild(line);
-        Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(_controller__WEBPACK_IMPORTED_MODULE_1__["default"], container);
+        _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_1__["default"], container);
       });
     });
   }
@@ -4775,10 +4903,8 @@ var runnerFactory = function runnerFactory(steps) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
-/* harmony import */ var _utils_insert_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/insert-node */ "./js/utils/insert-node.js");
-/* harmony import */ var _utils_remove_node__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/remove-node */ "./js/utils/remove-node.js");
-/* harmony import */ var _utils_draw_line__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/draw-line */ "./js/utils/draw-line.js");
-
+/* harmony import */ var _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/graphics-manager */ "./js/services/graphics-manager.js");
+/* harmony import */ var _utils_draw_line__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/draw-line */ "./js/utils/draw-line.js");
 
 
 
@@ -4802,14 +4928,14 @@ var SearchPathService = {
   * @param {Node} node
   */
   update: function update(node) {
-    Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, this.history[this.currentId - 1]);
-    this.current = Object(_utils_draw_line__WEBPACK_IMPORTED_MODULE_4__["default"])(this.context, node);
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, this.history[this.currentId - 1]);
+    this.current = Object(_utils_draw_line__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, node);
     this.history[this.currentId] = this.current;
   },
   retraceHistory: function retraceHistory(id) {
-    Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, this.current);
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, this.current);
     this.current = this.history[id];
-    Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(this.context, this.current);
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, this.current);
   },
   clearFuture: function clearFuture() {
     this.history.length = this.currentId;
@@ -4817,7 +4943,7 @@ var SearchPathService = {
   clean: function clean() {
     for (var i = 1; i <= this.currentId; i++) {
       var line = this.history[i];
-      Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, line);
+      _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, line);
     }
   },
   reset: function reset() {
@@ -4826,8 +4952,8 @@ var SearchPathService = {
   },
   stepBackward: function stepBackward() {
     var line = this.history.pop();
-    Object(_utils_remove_node__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, line);
-    Object(_utils_insert_node__WEBPACK_IMPORTED_MODULE_2__["default"])(this.context, this.history[this.history.length - 1]);
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, line);
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, this.history[this.history.length - 1]);
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (SearchPathService);
@@ -4924,6 +5050,49 @@ window.store = Store;
 
 /***/ }),
 
+/***/ "./js/services/time-travel.js":
+/*!************************************!*\
+  !*** ./js/services/time-travel.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _graphics_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./graphics-manager */ "./js/services/graphics-manager.js");
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  goBackwards: function goBackwards(context, backVal) {
+    context.timeTravelling = true;
+    var currentId = context.currentId;
+    var proposedId = currentId - parseInt(backVal);
+    proposedId = Math.max(proposedId, 1);
+
+    while (context.currentId != proposedId + 1) {
+      context.stepBackward();
+    }
+
+    context.timeTravelling = false;
+    context.stepBackward();
+  },
+  goForwards: function goForwards(context, frontVal) {
+    context.timeTravelling = true;
+    var currentId = context.currentId;
+    var proposedId = currentId + parseInt(frontVal);
+    proposedId = Math.min(proposedId, context.totalSteps);
+
+    while (context.currentId != proposedId - 1) {
+      context.stepForward();
+    }
+
+    context.timeTravelling = false;
+    _graphics_manager__WEBPACK_IMPORTED_MODULE_0__["default"].flushBuffer(context);
+    context.stepForward();
+  }
+});
+
+/***/ }),
+
 /***/ "./js/utils/debounce.js":
 /*!******************************!*\
   !*** ./js/utils/debounce.js ***!
@@ -5009,51 +5178,6 @@ var done = false;
   });
   context.stage.addChild(line);
   return line;
-});
-
-/***/ }),
-
-/***/ "./js/utils/insert-edges.js":
-/*!**********************************!*\
-  !*** ./js/utils/insert-edges.js ***!
-  \**********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
-//Used while using Viva.js
-
-/* harmony default export */ __webpack_exports__["default"] = (function (context, node) {
-  [node.up, node.down, node.left, node.right].forEach(function (neighbour) {
-    if (neighbour) {
-      context.graph.addLink(node.id, neighbour); // let linkId = node.id + '👉 ' + neighbour;
-      // let line = Controller.graphics.getLinkUI(linkId);
-      // line.color = 0xFFFFFFff;
-    }
-  });
-});
-
-/***/ }),
-
-/***/ "./js/utils/insert-node.js":
-/*!*********************************!*\
-  !*** ./js/utils/insert-node.js ***!
-  \*********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/**
- * @function insertNode
- * This function add the Graphics object to the stage and renders it.
- * @param {Controller} context
- * @param {PIXI.Graphics} graphics
-*/
-/* harmony default export */ __webpack_exports__["default"] = (function (context, graphics) {
-  context.stage.addChild(graphics);
 });
 
 /***/ }),
@@ -5201,29 +5325,6 @@ __webpack_require__.r(__webpack_exports__);
   return polygon;
 });
 ;
-
-/***/ }),
-
-/***/ "./js/utils/remove-node.js":
-/*!*********************************!*\
-  !*** ./js/utils/remove-node.js ***!
-  \*********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/**
- * @function removeNode
- * This function removes the Graphics object from the stage.
- * @param {Controller} context
- * @param {PIXI.Graphics} graphics
-*/
-/* harmony default export */ __webpack_exports__["default"] = (function (context, graphics) {
-  if (graphics) {
-    context.stage.removeChild(graphics); // graphics.visible = false;
-  }
-});
 
 /***/ }),
 

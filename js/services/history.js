@@ -1,7 +1,6 @@
 import config from '../config';
 import Controller from '../controller';
-import insertNode from '../utils/insert-node';
-import removeNode from '../utils/remove-node';
+import GraphicsManager from '../services/graphics-manager';
 
 let HistoryService = {
   init(context){
@@ -27,7 +26,7 @@ let HistoryService = {
     let step = this.context.steps[this.currentId];
     let node = step.node;
     let graphicsContainer = node.graphics;
-    insertNode(this.context, graphicsContainer);
+    GraphicsManager.insert(this.context, graphicsContainer);
     this.history[this.currentId] = node.graphics;
     return step;
   },
@@ -43,7 +42,7 @@ let HistoryService = {
   retraceHistory(id){
     for(let i = 1; i<=id; i++){
       let graphicsContainer = this.history[i];
-      insertNode(this.context, graphicsContainer);
+      GraphicsManager.insert(this.context, graphicsContainer);
     }
     this.context.currentId = id+1;
   },
@@ -55,7 +54,7 @@ let HistoryService = {
   clean(){
     for(let i = 1; i<=this.currentId; i++){
       let graphicsContainer = this.history[i];
-      removeNode(this.context, graphicsContainer);
+      GraphicsManager.remove(this.context, graphicsContainer);
     }
   },
 
@@ -66,7 +65,7 @@ let HistoryService = {
 
   stepBackward(){
     let graphicsContainer = this.history.pop();
-    removeNode(this.context, graphicsContainer);
+    GraphicsManager.remove(this.context, graphicsContainer);
   }
 }
 

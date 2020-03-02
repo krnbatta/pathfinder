@@ -1,6 +1,6 @@
 import Store from './store';
 import Controller from '../controller';
-import insertNode from '../utils/insert-node';
+import GraphicsManager from '../services/graphics-manager';
 import config from '../config';
 
 export default {
@@ -90,7 +90,7 @@ export default {
         mapSprite.height = Controller.getDimensions().height;
         mapSprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
         mapSprite.texture.baseTexture.mipmap = true;
-        insertNode(Controller, mapSprite);
+        GraphicsManager.insert(Controller, mapSprite);
       });
     });
   },
@@ -157,7 +157,7 @@ export default {
           line.lineTo(to.x * 0.01, to.y * 0.01);
         });
         container.addChild(line);
-        insertNode(Controller, container);
+        GraphicsManager.insert(Controller, container);
       });
     });
   }

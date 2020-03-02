@@ -4,7 +4,7 @@ import Injector from '../services/injector';
 import Store from '../services/store';
 import debounce from '../utils/debounce';
 import drawLine from '../utils/draw-line';
-import removeNode from '../utils/remove-node';
+import GraphicsManager from '../services/graphics-manager';
 
 let _id = 1;
 
@@ -51,7 +51,7 @@ class Circle extends NodeObject {
         circles.forEach((circle) => {
           circle.node.hideUnPersistedPart();
         });
-        removeNode(self.controller, self.line);
+        GraphicsManager.remove(self.controller, self.line);
         self.nodesHidden = true;
       }
     });

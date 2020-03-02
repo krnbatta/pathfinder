@@ -6,7 +6,8 @@ import PlaybackControlsComponent from './playback-controls/component';
 import RemoteComponent from './remote/component';
 import StatsComponent from './stats/component';
 import TabletComponent from './tablet/component';
+import TimeTravelComponent from './time-travel/component';
 
-let Components = [MonitorComponent, TabletComponent, DebuggerComponent, EventsListComponent, MapComponent, PlaybackControlsComponent, StatsComponent];
+let Components = [MonitorComponent, TabletComponent, DebuggerComponent, EventsListComponent, MapComponent, PlaybackControlsComponent, StatsComponent, TimeTravelComponent];
 
 export default Components;

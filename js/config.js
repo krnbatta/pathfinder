@@ -10,7 +10,7 @@ const config = {
   pathColor: 0xFFFFFF,
   borderColor: 0x000000,
   borderWidth: 0.1,
-  nodeSize: 5,
+  nodeSize: 20,
   roadNetworkScale: 0.005,
   nodeAttrs: {
     source: {

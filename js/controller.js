@@ -9,7 +9,6 @@ import SearchPathService from './services/search-path';
 import Store from './services/store';
 import config from './config';
 import $ from 'jquery';
-import insertNode from './utils/insert-node';
 import runnerFactory from './services/runner';
 import Renderer from './services/renderer';
 import mouseTracker from './services/mouse-tracker';
@@ -48,7 +47,9 @@ let Controller = new StateMachine({
       //stage => app.stage
       stage: null,
       //canvas => DOM element canvas
-      canvas: null
+      canvas: null,
+
+      timeTravelling: false
     },
     methods: {
       /**

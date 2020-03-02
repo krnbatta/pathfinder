@@ -109,6 +109,11 @@ html, body {
 }
 
 
+#time-travel{
+  display: inline-block;
+  position: absolute;
+  right: 100px;
+}
 
 /* tablet css */
 #tablet-component{

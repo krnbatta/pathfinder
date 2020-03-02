@@ -1,7 +1,6 @@
 import config from '../config';
 import Controller from '../controller';
-import insertNode from '../utils/insert-node';
-import removeNode from '../utils/remove-node';
+import GraphicsManager from '../services/graphics-manager';
 
 let FrontierService = {
   init(context){
@@ -29,10 +28,10 @@ let FrontierService = {
       node.nodeObjects.forEach((nodeObject) => {
         let graphics = nodeObject.createGraphics(attrs);
         if(graphics){
-          graphicsContainer.addChild(graphics);          
+          graphicsContainer.addChild(graphics);
         }
       });
-      insertNode(this.context, graphicsContainer);
+      GraphicsManager.insert(this.context, graphicsContainer);
       this.current.push(graphicsContainer);
     }
     this.history[this.currentId] = this.current.slice();
@@ -50,7 +49,7 @@ let FrontierService = {
 
   clean(){
     this.current.forEach((graphicsContainer) => {
-      removeNode(this.context, graphicsContainer);
+      GraphicsManager.remove(this.context, graphicsContainer);
     });
   },
 
@@ -66,7 +65,7 @@ let FrontierService = {
   retraceHistory(id){
     this.current = this.history[id];
     this.current.forEach((graphicsContainer) => {
-      insertNode(this.context, graphicsContainer);
+      GraphicsManager.insert(this.context, graphicsContainer);
     });
   },
 
@@ -77,12 +76,12 @@ let FrontierService = {
     if(frontiers.length){
       let difference = frontiers.filter(x => !prevFrontiers.includes(x));
       difference.forEach((graphicsContainer) => {
-        removeNode(this.context, graphicsContainer);
+        GraphicsManager.remove(this.context, graphicsContainer);
       });
     }
     else if(prevFrontiers.length){
       prevFrontiers.forEach((graphicsContainer) => {
-        insertNode(this.context, graphicsContainer);
+        GraphicsManager.insert(this.context, graphicsContainer);
       });
     }
   }

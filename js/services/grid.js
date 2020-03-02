@@ -3,7 +3,7 @@ import config from '../config';
 import environment from '../environment';
 import errorNotifier from './error-notifier';
 import nodeFactory from '../utils/node-factory';
-import insertNode from '../utils/insert-node';
+import GraphicsManager from '../services/graphics-manager';
 import Controller from '../controller';
 import $ from "jquery";
 
@@ -19,7 +19,7 @@ export default {
       let mapSprite = new PIXI.Sprite.from(`${config.clientAddr}/maps/images/${map.mapName}.png`);
       mapSprite.width = gridData.width * config.nodeSize;
       mapSprite.height = gridData.height * config.nodeSize;
-      insertNode(Controller, mapSprite);
+      GraphicsManager.insert(Controller, mapSprite);
     });
   },
 
@@ -158,7 +158,7 @@ export default {
             let cellElement = nodeFactory(cell);
             mapContainer.addChild(cellElement);
           });
-          insertNode(Controller, mapContainer);
+          GraphicsManager.insert(Controller, mapContainer);
         });
       }, (err) => {
         errorNotifier(err);
@@ -259,12 +259,12 @@ export default {
         let mapSprite = PIXI.Sprite.from(texture);
         // mapSprite.width = 800;
         // mapSprite.height = 500;
-        insertNode(Controller, mapSprite);
+        GraphicsManager.insert(Controller, mapSprite);
         // document.body.appendChild(img);
       }
 
       // let mapSprite = PIXI.Sprite.from("maps/tfs.png");
-      // insertNode(Controller, mapSprite);
+      // GraphicsManager.insert(Controller, mapSprite);
     });
   }
 }
