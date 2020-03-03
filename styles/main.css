@@ -1,11 +1,13 @@
 html, body {
   height: 100%;
+  font-size: 0.8rem;
 }
 #pathfinder {
   width: 100%;
   height: 100%;
   position: absolute;
   overflow: auto;
+  margin: 10px;
 }
 #debug-component{
   position: absolute;
@@ -112,7 +114,7 @@ html, body {
 #time-travel{
   display: inline-block;
   position: absolute;
-  right: 100px;
+  right: 10px;
 }
 
 /* tablet css */
@@ -231,6 +233,15 @@ html, body {
   	margin: 0 auto;
 }
 
+#breakpoints{
+  display: inline-block;
+  position: absolute;
+  right: 500px;
+}
+
+#bp-btn{
+  padding: 1px 7px 2px 7px;
+}
 /* Remote css */
 #remote .controller{
   margin-top: 100px;

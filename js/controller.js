@@ -1,6 +1,7 @@
 import StateMachine from "javascript-state-machine";
 import Components from './components';
 import EventsListComponent from './components/events-list/component';
+import BreakpointsComponent from './components/breakpoints/component';
 import PlaybackService from './services/playback';
 import FloatboxService from './services/floatbox';
 import FrontierService from './services/frontier';
@@ -185,6 +186,11 @@ let Controller = new StateMachine({
           PlaybackService.pause();
         }
         let currentStep = this.steps[this.currentId];
+        let breakAlg = BreakpointsComponent.check(currentStep);
+        if(breakAlg){
+          PlaybackService.pause();
+          alert("Breakpoint condition");
+        }
         this.runner();
         EventsListComponent.addEvent(currentStep);
       },

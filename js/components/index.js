@@ -7,7 +7,8 @@ import RemoteComponent from './remote/component';
 import StatsComponent from './stats/component';
 import TabletComponent from './tablet/component';
 import TimeTravelComponent from './time-travel/component';
+import BreakpointsComponent from './breakpoints/component';
 
-let Components = [MonitorComponent, TabletComponent, DebuggerComponent, EventsListComponent, MapComponent, PlaybackControlsComponent, StatsComponent, TimeTravelComponent];
+let Components = [MonitorComponent, TabletComponent, DebuggerComponent, EventsListComponent, MapComponent, PlaybackControlsComponent, StatsComponent, TimeTravelComponent, BreakpointsComponent];
 
 export default Components;
