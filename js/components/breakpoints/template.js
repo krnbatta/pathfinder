@@ -12,7 +12,9 @@ let template = () => `
           </button>
         </div>
         <div class="modal-body">
-          <div class="row">
+          <div id="bps"></div>
+          <div id="add-bp">
+            <a>Add Breakpoint</a>
           </div>
         </div>
         <div class="modal-footer">

@@ -230,13 +230,27 @@ class Node {
     }
   }
 
+  get fValid(){
+    if(this.type == "expanding" && this.parentNode){
+      return this.f <= this.parentNode.f ? true : false;
+    }
+    return true;
+  }
+
+  get gValid(){
+    if(this.type == "expanding" && this.parentNode){
+      return this.g >= this.parentNode.g ? true : false;
+    }
+    return true;
+  }
+
   /**
   * h value is calculated by adding f and g value
   * @type {number}
   * @public
   */
   get h() {
-    return this.f + this.g;
+    return this.f - this.g;
   }
 
   get text() {
@@ -249,6 +263,14 @@ class Node {
       }
     }
     return this._text;
+  }
+
+  get x(){
+    return this.variables.x;
+  }
+
+  get y(){
+    return this.variables.y;
   }
 }
 

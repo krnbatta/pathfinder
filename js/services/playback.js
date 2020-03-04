@@ -37,6 +37,12 @@ let PlaybackService = new StateMachine({
     },
 
     methods: {
+      onPendingTransition(transition, from, to) {
+        debugger
+      },
+      onInvalidTransition(transition, from, to) {
+        debugger
+      },
       /**
       * @function onInit
       * This lifecycle function is called when this service is initiated. It calls and the callbacks function corresponding to this transition

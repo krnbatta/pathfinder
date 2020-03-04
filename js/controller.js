@@ -1,4 +1,5 @@
 import StateMachine from "javascript-state-machine";
+import * as Toastr from 'toastr';
 import Components from './components';
 import EventsListComponent from './components/events-list/component';
 import BreakpointsComponent from './components/breakpoints/component';
@@ -50,9 +51,18 @@ let Controller = new StateMachine({
       //canvas => DOM element canvas
       canvas: null,
 
-      timeTravelling: false
+      timeTravelling: false,
+
+      preempt: false
     },
     methods: {
+      onPendingTransition(transition, from, to) {
+        debugger
+      },
+      onInvalidTransition(transition, from, to) {
+        debugger
+      },
+
       /**
       * @function onInit
       * This function is called when the Controller is initiated(init transition) i.e. none to ready state. It initiates all the components on the page.
@@ -65,6 +75,13 @@ let Controller = new StateMachine({
         HistoryService.init(this);
         FrontierService.init(this);
         SearchPathService.init(this);
+        this.configureToastr();
+      },
+
+      configureToastr(){
+        // Toastr.options.timeOut = 0; // How long the toast will display without user interaction
+        // Toastr.options.extendedTimeOut = 30; // How long the toast will display after a user hovers over it
+        // Toastr.options.closeButton = true;
       },
 
       /**
@@ -181,18 +198,28 @@ let Controller = new StateMachine({
       * This function calls runner to draw the current step and also add step text.
       */
       stepForward() {
+        if(this.preempt){
+          return;
+        }
         this.clearFutureData();
         if(this.currentId >= this.totalSteps && PlaybackService.state != 'paused'){
           PlaybackService.pause();
+          return;
         }
         let currentStep = this.steps[this.currentId];
-        let breakAlg = BreakpointsComponent.check(currentStep);
-        if(breakAlg){
-          PlaybackService.pause();
-          alert("Breakpoint condition");
-        }
         this.runner();
         EventsListComponent.addEvent(currentStep);
+        if(!this.timeTravelling){
+          let bpMsg = BreakpointsComponent.check(currentStep);
+          if(bpMsg){
+            this.preempt = true;
+            Toastr.error(bpMsg);
+            setTimeout(() => {
+              PlaybackService.pause();
+              this.preempt = false;
+            }, 0);
+          }
+        }
       },
 
       /**
