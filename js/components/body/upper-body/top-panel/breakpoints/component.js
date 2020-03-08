@@ -1,7 +1,10 @@
 import StateMachine from "javascript-state-machine";
 
 import template from './template'
+
 import $ from 'jquery';
+import MicroModal from 'micromodal';
+
 import BaseComponent from '../../../../base-component';
 import Controller from '../../../../../controller';
 import TimeTravelService from '../../../../../services/time-travel';
@@ -65,7 +68,7 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
       });
       htmlStr += `</select></div>`;
       htmlStr += `<div class='col-sm'><input class='bp-val' type='number'></div>`;
-      htmlStr += `<div class='col-sm'><a class="remove-bp">Remove</a></div></div>`;
+      htmlStr += `<div class='col-sm'><a class="remove-bp modal__btn modal__btn-warning">Remove</a></div></div>`;
       $('#bps').append(htmlStr);
       $(".remove-bp").on('click', (e) => {
         $(e.target).closest('.row').remove();
@@ -77,10 +80,11 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function calls the PlaybackService callbacks as per the button clicked
     */
     bindEvents() {
+      MicroModal.init();
       let self = this;
       $('#save-bp').on('click', () => {
         self.setValues();
-        $('#bp-btn').click();
+        MicroModal.close('bp-modal');
       });
       $('#remove-bp').on('click', () => {
         self.clearValues();
