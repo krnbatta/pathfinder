@@ -77,6 +77,12 @@ class Circle extends NodeObject {
   get maxY(){
     return this.cy;
   }
+  get minX(){
+    return this.cx;
+  }
+  get minY(){
+    return this.cy;
+  }
 }
 
 export default Circle;

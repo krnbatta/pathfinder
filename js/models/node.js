@@ -157,6 +157,14 @@ class Node {
     return Math.max.apply(Math, this.nodeObjects.map((nodeObject) => nodeObject.maxY));
   }
 
+  get minX(){
+    return Math.min.apply(Math, this.nodeObjects.map((nodeObject) => nodeObject.minX));
+  }
+
+  get minY(){
+    return Math.min.apply(Math, this.nodeObjects.map((nodeObject) => nodeObject.minY));
+  }
+
   /**
   * step is corresponding step object for this node in the algorithm.
   * @type {Step}

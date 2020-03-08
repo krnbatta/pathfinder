@@ -53,6 +53,14 @@ class Polygon extends NodeObject {
     let ycoords = this.points.filter((a,i)=>i%2===1);
     return Math.max(...ycoords);
   }
+  get minX(){
+    let xcoords = this.points.filter((a,i)=>i%2===0);
+    return Math.min(...xcoords);
+  }
+  get minY(){
+    let ycoords = this.points.filter((a,i)=>i%2===1);
+    return Math.min(...ycoords);
+  }
 }
 
 export default Polygon;

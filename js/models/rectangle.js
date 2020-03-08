@@ -50,6 +50,12 @@ class Rectangle extends NodeObject {
   get maxY(){
     return this.y;
   }
+  get minX(){
+    return this.x;
+  }
+  get minY(){
+    return this.y;
+  }
 }
 
 export default Rectangle;

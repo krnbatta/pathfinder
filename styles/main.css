@@ -1,44 +1,137 @@
-html, body {
-  height: 100%;
-  font-size: 0.8rem;
-}
-#pathfinder {
+body{
+  position: absolute;
   width: 100%;
   height: 100%;
-  position: absolute;
-  overflow: auto;
-  margin: 10px;
+  margin: 0;
 }
-#debug-component{
+#pathfinder{
   position: absolute;
-  top: 0;
-  left: 250px;
-}
-#map-component{
-  position: absolute;
-  top: 0;
-}
-#canvas{
-  transform: translateZ(0);
-  position: absolute;
-  z-index: 1;
-}
-#map-canvas{
-  transform: translateZ(0);
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-#events-list-component{
-  position: absolute;
-  padding: 10px;
+  width: 100%;
   height: 100%;
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  display: flex;
+  flex-flow: column nowrap;
+}
+#header{
+  flex: 0;
+}
+#body{
+  flex: 11;
+  display: flex;
+  flex-flow: column nowrap;
+}
+#footer{
+  flex: 1;
+}
+#upper-body{
+  flex: 2;
+}
+#bottom-body{
+  flex: 10;
+  display: flex;
+  flex-flow: row nowrap;
+}
+#main-panel{
+  flex: 9;
+}
+#side-panel{
+  flex: 3;
+}
+#upper-body,#lower-body{
+  padding: 5px;
+}
+#map{
+  display: inline-block;
+  margin: 0 5px;
+}
+#algorithm{
+  display: inline-block;
+  margin: 0 5px;
+}
+#map-input{
+  display: none;
+}
+#debug-input{
+  display: none;
+}
+#map-label{
+  display: block;
+  border: 1px solid #ddd;
+  background: #ccc;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+#map-label:hover{
+  background: #a3a3a3;
+}
+#map-label:active{
+  background: #b7b7b7;
+}
+#debug-label{
+  display: block;
+  border: 1px solid #ddd;
+  background: #ccc;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+#debug-label:hover{
+  background: #a3a3a3;
+}
+#debug-label:active{
+  background: #b7b7b7;
+}
+
+#playback-controls,#breakpoints,#time-travel,#camera-controls{
+  display: inline-block;
+  vertical-align: bottom;
+  margin: 0 10px;
+}
+#play,#pause,#stop,#step-backward,#step-forward,#bp-btn,#fit-map,#fit-debugger,#fit-scale,#travel-jump,#travel-forward,#travel-backward{
+  height: 30px;
+  width: 40px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#travel-jump-input,#travel-backward-input,#travel-forward-input{
+  height: 24px;
+  vertical-align: middle;
+  width: 50px;
+}
+#travel-jump,#travel-forward,#travel-backward{
+  vertical-align: bottom;
+}
+#fit-map,#fit-debugger,#fit-scale{
+  position: relative;
+}
+#camera-controls i.fa-terminal{
+  position: absolute;
+  top: 5px;
+  left: 13px;
+}
+#camera-controls i.fa-map{
+  position: absolute;
+  top: 5px;
+  left: 13px;
+}
+#camera-controls i.fa-arrows-alt{
+  position: absolute;
+  top: 6px;
+  left: 14px;
+}
+
+#screen{
+  width: 100%;
+  height: 100%;
+}
+
+#side-panel{
+  position: relative;
 }
 #events-list{
+  position: absolute;
   height: 100%;
   overflow: auto;
 }
+
 .event:hover{
     color: white;
     background:#284570;
@@ -62,10 +155,6 @@ html, body {
 }
 .event:hover:before {
   color: white;
-}
-
-#playback-controls-component{
-  position: absolute;
 }
 
 /* Float Box css */
@@ -108,370 +197,4 @@ html, body {
   color: white;
   background:#284570;
   border-radius:2px;
-}
-
-
-#time-travel{
-  display: inline-block;
-  position: absolute;
-  right: 10px;
-}
-
-/* tablet css */
-#tablet-component{
-  position: absolute;
-  right: 10px;
-  top: 40px;
-}
-
-#tablet {
-  position: relative;
-  width: 400px;
-  height: 500px;
-  margin: auto;
-  border: 16px black solid;
-  border-top-width: 60px;
-  border-bottom-width: 60px;
-  border-radius: 36px;
-}
-
-/* The horizontal line on the top of the device */
-#tablet:before {
-  content: '';
-  display: block;
-  width: 60px;
-  height: 5px;
-  position: absolute;
-  top: -30px;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #333;
-  border-radius: 10px;
-}
-
-/* The circle on the bottom of the device */
-#tablet:after {
-  content: '';
-  display: block;
-  width: 35px;
-  height: 35px;
-  position: absolute;
-  left: 50%;
-  bottom: -65px;
-  transform: translate(-50%, -50%);
-  background: #333;
-  border-radius: 50%;
-}
-
-/* The  (or content) of the device */
-#tablet-content {
-  width: 400px;
-  height: 500px;
-  background: white;
-  margin: -1px;
-}
-
-
-/* Monitor Css */
-#monitor-component{
-  position: absolute;
-  top: 40px;
-}
-
-#monitor {
-  width: 800px;
-}
-
-#monitor .body {
-    height: 600px;
-    background: #ddd;
-    border-radius: 5px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: inset 0px -2px 0px #909090;
-}
-
-#monitor .body .screen {
-  box-sizing: border-box;
-  height: 550px;
-  border: 10px solid #000;
-  background: #444;
-  overflow: scroll;
-  transition: background 0.5s;
-  border-radius: 5px 5px 0px 0px;
-  position: relative;
-}
-
-#monitor .body .screen h1 {
-  padding-top: 58px;
-  text-align: center;
-  font-size: 150%;
-  opacity: 0;
-  transition: opacity 0.5s 0.5s;
-  color: #fff;
-  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-#monitor .body .logo {
-  width: 16px;
-  height: 16px;
-  border-radius: 100px;
-  background: #bbb;
-  margin: 5px auto 0 auto;
-  box-shadow: inset 0px 2px 0px rgba(0, 0, 0, 0.2);
-}
-
-#monitor .stand {
-  	width: 100px;
-    height: 25px;
-    background: #aeaeae;
-    border: 20px solid #fff;
-    border-top: 0;
-    border-bottom: 20px solid #c5c5c5;
-    border-radius: 5px;
-    box-shadow: 0px 4px 0px -2px #909090;
-  	margin: 0 auto;
-}
-
-#breakpoints{
-  display: inline-block;
-  position: absolute;
-  right: 500px;
-}
-
-#bp-btn{
-  padding: 1px 7px 2px 7px;
-}
-/* Remote css */
-#remote .controller{
-  margin-top: 100px;
-  height: 200px;
-  width: 400px;
-  background-color: #E6E6E6;
-  position: relative;
-  box-shadow: 15px 15px 15px rgba(0,0,0,0.2);
-}
-
-#remote .controllerLeft{
-  height: 250px;
-  width: 250px;
-  background-color: #E6E6E6;
-  position: absolute;
-  border-radius: 100%;
-  margin-left: -125px;
-  box-shadow: -15px 8px 15px rgba(0,0,0,0.2);
-}
-
-#remote .controllerRight{
-  height: 250px;
-  width: 250px;
-  background-color: #B8B8B8;
-  position: relative;
-  border-radius: 100%;
-  margin-right: -125px;
-  border: solid 15px rgba(230, 230, 230,1);
-  box-shadow: 15px 8px 15px rgba(0,0,0,0.2);
-}
-
-#remote .circle{
-  height: 150px;
-  width: 150px;
-  background-color: #E6E6E6;
-  position: absolute;
-  border-radius: 100%;
-  border: solid 5px rgba(184, 184, 184, 1);
-  margin-left: 42px;
-  margin-top: 52px;
-}
-
-#remote .crossCenter{
-  background-color: #333333;
-  width: 35px;
-  height: 35px;
-  margin-top: 110px;
-  margin-left: 100px;
-  position: relative;
-}
-
-#remote .crossCircle{
-  background-color: #292929;
-  width: 25px;
-  height: 25px;
-  position: absolute;
-  border-radius: 100%;
-  margin-top: 5px;
-  margin-left: 5px;
-}
-
-#remote .crossTop{
-  background-color: #333333;
-  width: 35px;
-  height: 35px;
-  position: absolute;
-  border-radius: 15%;
-  margin-top: -30px;
-}
-
-#remote .crossBottom{
-  background-color: #333333;
-  width: 35px;
-  height: 35px;
-  position: absolute;
-  border-radius: 15%;
-  margin-top: 30px;
-}
-
-#remote .crossLeft{
-  background-color: #333333;
-  width: 35px;
-  height: 35px;
-  position: absolute;
-  border-radius: 15%;
-  margin-left: -30px;
-}
-
-#remote .crossRight{
-  background-color: #333333;
-  width: 35px;
-  height: 35px;
-  position: absolute;
-  border-radius: 15%;
-  margin-left: 30px;
-}
-
-#remote .centerBlue{
-  position: absolute;
-  width: 50px;
-  height: 20px;
-  margin-left: 175px;
-  margin-top: 30px;
-  background-color: #0099FF;
-}
-
-#remote .centerLeft{
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  margin-left: -10px;
-  margin-top: 0px;
-  background-color: #0099FF;
-  border-radius: 100%;
-}
-
-#remote .centerRight{
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  margin-left: 40px;
-  margin-top: 0px;
-  background-color: #0099FF;
-  border-radius: 100%;
-}
-
-#remote .backButton1Center{
-  position: absolute;
-  width: 80px;
-  height: 50px;
-  background-color: #E6E6E6;
-  -webkit-transform: rotate(-30deg);
-  margin-top: 60px;
-  margin-left: 45px;
-}
-
-#remote .backButton2Center{
-  position: absolute;
-  width: 80px;
-  height: 50px;
-  background-color: #E6E6E6;
-  -webkit-transform: rotate(-30deg);
-  margin-top: 115px;
-  margin-left: 90px;
-}
-
-#remote .cornerLeft1{
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  background-color: #00B800;
-  border-radius: 100%;
-  margin-left: -20px;
-  border: solid 5px rgba(230, 230, 230, 1)
-}
-
-#remote .cornerRight1{
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  background-color: #6699FF;
-  border-radius: 100%;
-  margin-left: 60px;
-  border: solid 5px rgba(230, 230, 230, 1)
-}
-
-#remote .cornerLeft2{
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  background-color: #CFCF00;
-  border-radius: 100%;
-  margin-left: -20px;
-  border: solid 5px rgba(230, 230, 230, 1)
-}
-
-#remote .cornerRight2{
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  background-color: #7D230D;
-  border-radius: 100%;
-  margin-left: 60px;
-  border: solid 5px rgba(230, 230, 230, 1)
-}
-
-#remote .centerStart{
-  background-color: #B8B8B8;
-  position: absolute;
-  height: 35px;
-  width: 10px;
-  margin-left: 180px;
-  margin-top: 110px;
-  -webkit-transform: rotate(20deg);
-}
-
-#remote .centerSelect{
-  background-color: #B8B8B8;
-  position: absolute;
-  height: 35px;
-  width: 10px;
-  margin-left: 205px;
-  margin-top: 110px;
-  -webkit-transform: rotate(20deg);
-}
-
-#remote .SLeft{
-  background-color: #B8B8B8;
-  position: absolute;
-  border-radius: 100%;
-  height: 10px;
-  width: 10px;
-  margin-top: 30px;
-}
-
-#remote .SRight{
-  background-color: #B8B8B8;
-  position: absolute;
-  border-radius: 100%;
-  height: 10px;
-  width: 10px;
-  margin-top: -5px;
-}
-
-#remote .cable{
-  background-color: black;
-  width: 10px;
-  height: 150px;
-  position: absolute;
-  margin-left: 49.7%;
-  margin-top: -100px;
-  box-shadow: 7px 8px 15px rgba(0,0,0,0.2);
 }

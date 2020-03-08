@@ -52,6 +52,12 @@ class Line extends NodeObject {
   get maxY(){
     return Math.max(this.y1, this.y2);
   }
+  get minX(){
+    return Math.min(this.x1, this.x2);
+  }
+  get minY(){
+    return Math.min(this.y1, this.y2);
+  }
 }
 
 export default Line;

@@ -52,6 +52,20 @@ class Tracer {
     * @public
     */
     this.maxY = -1;
+
+    /**
+    * minX is minimum value of x explored by the algorithm. Default value is step to -1.
+    * @type {number}
+    * @public
+    */
+    this.minX = Infinity;
+
+    /**
+    * minY is minimum value of y explored by the algorithm. Default value is step to -1.
+    * @type {number}
+    * @public
+    */
+    this.minY = Infinity;
   }
 
   /**
@@ -88,6 +102,7 @@ class Tracer {
           event.tracer = this;
           let step = Store.createRecord('Step', event);
           this.checkMax(step.node);
+          this.checkMin(step.node);
           if(event.type=="source"){
             this.source = step;
           }
@@ -110,13 +125,22 @@ class Tracer {
     }
   }
 
+  checkMin(node){
+    if(node.minX < this.minX){
+      this.minX = node.minX;
+    }
+    if(node.minY < this.minY){
+      this.minY = node.minY;
+    }
+  }
+
   /**
   * width returns width required for visualising the tracer.
   * @type {number}
   * @public
   */
   get width() {
-    return this.maxX * config.nodeSize
+    return (this.maxX - this.minX) * config.nodeSize
   }
 
   /**
@@ -125,7 +149,7 @@ class Tracer {
   * @public
   */
   get height() {
-    return this.maxY * config.nodeSize
+    return (this.maxY - this.minY) * config.nodeSize
   }
 
 }

@@ -1,8 +1,8 @@
 import StateMachine from "javascript-state-machine";
 import * as Toastr from 'toastr';
 import Components from './components';
-import EventsListComponent from './components/events-list/component';
-import BreakpointsComponent from './components/breakpoints/component';
+import EventsListComponent from './components/body/bottom-body/side-panel/events-list/component';
+import BreakpointsComponent from './components/body/upper-body/top-panel/breakpoints/component';
 import PlaybackService from './services/playback';
 import FloatboxService from './services/floatbox';
 import FrontierService from './services/frontier';
@@ -14,6 +14,7 @@ import $ from 'jquery';
 import runnerFactory from './services/runner';
 import Renderer from './services/renderer';
 import mouseTracker from './services/mouse-tracker';
+import resizeTracker from './services/resize-tracker';
 import Injector from './services/injector';
 /**
 * @module controller
@@ -69,6 +70,7 @@ let Controller = new StateMachine({
       */
       onInit() {
         mouseTracker(this);
+        resizeTracker(this);
         Components.forEach((component) => {
           component.init();
         });
@@ -147,8 +149,25 @@ let Controller = new StateMachine({
       setupRenderer() {
         if(!this.rendered){
           let {width, height} = this.getDimensions();
+          let screen = $("#screen")
+          width = screen.width();
+          height = screen.height();
           Renderer.render(this, width, height);
         }
+      },
+
+      fitMap(){
+        let {width, height} = this.getDimensions();
+        Renderer.fitMap(this, width, height);
+      },
+
+      fitScale(){
+        Renderer.fitScale(this);
+      },
+
+      fitDebugger(){
+        let tracer = this.tracer;
+        Renderer.fitDebugger(this, tracer.minY, tracer.maxY, tracer.minX, tracer.maxX);
       },
 
       /**

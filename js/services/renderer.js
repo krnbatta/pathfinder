@@ -13,7 +13,7 @@ export default {
   render(context, width, height) {
     context.canvas = document.createElement("canvas");
     context.canvas.id = "canvas";
-    $(".screen").append(context.canvas);
+    $("#screen").append(context.canvas);
     context.app = new PIXI.Application({
       width: width,
       height: height,
@@ -57,5 +57,40 @@ export default {
     context.app.stage.addChild(context.stage);
     context.rendered = true;
     Injector.register('renderer', context.renderer);
+  },
+  fitMap(context, mapWidth, mapHeight){
+    let viewport = context.stage;
+    let canvas = context.canvas;
+    let screenWidth = canvas.width;
+    let screenHeight = canvas.height;
+    let scaleX = screenWidth/mapWidth;
+    let scaleY = screenHeight/mapHeight;
+    viewport.left = 0;
+    viewport.top = 0;
+    viewport.scale.x = scaleX;
+    viewport.scale.y = scaleY;
+  },
+  fitDebugger(context, top, bottom, left, right){
+    let viewport = context.stage;
+    let canvas = context.canvas;
+    let screenWidth = canvas.width;
+    let screenHeight = canvas.height;
+    let scaledTop = (top-10) * config.nodeSize;
+    let scaledBottom = (bottom+10) * config.nodeSize;
+    let scaledLeft = (left-10) * config.nodeSize;
+    let scaledRight = (right+10) * config.nodeSize;
+    let scaleX = screenWidth/(scaledRight-scaledLeft);
+    let scaleY = screenHeight/(scaledBottom-scaledTop);
+    viewport.left = scaledLeft;
+    viewport.top = scaledTop;
+    viewport.scale.x = scaleX;
+    viewport.scale.y = scaleY;
+  },
+  fitScale(context){
+    let viewport = context.stage;
+    viewport.left = 0;
+    viewport.top = 0;
+    viewport.scale.x = 1;
+    viewport.scale.y = 1;
   }
 }
