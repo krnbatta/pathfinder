@@ -24,5 +24,17 @@ export default {
     context.timeTravelling = false;
     GraphicsManager.flushBuffer(context);
     context.stepForward();
+  },
+
+  jump(context, jumpVal){
+    let currentId = context.currentId;
+    if(jumpVal > currentId){
+      let frontVal = jumpVal - currentId + 1;
+      this.goForwards(context, frontVal);
+    }
+    else{
+      let backVal = currentId - jumpVal + 1;
+      this.goBackwards(context, backVal);
+    }
   }
 }

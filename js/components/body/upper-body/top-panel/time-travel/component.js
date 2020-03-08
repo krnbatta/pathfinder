@@ -47,6 +47,10 @@ let TimeTravelComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function calls the PlaybackService callbacks as per the button clicked
     */
     bindEvents() {
+      $("#travel-jump").on('click', (e) => {
+        let jumpVal = $('#travel-jump-input').val();
+        TimeTravelService.jump(Controller, parseInt(jumpVal));
+      });
       $("#travel-backward").on('click', (e) => {
         let backVal = $('#travel-backward-input').val();
         TimeTravelService.goBackwards(Controller, backVal);

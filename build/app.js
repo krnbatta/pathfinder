@@ -1600,6 +1600,10 @@ var TimeTravelComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_
     * This function calls the PlaybackService callbacks as per the button clicked
     */
     bindEvents: function bindEvents() {
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-jump").on('click', function (e) {
+        var jumpVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-jump-input').val();
+        _services_time_travel__WEBPACK_IMPORTED_MODULE_5__["default"].jump(_controller__WEBPACK_IMPORTED_MODULE_4__["default"], parseInt(jumpVal));
+      });
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-backward").on('click', function (e) {
         var backVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-backward-input').val();
         _services_time_travel__WEBPACK_IMPORTED_MODULE_5__["default"].goBackwards(_controller__WEBPACK_IMPORTED_MODULE_4__["default"], backVal);
@@ -1692,7 +1696,7 @@ var TopPanelComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0_
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 var template = function template() {
-  return "\n<p class=\"footer-monash\">Developed with love at Monash University <img width='40px' height='40px' src=\"images/monash.png\"></p>\n<p class=\"footer-credits\"><span>Supervisors: Dr Daniel Harabor, Dr Michael Wybrow</span> <span>Developed By Karan Batta - <a class=\"fab fa-github\" href=\"https://github.com/krnbatta/pathfinder\" target=\"_blank\"></a></span> </p>\n";
+  return "\n<p class=\"footer-monash\">Developed with love at Monash University <img width='40px' height='40px' src=\"images/monash.png\"></p>\n<p class=\"footer-credits\"><span>Supervisors: Dr Daniel Harabor, Dr Michael Wybrow</span> <span>Developed By Karan Batta - <a class=\"fab fa-linkedin\" href=\"https://www.linkedin.com/in/krnbatta/\" target=\"_blank\"></a> <a class=\"fab fa-github-square\" href=\"https://github.com/krnbatta/pathfinder\" target=\"_blank\"></a></span> </p>\n";
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (template);
@@ -6073,6 +6077,17 @@ __webpack_require__.r(__webpack_exports__);
     context.timeTravelling = false;
     _graphics_manager__WEBPACK_IMPORTED_MODULE_0__["default"].flushBuffer(context);
     context.stepForward();
+  },
+  jump: function jump(context, jumpVal) {
+    var currentId = context.currentId;
+
+    if (jumpVal > currentId) {
+      var frontVal = jumpVal - currentId + 1;
+      this.goForwards(context, frontVal);
+    } else {
+      var backVal = currentId - jumpVal + 1;
+      this.goBackwards(context, backVal);
+    }
   }
 });
 
