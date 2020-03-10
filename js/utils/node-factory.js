@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js'
+
 import config from '../config';
 import FloatboxService from '../services/floatbox';
 import Controller from '../controller';

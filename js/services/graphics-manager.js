@@ -1,6 +1,8 @@
+import * as PIXI from 'pixi.js'
+
 export default {
   currentBuffer: null,
-  
+
   insert(context, graphics){
     if(!graphics){
       return;

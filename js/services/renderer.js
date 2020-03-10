@@ -1,4 +1,7 @@
 import $ from 'jquery';
+import * as PIXI from 'pixi.js'
+import { Viewport } from 'pixi-viewport'
+
 import Injector from './injector';
 import config from '../config';
 
@@ -24,7 +27,7 @@ export default {
     });
     let viewport;
     if(config.zooming){
-      viewport = new Viewport.Viewport({
+      viewport = new Viewport({
         screenWidth: width,
         screenHeight: height,
         worldWidth: width*2,

@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js'
+
 import Store from './store';
 import config from '../config';
 import environment from '../environment';

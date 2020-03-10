@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js'
+
 import Store from './store';
 import Controller from '../controller';
 import GraphicsManager from '../services/graphics-manager';

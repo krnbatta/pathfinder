@@ -1,0 +1,16 @@
+#map-input{
+  display: none;
+}
+#map-label{
+  display: block;
+  border: 1px solid #ddd;
+  background: #ccc;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+#map-label:hover{
+  background: #a3a3a3;
+}
+#map-label:active{
+  background: #b7b7b7;
+}

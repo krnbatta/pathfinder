@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js'
+
 import Store from '../services/store'
 import NodeObjectsProcessor from '../services/node-objects-processor'
 import config from '../config'
