@@ -1140,7 +1140,7 @@ var DebuggerComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0_
         }
 
         var fileName = debugFile.name.split(".")[0];
-        jquery__WEBPACK_IMPORTED_MODULE_3___default()("#algorithm").html("<div id='debug-label'>Algorithm: ".concat(fileName, "</div>"));
+        jquery__WEBPACK_IMPORTED_MODULE_3___default()("#algorithm").html("<div id='debug-label'>Trace: ".concat(fileName, "</div>"));
         _breakpoints_component__WEBPACK_IMPORTED_MODULE_7__["default"].show();
         _time_travel_component__WEBPACK_IMPORTED_MODULE_8__["default"].show();
         _camera_controls_component__WEBPACK_IMPORTED_MODULE_9__["default"].showDebuggerControl();
@@ -1167,7 +1167,7 @@ var DebuggerComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0_
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 var template = function template() {
-  return "\n    <label id=\"debug-label\" for=\"debug-input\"><i class=\"fa fa-terminal\"></i> Upload algorithm</label>\n    <input type = 'file' id='debug-input'='.json' accept />\n";
+  return "\n    <label id=\"debug-label\" for=\"debug-input\"><i class=\"fa fa-terminal\"></i> Upload Trace</label>\n    <input type = 'file' id='debug-input'='.json' accept />\n";
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (template);

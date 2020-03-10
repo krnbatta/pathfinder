@@ -48,7 +48,7 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
           $("#map").html(`<div id='map-label'>No Map Uploaded</div>`);
         }
         let fileName = debugFile.name.split(".")[0];
-        $("#algorithm").html(`<div id='debug-label'>Algorithm: ${fileName}</div>`);
+        $("#algorithm").html(`<div id='debug-label'>Trace: ${fileName}</div>`);
         BreakpointsComponent.show();
         TimeTravelComponent.show();
         CameraControlsComponent.showDebuggerControl();
