@@ -240,7 +240,7 @@ class Node {
 
   get fValid(){
     if(this.type == "expanding" && this.parentNode){
-      return this.f <= this.parentNode.f ? true : false;
+      return this.f >= this.parentNode.f ? true : false;
     }
     return true;
   }

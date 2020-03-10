@@ -148,13 +148,12 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
     },
 
     automaticCheck(node){
-      return ``;
       let message = ``;
       if(!node.gValid){
-        message += `The g value of current node(${node.g}) being expanded is less than that of its parent(${node.parentNode.g}) <br>`;
+        message += `The g value of current node(${node.g}) being expanded is less than that of its parent(${node.parentNode.g}). This indicates that a negative cost cycle might exist in the graph and is certainly an error. <br>`;
       }
       if(!node.fValid){
-        message += `The f value of current node(${node.f}) being expanded is more than that of its parent(${node.parentNode.f}) <br>`;
+        message += `The f value of current node(${node.f}) being expanded is less than that of its parent(${node.parentNode.f}). This indicates an inadmissible heuristic function and might be an error. <br>`;
       }
       return message;
     },
