@@ -68,10 +68,16 @@ export default {
     let screenHeight = canvas.height;
     let scaleX = screenWidth/mapWidth;
     let scaleY = screenHeight/mapHeight;
-    viewport.left = 0;
-    viewport.top = 0;
+    if(scaleX < scaleY){
+      scaleY = scaleX;
+    }
+    else{
+      scaleX = scaleY;
+    }
     viewport.scale.x = scaleX;
     viewport.scale.y = scaleY;
+    viewport.left = 0;
+    viewport.top = 0;
   },
   fitDebugger(context, top, bottom, left, right){
     let viewport = context.stage;
@@ -84,10 +90,16 @@ export default {
     let scaledRight = (right+10) * config.nodeSize;
     let scaleX = screenWidth/(scaledRight-scaledLeft);
     let scaleY = screenHeight/(scaledBottom-scaledTop);
-    viewport.left = scaledLeft;
-    viewport.top = scaledTop;
+    if(scaleX < scaleY){
+      scaleY = scaleX;
+    }
+    else{
+      scaleX = scaleY;
+    }
     viewport.scale.x = scaleX;
     viewport.scale.y = scaleY;
+    viewport.left = scaledLeft;
+    viewport.top = scaledTop;
   },
   fitScale(context){
     let viewport = context.stage;

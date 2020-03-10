@@ -5555,10 +5555,17 @@ __webpack_require__.r(__webpack_exports__);
     var screenHeight = canvas.height;
     var scaleX = screenWidth / mapWidth;
     var scaleY = screenHeight / mapHeight;
-    viewport.left = 0;
-    viewport.top = 0;
+
+    if (scaleX < scaleY) {
+      scaleY = scaleX;
+    } else {
+      scaleX = scaleY;
+    }
+
     viewport.scale.x = scaleX;
     viewport.scale.y = scaleY;
+    viewport.left = 0;
+    viewport.top = 0;
   },
   fitDebugger: function fitDebugger(context, top, bottom, left, right) {
     var viewport = context.stage;
@@ -5571,10 +5578,17 @@ __webpack_require__.r(__webpack_exports__);
     var scaledRight = (right + 10) * _config__WEBPACK_IMPORTED_MODULE_4__["default"].nodeSize;
     var scaleX = screenWidth / (scaledRight - scaledLeft);
     var scaleY = screenHeight / (scaledBottom - scaledTop);
-    viewport.left = scaledLeft;
-    viewport.top = scaledTop;
+
+    if (scaleX < scaleY) {
+      scaleY = scaleX;
+    } else {
+      scaleX = scaleY;
+    }
+
     viewport.scale.x = scaleX;
     viewport.scale.y = scaleY;
+    viewport.left = scaledLeft;
+    viewport.top = scaledTop;
   },
   fitScale: function fitScale(context) {
     var viewport = context.stage;
