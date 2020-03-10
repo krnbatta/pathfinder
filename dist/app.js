@@ -1951,9 +1951,12 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
       _services_search_path__WEBPACK_IMPORTED_MODULE_9__["default"].init(this);
       this.configureToastr();
     },
-    configureToastr: function configureToastr() {// Toastr.options.timeOut = 0; // How long the toast will display without user interaction
-      // Toastr.options.extendedTimeOut = 30; // How long the toast will display after a user hovers over it
-      // Toastr.options.closeButton = true;
+    configureToastr: function configureToastr() {
+      toastr__WEBPACK_IMPORTED_MODULE_1__["options"].timeOut = 0; // How long the toast will display without user interaction
+
+      toastr__WEBPACK_IMPORTED_MODULE_1__["options"].extendedTimeOut = 30; // How long the toast will display after a user hovers over it
+
+      toastr__WEBPACK_IMPORTED_MODULE_1__["options"].closeButton = true;
     },
 
     /**
