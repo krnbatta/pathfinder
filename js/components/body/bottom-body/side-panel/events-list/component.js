@@ -4,8 +4,10 @@ import template from './template'
 import $ from 'jquery';
 import BaseComponent from '../../../../base-component';
 import PlaybackService from '../../../../../services/playback';
+import Store from '../../../../../services/store';
 
 import Controller from '../../../../../controller';
+import config from '../../../../../config';
 
 /**
 * @module components/events-list
@@ -62,6 +64,27 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     pause() {
       $("#events").show();
+      this.clearHighlighting();
+      this.highlightNodes();
+    },
+
+    clearHighlighting(){
+      $(".event").removeAttr("style");
+    },
+
+    highlightNodes(){
+      let currentNodeId = Controller.currentId - 1;
+      let currentNode = Store.findById("Node", currentNodeId);
+      let siblingNodes = currentNode.siblingNodes;
+      let parentNode = currentNode.parentNode;
+      $(`#event-${parentNode._id}`).css("background-color", `#${parentNode.attrs.fillStyle.toString(16)}`);
+      $(`#event-${currentNode._id}`).css("background-color", `#${currentNode.attrs.fillStyle.toString(16)}`);
+      if(currentNode.step.isFrontier){
+        $(`#event-${currentNode._id}`).css("background-color", `#${config.nodeAttrs.frontier.fillColor.toString(16)}`);
+      }
+      // siblingNodes.forEach((node) => {
+      //   $(`#event-${node.id}`).css("background-color", "#fff");
+      // });
     },
 
     /**
@@ -79,7 +102,7 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     addEvent(event) {
       this.events.push(event);
-      let li = $.parseHTML(`<li class="event">${event.text}</li>`)[0];
+      let li = $.parseHTML(`<li id='event-${event._id}' class="event">${event.text}</li>`)[0];
       $(li).on("click", (e) => {
         Controller.retraceHistory(event._id);
       });

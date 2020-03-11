@@ -46,6 +46,15 @@ class StoreSingleton {
       }
     }
 
+    findById(modelName, id){
+      try{
+        return this.data[modelName][id];
+      }
+      catch(e){
+        return null;
+      }
+    }
+
     where(modelName, condition){
       return Object.values(this.data[modelName]).filter(record => Object.keys(condition).every(key => record[key] == condition[key]));
     }

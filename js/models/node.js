@@ -185,14 +185,36 @@ class Node {
     if(!this.pId){
       return null;
     }
-    let pNode = null;
-    Object.values(Store.data.Node).forEach((node) => {
+    for(let i=this._id-1; i>=0; i--){
+      let node = Store.data.Node[i];
       if(node.id == this.pId){
-        pNode = node;
-        return;
+        return node;
       }
+    }
+    return null;
+  }
+
+  get childNodes(){
+    let nodes = [];
+    if(this.type != "expanding"){
+      return nodes;
+    }
+    for(let i=this._id-1; i>=0; i--){
+      let node = Store.data.Node[i];
+      if(!node || node._id == this._id){
+        return nodes;
+      }
+      if(node.pId == this.id){
+        nodes.push(node);
+      }
+    }
+    return nodes;
+  }
+
+  get siblingNodes(){
+    return this.parentNode.childNodes.filter((node) => {
+      node.id!==this.id;
     });
-    return pNode;
   }
 
   get pathNodeObject(){
