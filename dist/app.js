@@ -3092,6 +3092,10 @@ function () {
     get: function get() {
       var _this2 = this;
 
+      if (!this.parentNode) {
+        return [];
+      }
+
       return this.parentNode.childNodes.filter(function (node) {
         node.id !== _this2.id;
       });

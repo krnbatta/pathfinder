@@ -212,6 +212,9 @@ class Node {
   }
 
   get siblingNodes(){
+    if(!this.parentNode){
+      return [];
+    }
     return this.parentNode.childNodes.filter((node) => {
       node.id!==this.id;
     });
