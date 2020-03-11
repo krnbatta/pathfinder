@@ -114,20 +114,25 @@ export default {
     }
   },
   process(){
-    let mesh = Store.find('Mesh');
-    mesh.meshData.then((meshData) => {
-      Controller.setupRenderer();
-      let container = new PIXI.Container();
-      for (let i = 0; i < meshData.polygonsArr.length; ++i) {
-        let points = meshData.polygonsArr[i];
-        let polygon = new PIXI.Graphics();
-        polygon.lineStyle(1, 0x000000);
-        polygon.beginFill(0xFFFFFF);
-        polygon.drawPolygon(points);
-        polygon.endFill();
-        container.addChild(polygon);
-      }
-      GraphicsManager.insert(Controller, container);
+    return new Promise((resolve, reject) => {
+      let mesh = Store.find('Mesh');
+      mesh.meshData.then((meshData) => {
+        Controller.setupRenderer();
+        let container = new PIXI.Container();
+        for (let i = 0; i < meshData.polygonsArr.length; ++i) {
+          let points = meshData.polygonsArr[i];
+          let polygon = new PIXI.Graphics();
+          polygon.lineStyle(1, 0x000000);
+          polygon.beginFill(0xFFFFFF);
+          polygon.drawPolygon(points);
+          polygon.endFill();
+          container.addChild(polygon);
+        }
+        GraphicsManager.insert(Controller, container);
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      });
     });
   }
 }

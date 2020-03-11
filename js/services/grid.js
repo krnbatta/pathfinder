@@ -13,35 +13,43 @@ import $ from "jquery";
 * This service is responsible for: parsing grid file, building grid cells and drawing grid on canvas.
 */
 export default {
-  renderMap(){
-    let grid = Store.find("Grid");
-    let map = Store.find("Map");
-    grid.gridData.then((gridData) => {
-      Controller.setupRenderer();
-      let mapSprite = new PIXI.Sprite.from(`${config.clientAddr}/maps/images/${map.mapName}.png`);
-      mapSprite.width = gridData.width * config.nodeSize;
-      mapSprite.height = gridData.height * config.nodeSize;
-      GraphicsManager.insert(Controller, mapSprite);
-    });
+  renderMap(resolve, reject){
+    try{
+      let grid = Store.find("Grid");
+      let map = Store.find("Map");
+      grid.gridData.then((gridData) => {
+        Controller.setupRenderer();
+        let mapSprite = new PIXI.Sprite.from(`${config.clientAddr}/maps/images/${map.mapName}.png`);
+        mapSprite.width = gridData.width * config.nodeSize;
+        mapSprite.height = gridData.height * config.nodeSize;
+        GraphicsManager.insert(Controller, mapSprite);
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      });
+    }
+    catch(e){
+      reject(e);
+    }
   },
 
-  checkMap(){
+  checkMap(resolve, reject){
     let map = Store.find("Map");
     var img = new Image();
     let self = this;
     img.onerror = function(){
       //send request to server
-      self.sendToServer();
+      self.sendToServer(resolve, reject);
     }
     img.onload = function(){
       //load map from image directly
-      self.renderMap();
+      self.renderMap(resolve, reject);
       img = null;
     }
     img.src = `${config.clientAddr}/maps/images/${map.mapName}.png`;
   },
 
-  sendToServer(){
+  sendToServer(resolve, reject){
     let grid = Store.find("Grid");
     let map = Store.find("Map");
     grid.gridData.then((gridData) => {
@@ -53,7 +61,10 @@ export default {
         }
       }).then((res) => res.json()).then((data) => {
         if(data.done){
-          this.renderMap();
+          this.renderMap(resolve, reject);
+        }
+        else{
+          reject();
         }
       });
     });
@@ -169,7 +180,9 @@ export default {
   },
 
   process(){
-    this.checkMap();
+    return new Promise((resolve, reject) => {
+      this.checkMap(resolve, reject);
+    });
   },
 
   processMe(){

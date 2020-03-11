@@ -11,7 +11,7 @@ import GridService from '../../../../../services/grid';
 import MeshService from '../../../../../services/mesh';
 import RoadNetworkService from '../../../../../services/road-network';
 import CameraControlsComponent from '../camera-controls/component';
-
+import Spinner from '../../../../../services/spinner';
 /**
 * @module components/map
 * This component handles the uploading of map file.
@@ -41,10 +41,12 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     bindEvents() {
       $("#map-input").on('change', (e) => {
+        Spinner.show();
         if(this.validateFiles(e.target.files)){
           this.processFiles(e.target.files);
         }
         else{
+          Spinner.hide();
           alert("Invalid format(s)");
         }
       });
@@ -66,9 +68,12 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
         let grFile = file1Type == "gr" ? file1 : file2;
         let map = Store.createRecord("Map", {fileType, fileName});
         Store.createRecord('RoadNetwork', {coFile, grFile});
-        RoadNetworkService.process();
         config.mapType = 'roadnetwork';
         this.fileName = `${file1Name}(roadnetwork)`;
+        let roadNetworkPromise = RoadNetworkService.process();
+        roadNetworkPromise.finally(() => {
+          Spinner.hide();
+        });
       }
       else{
         let file = files[0];
@@ -78,13 +83,19 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
         let map = Store.createRecord("Map", {fileType, fileName});
         if(fileType == "grid"){
           Store.createRecord('Grid', file);
-          GridService.process();
           config.mapType = 'grid';
+          let gridPromise = GridService.process();
+          gridPromise.finally(() => {
+            Spinner.hide();
+          });
         }
         else if(fileType == "mesh"){
           Store.createRecord('Mesh', file);
-          MeshService.process();
           config.mapType = 'mesh';
+          let meshPromise = MeshService.process();
+          meshPromise.finally(() => {
+            Spinner.hide();
+          });
         }
         this.fileName = `${fileName}(${fileType})`;
       }

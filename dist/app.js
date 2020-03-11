@@ -1221,6 +1221,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_mesh__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../../../../services/mesh */ "./js/services/mesh.js");
 /* harmony import */ var _services_road_network__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../../../../services/road-network */ "./js/services/road-network.js");
 /* harmony import */ var _camera_controls_component__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../camera-controls/component */ "./js/components/body/upper-body/top-panel/camera-controls/component.js");
+/* harmony import */ var _services_spinner__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../../../../services/spinner */ "./js/services/spinner.js");
+
 
 
 
@@ -1265,9 +1267,12 @@ var MapComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___def
       var _this = this;
 
       jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map-input").on('change', function (e) {
+        _services_spinner__WEBPACK_IMPORTED_MODULE_12__["default"].show();
+
         if (_this.validateFiles(e.target.files)) {
           _this.processFiles(e.target.files);
         } else {
+          _services_spinner__WEBPACK_IMPORTED_MODULE_12__["default"].hide();
           alert("Invalid format(s)");
         }
       });
@@ -1294,9 +1299,12 @@ var MapComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___def
           coFile: coFile,
           grFile: grFile
         });
-        _services_road_network__WEBPACK_IMPORTED_MODULE_10__["default"].process();
         _config__WEBPACK_IMPORTED_MODULE_5__["default"].mapType = 'roadnetwork';
         this.fileName = "".concat(file1Name, "(roadnetwork)");
+        var roadNetworkPromise = _services_road_network__WEBPACK_IMPORTED_MODULE_10__["default"].process();
+        roadNetworkPromise.finally(function () {
+          _services_spinner__WEBPACK_IMPORTED_MODULE_12__["default"].hide();
+        });
       } else {
         var file = files[0];
 
@@ -1313,12 +1321,18 @@ var MapComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___def
 
         if (_fileType == "grid") {
           _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Grid', file);
-          _services_grid__WEBPACK_IMPORTED_MODULE_8__["default"].process();
           _config__WEBPACK_IMPORTED_MODULE_5__["default"].mapType = 'grid';
+          var gridPromise = _services_grid__WEBPACK_IMPORTED_MODULE_8__["default"].process();
+          gridPromise.finally(function () {
+            _services_spinner__WEBPACK_IMPORTED_MODULE_12__["default"].hide();
+          });
         } else if (_fileType == "mesh") {
           _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Mesh', file);
-          _services_mesh__WEBPACK_IMPORTED_MODULE_9__["default"].process();
           _config__WEBPACK_IMPORTED_MODULE_5__["default"].mapType = 'mesh';
+          var meshPromise = _services_mesh__WEBPACK_IMPORTED_MODULE_9__["default"].process();
+          meshPromise.finally(function () {
+            _services_spinner__WEBPACK_IMPORTED_MODULE_12__["default"].hide();
+          });
         }
 
         this.fileName = "".concat(_fileName, "(").concat(_fileType, ")");
@@ -4666,36 +4680,43 @@ __webpack_require__.r(__webpack_exports__);
 */
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  renderMap: function renderMap() {
-    var grid = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find("Grid");
-    var map = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find("Map");
-    grid.gridData.then(function (gridData) {
-      _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
-      var mapSprite = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from("".concat(_config__WEBPACK_IMPORTED_MODULE_2__["default"].clientAddr, "/maps/images/").concat(map.mapName, ".png"));
-      mapSprite.width = gridData.width * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
-      mapSprite.height = gridData.height * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
-      _services_graphics_manager__WEBPACK_IMPORTED_MODULE_6__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], mapSprite);
-    });
+  renderMap: function renderMap(resolve, reject) {
+    try {
+      var grid = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find("Grid");
+      var map = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find("Map");
+      grid.gridData.then(function (gridData) {
+        _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
+        var mapSprite = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from("".concat(_config__WEBPACK_IMPORTED_MODULE_2__["default"].clientAddr, "/maps/images/").concat(map.mapName, ".png"));
+        mapSprite.width = gridData.width * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
+        mapSprite.height = gridData.height * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
+        _services_graphics_manager__WEBPACK_IMPORTED_MODULE_6__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], mapSprite);
+        setTimeout(function () {
+          resolve();
+        }, 1000);
+      });
+    } catch (e) {
+      reject(e);
+    }
   },
-  checkMap: function checkMap() {
+  checkMap: function checkMap(resolve, reject) {
     var map = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find("Map");
     var img = new Image();
     var self = this;
 
     img.onerror = function () {
       //send request to server
-      self.sendToServer();
+      self.sendToServer(resolve, reject);
     };
 
     img.onload = function () {
       //load map from image directly
-      self.renderMap();
+      self.renderMap(resolve, reject);
       img = null;
     };
 
     img.src = "".concat(_config__WEBPACK_IMPORTED_MODULE_2__["default"].clientAddr, "/maps/images/").concat(map.mapName, ".png");
   },
-  sendToServer: function sendToServer() {
+  sendToServer: function sendToServer(resolve, reject) {
     var _this = this;
 
     var grid = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find("Grid");
@@ -4716,7 +4737,9 @@ __webpack_require__.r(__webpack_exports__);
         return res.json();
       }).then(function (data) {
         if (data.done) {
-          _this.renderMap();
+          _this.renderMap(resolve, reject);
+        } else {
+          reject();
         }
       });
     });
@@ -4838,7 +4861,11 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   process: function process() {
-    this.checkMap();
+    var _this4 = this;
+
+    return new Promise(function (resolve, reject) {
+      _this4.checkMap(resolve, reject);
+    });
   },
   processMe: function processMe() {
     var grid = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find('Grid');
@@ -5246,22 +5273,27 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   process: function process() {
-    var mesh = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find('Mesh');
-    mesh.meshData.then(function (meshData) {
-      _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
-      var container = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Container"]();
+    return new Promise(function (resolve, reject) {
+      var mesh = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find('Mesh');
+      mesh.meshData.then(function (meshData) {
+        _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
+        var container = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Container"]();
 
-      for (var i = 0; i < meshData.polygonsArr.length; ++i) {
-        var points = meshData.polygonsArr[i];
-        var polygon = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]();
-        polygon.lineStyle(1, 0x000000);
-        polygon.beginFill(0xFFFFFF);
-        polygon.drawPolygon(points);
-        polygon.endFill();
-        container.addChild(polygon);
-      }
+        for (var i = 0; i < meshData.polygonsArr.length; ++i) {
+          var points = meshData.polygonsArr[i];
+          var polygon = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]();
+          polygon.lineStyle(1, 0x000000);
+          polygon.beginFill(0xFFFFFF);
+          polygon.drawPolygon(points);
+          polygon.endFill();
+          container.addChild(polygon);
+        }
 
-      _services_graphics_manager__WEBPACK_IMPORTED_MODULE_6__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], container);
+        _services_graphics_manager__WEBPACK_IMPORTED_MODULE_6__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], container);
+        setTimeout(function () {
+          resolve();
+        }, 1000);
+      });
     });
   }
 });
@@ -5826,25 +5858,30 @@ __webpack_require__.r(__webpack_exports__);
       grReader.readAsText(file);
     }
   },
-  renderMap: function renderMap() {
-    var roadNetwork = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find('RoadNetwork');
-    roadNetwork.roadCoordinates.coData.then(function (coData) {
-      roadNetwork.roadGraph.grData.then(function (grData) {
-        _controller__WEBPACK_IMPORTED_MODULE_2__["default"].setupRenderer();
-        var mapSprite = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from("".concat(_config__WEBPACK_IMPORTED_MODULE_4__["default"].clientAddr, "/maps/images/ny.png"));
-        mapSprite.width = _controller__WEBPACK_IMPORTED_MODULE_2__["default"].getDimensions().width;
-        mapSprite.height = _controller__WEBPACK_IMPORTED_MODULE_2__["default"].getDimensions().height;
-        mapSprite.texture.baseTexture.scaleMode = pixi_js__WEBPACK_IMPORTED_MODULE_0__["SCALE_MODES"].NEAREST;
-        mapSprite.texture.baseTexture.mipmap = true;
-        _services_graphics_manager__WEBPACK_IMPORTED_MODULE_3__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_2__["default"], mapSprite);
+  renderMap: function renderMap(resolve, reject) {
+    try {
+      var roadNetwork = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find('RoadNetwork');
+      roadNetwork.roadCoordinates.coData.then(function (coData) {
+        roadNetwork.roadGraph.grData.then(function (grData) {
+          _controller__WEBPACK_IMPORTED_MODULE_2__["default"].setupRenderer();
+          var mapSprite = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from("".concat(_config__WEBPACK_IMPORTED_MODULE_4__["default"].clientAddr, "/maps/images/ny.png"));
+          mapSprite.width = _controller__WEBPACK_IMPORTED_MODULE_2__["default"].getDimensions().width;
+          mapSprite.height = _controller__WEBPACK_IMPORTED_MODULE_2__["default"].getDimensions().height;
+          mapSprite.texture.baseTexture.scaleMode = pixi_js__WEBPACK_IMPORTED_MODULE_0__["SCALE_MODES"].NEAREST;
+          mapSprite.texture.baseTexture.mipmap = true;
+          _services_graphics_manager__WEBPACK_IMPORTED_MODULE_3__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_2__["default"], mapSprite);
+          setTimeout(function () {
+            resolve();
+          }, 1000);
+        });
       });
-    });
+    } catch (e) {
+      reject(e);
+    }
   },
-  sendToServer: function sendToServer() {
+  sendToServer: function sendToServer(resolve, reject) {
     var _this = this;
 
-    // this.renderMap();
-    // return;
     var roadNetwork = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find('RoadNetwork');
     roadNetwork.roadCoordinates.coData.then(function (coData) {
       roadNetwork.roadGraph.grData.then(function (grData) {
@@ -5861,57 +5898,37 @@ __webpack_require__.r(__webpack_exports__);
           return res.json();
         }).then(function (data) {
           if (data.done) {
-            _this.renderMap();
+            _this.renderMap(resolve, reject);
+          } else {
+            reject();
           }
         });
       });
     });
   },
-  checkMap: function checkMap() {
+  checkMap: function checkMap(resolve, reject) {
     var map = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find("Map");
     var img = new Image();
     var self = this;
 
     img.onerror = function () {
       //send request to server
-      self.sendToServer();
+      self.sendToServer(resolve, reject);
     };
 
     img.onload = function () {
       //load map from image directly
-      self.renderMap();
+      self.renderMap(resolve, reject);
       img = null;
     };
 
     img.src = "".concat(_config__WEBPACK_IMPORTED_MODULE_4__["default"].clientAddr, "/maps/images/ny.png");
   },
   process: function process() {
-    this.checkMap();
-    return;
-    var roadNetwork = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find('RoadNetwork');
-    var container = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Container"]();
-    roadNetwork.roadCoordinates.coData.then(function (coData) {
-      roadNetwork.roadGraph.grData.then(function (grData) {
-        _controller__WEBPACK_IMPORTED_MODULE_2__["default"].setupRenderer();
-        var point = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]();
-        coData.coordinates.forEach(function (p) {
-          point.lineStyle(1, 0x000000);
-          point.beginFill(0x000000);
-          point.drawCircle(p.x * 0.01, p.y * 0.01, 0.5);
-          point.endFill();
-        });
-        container.addChild(point);
-        var line = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]();
-        line.lineStyle(0.25, 0x000000);
-        grData.lines.forEach(function (l) {
-          var from = coData.coordinates[l[0]];
-          var to = coData.coordinates[l[1]];
-          line.moveTo(from.x * 0.01, from.y * 0.01);
-          line.lineTo(to.x * 0.01, to.y * 0.01);
-        });
-        container.addChild(line);
-        _services_graphics_manager__WEBPACK_IMPORTED_MODULE_3__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_2__["default"], container);
-      });
+    var _this2 = this;
+
+    return new Promise(function (resolve, reject) {
+      _this2.checkMap(resolve, reject);
     });
   }
 });
@@ -6052,6 +6069,78 @@ var SearchPathService = {
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (SearchPathService);
+
+/***/ }),
+
+/***/ "./js/services/spinner.js":
+/*!********************************!*\
+  !*** ./js/services/spinner.js ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var spin_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! spin.js */ "./node_modules/spin.js/spin.js");
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  _spinner: null,
+  _target: null,
+  _overlay: null,
+  options: {
+    lines: 14,
+    length: 70,
+    width: 15,
+    radius: 84,
+    scale: 1,
+    corners: 1,
+    speed: 1.3,
+    rotate: 0,
+    animation: "spinner-line-shrink",
+    direction: 1,
+    color: "#000000",
+    fadeColor: "transparent",
+    top: "50%",
+    left: "50%",
+    shadow: "0 0 1px #cdcdcd"
+  },
+
+  get target() {
+    if (!this._target) {
+      this._target = document.getElementById("pathfinder");
+    }
+
+    return this._target;
+  },
+
+  get overlay() {
+    if (!this._overlay) {
+      this._overlay = document.createElement("div");
+      this._overlay.id = "overlay";
+      this._overlay.style.display = "none";
+      this.target.appendChild(this._overlay);
+    }
+
+    return this._overlay;
+  },
+
+  get spinner() {
+    if (!this._spinner) {
+      this._spinner = new spin_js__WEBPACK_IMPORTED_MODULE_0__["Spinner"](this.options);
+    }
+
+    return this._spinner;
+  },
+
+  show: function show() {
+    this.overlay.style.display = "block";
+    this.spinner.spin(this.target);
+  },
+  hide: function hide() {
+    this.overlay.style.display = "none";
+    this.spinner.stop();
+  }
+});
 
 /***/ }),
 
@@ -64972,6 +65061,250 @@ Loader.use = function LoaderUseStatic(fn) {
   attachTo.clearImmediate = clearImmediate;
 })(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../process/browser.js */ "./node_modules/process/browser.js")))
+
+/***/ }),
+
+/***/ "./node_modules/spin.js/spin.js":
+/*!**************************************!*\
+  !*** ./node_modules/spin.js/spin.js ***!
+  \**************************************/
+/*! exports provided: Spinner */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Spinner", function() { return Spinner; });
+var __assign = undefined && undefined.__assign || function () {
+  __assign = Object.assign || function (t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+      s = arguments[i];
+
+      for (var p in s) {
+        if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+      }
+    }
+
+    return t;
+  };
+
+  return __assign.apply(this, arguments);
+};
+
+var defaults = {
+  lines: 12,
+  length: 7,
+  width: 5,
+  radius: 10,
+  scale: 1.0,
+  corners: 1,
+  color: '#000',
+  fadeColor: 'transparent',
+  animation: 'spinner-line-fade-default',
+  rotate: 0,
+  direction: 1,
+  speed: 1,
+  zIndex: 2e9,
+  className: 'spinner',
+  top: '50%',
+  left: '50%',
+  shadow: '0 0 1px transparent',
+  position: 'absolute'
+};
+
+var Spinner =
+/** @class */
+function () {
+  function Spinner(opts) {
+    if (opts === void 0) {
+      opts = {};
+    }
+
+    this.opts = __assign(__assign({}, defaults), opts);
+  }
+  /**
+   * Adds the spinner to the given target element. If this instance is already
+   * spinning, it is automatically removed from its previous target by calling
+   * stop() internally.
+   */
+
+
+  Spinner.prototype.spin = function (target) {
+    this.stop();
+    this.el = document.createElement('div');
+    this.el.className = this.opts.className;
+    this.el.setAttribute('role', 'progressbar');
+    css(this.el, {
+      position: this.opts.position,
+      width: 0,
+      zIndex: this.opts.zIndex,
+      left: this.opts.left,
+      top: this.opts.top,
+      transform: "scale(" + this.opts.scale + ")"
+    });
+
+    if (target) {
+      target.insertBefore(this.el, target.firstChild || null);
+    }
+
+    drawLines(this.el, this.opts);
+    return this;
+  };
+  /**
+   * Stops and removes the Spinner.
+   * Stopped spinners may be reused by calling spin() again.
+   */
+
+
+  Spinner.prototype.stop = function () {
+    if (this.el) {
+      if (typeof requestAnimationFrame !== 'undefined') {
+        cancelAnimationFrame(this.animateId);
+      } else {
+        clearTimeout(this.animateId);
+      }
+
+      if (this.el.parentNode) {
+        this.el.parentNode.removeChild(this.el);
+      }
+
+      this.el = undefined;
+    }
+
+    return this;
+  };
+
+  return Spinner;
+}();
+
+
+/**
+ * Sets multiple style properties at once.
+ */
+
+function css(el, props) {
+  for (var prop in props) {
+    el.style[prop] = props[prop];
+  }
+
+  return el;
+}
+/**
+ * Returns the line color from the given string or array.
+ */
+
+
+function getColor(color, idx) {
+  return typeof color == 'string' ? color : color[idx % color.length];
+}
+/**
+ * Internal method that draws the individual lines.
+ */
+
+
+function drawLines(el, opts) {
+  var borderRadius = Math.round(opts.corners * opts.width * 500) / 1000 + 'px';
+  var shadow = 'none';
+
+  if (opts.shadow === true) {
+    shadow = '0 2px 4px #000'; // default shadow
+  } else if (typeof opts.shadow === 'string') {
+    shadow = opts.shadow;
+  }
+
+  var shadows = parseBoxShadow(shadow);
+
+  for (var i = 0; i < opts.lines; i++) {
+    var degrees = ~~(360 / opts.lines * i + opts.rotate);
+    var backgroundLine = css(document.createElement('div'), {
+      position: 'absolute',
+      top: -opts.width / 2 + "px",
+      width: opts.length + opts.width + 'px',
+      height: opts.width + 'px',
+      background: getColor(opts.fadeColor, i),
+      borderRadius: borderRadius,
+      transformOrigin: 'left',
+      transform: "rotate(" + degrees + "deg) translateX(" + opts.radius + "px)"
+    });
+    var delay = i * opts.direction / opts.lines / opts.speed;
+    delay -= 1 / opts.speed; // so initial animation state will include trail
+
+    var line = css(document.createElement('div'), {
+      width: '100%',
+      height: '100%',
+      background: getColor(opts.color, i),
+      borderRadius: borderRadius,
+      boxShadow: normalizeShadow(shadows, degrees),
+      animation: 1 / opts.speed + "s linear " + delay + "s infinite " + opts.animation
+    });
+    backgroundLine.appendChild(line);
+    el.appendChild(backgroundLine);
+  }
+}
+
+function parseBoxShadow(boxShadow) {
+  var regex = /^\s*([a-zA-Z]+\s+)?(-?\d+(\.\d+)?)([a-zA-Z]*)\s+(-?\d+(\.\d+)?)([a-zA-Z]*)(.*)$/;
+  var shadows = [];
+
+  for (var _i = 0, _a = boxShadow.split(','); _i < _a.length; _i++) {
+    var shadow = _a[_i];
+    var matches = shadow.match(regex);
+
+    if (matches === null) {
+      continue; // invalid syntax
+    }
+
+    var x = +matches[2];
+    var y = +matches[5];
+    var xUnits = matches[4];
+    var yUnits = matches[7];
+
+    if (x === 0 && !xUnits) {
+      xUnits = yUnits;
+    }
+
+    if (y === 0 && !yUnits) {
+      yUnits = xUnits;
+    }
+
+    if (xUnits !== yUnits) {
+      continue; // units must match to use as coordinates
+    }
+
+    shadows.push({
+      prefix: matches[1] || '',
+      x: x,
+      y: y,
+      xUnits: xUnits,
+      yUnits: yUnits,
+      end: matches[8]
+    });
+  }
+
+  return shadows;
+}
+/**
+ * Modify box-shadow x/y offsets to counteract rotation
+ */
+
+
+function normalizeShadow(shadows, degrees) {
+  var normalized = [];
+
+  for (var _i = 0, shadows_1 = shadows; _i < shadows_1.length; _i++) {
+    var shadow = shadows_1[_i];
+    var xy = convertOffset(shadow.x, shadow.y, degrees);
+    normalized.push(shadow.prefix + xy[0] + shadow.xUnits + ' ' + xy[1] + shadow.yUnits + shadow.end);
+  }
+
+  return normalized.join(', ');
+}
+
+function convertOffset(x, y, degrees) {
+  var radians = degrees * Math.PI / 180;
+  var sin = Math.sin(radians);
+  var cos = Math.cos(radians);
+  return [Math.round((x * cos + y * sin) * 1000) / 1000, Math.round((-x * sin + y * cos) * 1000) / 1000];
+}
 
 /***/ }),
 

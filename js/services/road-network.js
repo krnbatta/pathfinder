@@ -82,23 +82,29 @@ export default {
       grReader.readAsText(file);
     }
   },
-  renderMap() {
-    let roadNetwork = Store.find('RoadNetwork');
-    roadNetwork.roadCoordinates.coData.then((coData) => {
-      roadNetwork.roadGraph.grData.then((grData) => {
-        Controller.setupRenderer();
-        let mapSprite = new PIXI.Sprite.from(`${config.clientAddr}/maps/images/ny.png`);
-        mapSprite.width = Controller.getDimensions().width;
-        mapSprite.height = Controller.getDimensions().height;
-        mapSprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-        mapSprite.texture.baseTexture.mipmap = true;
-        GraphicsManager.insert(Controller, mapSprite);
+  renderMap(resolve, reject) {
+    try{
+      let roadNetwork = Store.find('RoadNetwork');
+      roadNetwork.roadCoordinates.coData.then((coData) => {
+        roadNetwork.roadGraph.grData.then((grData) => {
+          Controller.setupRenderer();
+          let mapSprite = new PIXI.Sprite.from(`${config.clientAddr}/maps/images/ny.png`);
+          mapSprite.width = Controller.getDimensions().width;
+          mapSprite.height = Controller.getDimensions().height;
+          mapSprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+          mapSprite.texture.baseTexture.mipmap = true;
+          GraphicsManager.insert(Controller, mapSprite);
+          setTimeout(() => {
+            resolve();
+          }, 1000);
+        });
       });
-    });
+    }
+    catch(e){
+      reject(e);
+    }
   },
-  sendToServer() {
-    // this.renderMap();
-    // return;
+  sendToServer(resolve, reject) {
     let roadNetwork = Store.find('RoadNetwork');
     roadNetwork.roadCoordinates.coData.then((coData) => {
       roadNetwork.roadGraph.grData.then((grData) => {
@@ -113,54 +119,33 @@ export default {
           }
         }).then((res) => res.json()).then((data) => {
           if (data.done) {
-            this.renderMap();
+            this.renderMap(resolve, reject);
+          }
+          else{
+            reject();
           }
         });
       });
     });
   },
-  checkMap(){
+  checkMap(resolve, reject){
     let map = Store.find("Map");
     var img = new Image();
     let self = this;
     img.onerror = function(){
       //send request to server
-      self.sendToServer();
+      self.sendToServer(resolve, reject);
     }
     img.onload = function(){
       //load map from image directly
-      self.renderMap();
+      self.renderMap(resolve, reject);
       img = null;
     }
     img.src = `${config.clientAddr}/maps/images/ny.png`;
   },
   process() {
-    this.checkMap();
-    return;
-    let roadNetwork = Store.find('RoadNetwork');
-    let container = new PIXI.Container();
-    roadNetwork.roadCoordinates.coData.then((coData) => {
-      roadNetwork.roadGraph.grData.then((grData) => {
-        Controller.setupRenderer();
-        let point = new PIXI.Graphics();
-        coData.coordinates.forEach((p) => {
-          point.lineStyle(1, 0x000000);
-          point.beginFill(0x000000);
-          point.drawCircle(p.x * 0.01, p.y * 0.01, 0.5);
-          point.endFill();
-        });
-        container.addChild(point);
-        let line = new PIXI.Graphics();
-        line.lineStyle(0.25, 0x000000);
-        grData.lines.forEach((l) => {
-          let from = coData.coordinates[l[0]];
-          let to = coData.coordinates[l[1]];
-          line.moveTo(from.x * 0.01, from.y * 0.01);
-          line.lineTo(to.x * 0.01, to.y * 0.01);
-        });
-        container.addChild(line);
-        GraphicsManager.insert(Controller, container);
-      });
+    return new Promise((resolve, reject) => {
+      this.checkMap(resolve, reject);
     });
   }
 }

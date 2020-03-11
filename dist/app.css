@@ -304,6 +304,17 @@ body {
 .col-sm {
   padding-right: 20px; }
 
+#overlay {
+  display: none;
+  background-color: #000;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0.5;
+  z-index: 10000; }
+
 #map-input {
   display: none; }
 
@@ -562,6 +573,36 @@ button.toast-close-button {
   #toast-container > div {
     padding: 15px 15px 15px 50px;
     width: 25em; } }
+
+@keyframes spinner-line-fade-more {
+  0%, 100% {
+    opacity: 0;
+    /* minimum opacity */ }
+  1% {
+    opacity: 1; } }
+
+@keyframes spinner-line-fade-quick {
+  0%, 39%, 100% {
+    opacity: 0.25;
+    /* minimum opacity */ }
+  40% {
+    opacity: 1; } }
+
+@keyframes spinner-line-fade-default {
+  0%, 100% {
+    opacity: 0.22;
+    /* minimum opacity */ }
+  1% {
+    opacity: 1; } }
+
+@keyframes spinner-line-shrink {
+  0%, 25%, 100% {
+    /* minimum scale and opacity */
+    transform: scale(0.5);
+    opacity: 0.25; }
+  26% {
+    transform: scale(1);
+    opacity: 1; } }
 
 
 /*# sourceMappingURL=app.css.map*/
