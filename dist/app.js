@@ -731,6 +731,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _base_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../base-component */ "./js/components/base-component.js");
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../../controller */ "./js/controller.js");
 /* harmony import */ var _services_time_travel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../../../services/time-travel */ "./js/services/time-travel.js");
+/* harmony import */ var _services_breakpoint__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../../../services/breakpoint */ "./js/services/breakpoint.js");
+
 
 
 
@@ -794,6 +796,7 @@ var BreakpointsComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE
       });
       htmlStr += "</select></div>";
       htmlStr += "<div class='col-sm'><input class='bp-val' type='number'></div>";
+      htmlStr += "<div class='col-sm'><label class=\"switch\"><input class='bp-active' type=\"checkbox\" checked=true><span class=\"slider round\"></span></label></div>";
       htmlStr += "<div class='col-sm'><a class=\"remove-bp modal__btn modal__btn-warning\">Remove</a></div></div>";
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#bps').append(htmlStr);
       jquery__WEBPACK_IMPORTED_MODULE_2___default()(".remove-bp").on('click', function (e) {
@@ -810,7 +813,6 @@ var BreakpointsComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE
       var self = this;
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#save-bp').on('click', function () {
         self.setValues();
-        micromodal__WEBPACK_IMPORTED_MODULE_3__["default"].close('bp-modal');
       });
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#remove-bp').on('click', function () {
         self.clearValues();
@@ -825,13 +827,15 @@ var BreakpointsComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE
       var bpOpds = jquery__WEBPACK_IMPORTED_MODULE_2___default()('.bp-opd');
       var bpOprs = jquery__WEBPACK_IMPORTED_MODULE_2___default()('.bp-opr');
       var bpVals = jquery__WEBPACK_IMPORTED_MODULE_2___default()('.bp-val');
+      var bpActive = jquery__WEBPACK_IMPORTED_MODULE_2___default()('.bp-active');
 
       for (var i = 0; i < totalBps; i++) {
         var operand = bpOpds[i].value;
         var operator = bpOprs[i].value;
         var val = bpVals[i].value;
+        var active = bpActive[i].is(":checked");
 
-        if (val) {
+        if (active && val) {
           bps.push({
             operand: operand,
             operator: operator,
@@ -840,63 +844,21 @@ var BreakpointsComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE
         }
       }
 
-      this.bps = bps;
-
-      if (this.bps.length) {
-        this.bpApplied = true;
-      }
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#bp-f-active").on("change", function () {
+        _services_breakpoint__WEBPACK_IMPORTED_MODULE_7__["default"].monotinicF(jquery__WEBPACK_IMPORTED_MODULE_2___default()("#bp-f-active").is(":checked"));
+      });
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#bp-g-active").on("change", function () {
+        _services_breakpoint__WEBPACK_IMPORTED_MODULE_7__["default"].monotinicG(jquery__WEBPACK_IMPORTED_MODULE_2___default()("#bp-g-active").is(":checked"));
+      });
+      _services_breakpoint__WEBPACK_IMPORTED_MODULE_7__["default"].bps = bps;
     },
     clearValues: function clearValues() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#bps .row').html('');
       this.addBreakpoint();
     },
-    manualCheck: function manualCheck(node) {
-      var valid = true;
-      var message = "";
-
-      if (this.bpApplied) {
-        for (var i = 0; i < this.bps.length; i++) {
-          var bp = this.bps[i];
-          var compareVal = node[bp.operand];
-
-          switch (bp.operator) {
-            case "less than":
-              valid = compareVal < parseInt(bp.val) ? false : true;
-              break;
-
-            case "equal to":
-              valid = compareVal == parseInt(bp.val) ? false : true;
-              break;
-
-            case "greater than":
-              valid = compareVal > parseInt(bp.val) ? false : true;
-              break;
-          }
-
-          if (!valid) {
-            message += "The value of ".concat(bp.operand, " for the current node is ").concat(compareVal, " which is ").concat(bp.operator, " the breakpoint value i.e. ").concat(bp.val, " <br>");
-          }
-        }
-      }
-
-      return message;
-    },
-    automaticCheck: function automaticCheck(node) {
-      var message = "";
-
-      if (!node.gValid) {
-        message += "The g value of current node(".concat(node.g, ") being expanded is less than that of its parent(").concat(node.parentNode.g, "). This indicates that a negative cost cycle might exist in the graph and is certainly an error. <br>");
-      }
-
-      if (!node.fValid) {
-        message += "The f value of current node(".concat(node.f, ") being expanded is less than that of its parent(").concat(node.parentNode.f, "). This indicates an inadmissible heuristic function and might be an error. <br>");
-      }
-
-      return message;
-    },
     check: function check(step) {
       var node = step.node;
-      return this.manualCheck(node) + this.automaticCheck(node);
+      return _services_breakpoint__WEBPACK_IMPORTED_MODULE_7__["default"].check(node);
     }
   }
 }));
@@ -914,7 +876,7 @@ var BreakpointsComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 var template = function template() {
-  return "\n  <button id='bp-btn' class=\"btn btn-primary\" data-micromodal-trigger=\"bp-modal\" title='Breakpoints'><i class='fas fa-2x fa-exclamation-triangle'/></button>\n  <div class=\"modal micromodal-slide\" id=\"bp-modal\" aria-hidden=\"true\">\n    <div class=\"modal__overlay\" tabindex=\"-1\" data-micromodal-close>\n      <div class=\"modal__container\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"bp-modal-title\">\n        <header class=\"modal__header\">\n          <h2 class=\"modal__title\" id=\"bp-modal-title\">\n            Set Breakpoints\n          </h2>\n          <button class=\"modal__close\" aria-label=\"Close modal\" data-micromodal-close></button>\n        </header>\n        <main class=\"modal__content\" id=\"bp-modal-content\">\n          <div id=\"bps\"></div>\n          <br>\n          <div id=\"add-bp\">\n            <a class='modal__btn modal__btn-info'>Add Breakpoint</a>\n          </div>\n        </main>\n        <footer class=\"modal__footer\">\n          <button id='remove-bp' class=\"modal__btn modal__btn-danger\" data-micromodal-close>Remove</button>\n          <button id='save-bp' class=\"modal__btn modal__btn-primary\">Save</button>\n        </footer>\n      </div>\n    </div>\n  </div>\n";
+  return "\n  <button id='bp-btn' class=\"btn btn-primary\" data-micromodal-trigger=\"bp-modal\" title='Breakpoints'><i class='fas fa-2x fa-exclamation-triangle'/></button>\n  <div class=\"modal micromodal-slide\" id=\"bp-modal\" aria-hidden=\"true\">\n    <div class=\"modal__overlay\" tabindex=\"-1\" data-micromodal-close>\n      <div class=\"modal__container\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"bp-modal-title\">\n        <header class=\"modal__header\">\n          <h2 class=\"modal__title\" id=\"bp-modal-title\">\n            Set Breakpoints\n          </h2>\n          <button class=\"modal__close\" aria-label=\"Close modal\" data-micromodal-close></button>\n        </header>\n        <hr>\n        <main class=\"modal__content\" id=\"bp-modal-content\">\n          <div class=\"row\">\n            <div class=\"col-sm\">\n              <label>Monotinic f value: </label>\n              <label class=\"switch\"><input id=\"bp-f-active\" type=\"checkbox\" checked=true><span class=\"slider round\"></span></label>\n            </div>\n            <div class=\"col-sm\">\n              <label>Monotinic g value: </label>\n              <label class=\"switch\"><input id=\"bp-g-active\" type=\"checkbox\" checked=true><span class=\"slider round\"></span></label>\n            </div>\n          </div>\n          <br>\n          <div id=\"bps\"></div>\n          <br>\n          <div id=\"add-bp\">\n            <a class='modal__btn modal__btn-info'>Add Breakpoint</a>\n          </div>\n        </main>\n        <footer class=\"modal__footer\">\n          <button id='remove-bp' class=\"modal__btn modal__btn-danger\" data-micromodal-close>Remove</button>\n          <button id='save-bp' class=\"modal__btn modal__btn-primary\" data-micromodal-close>Save</button>\n        </footer>\n      </div>\n    </div>\n  </div>\n";
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (template);
@@ -1588,9 +1550,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _template__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./template */ "./js/components/body/upper-body/top-panel/time-travel/template.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _base_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../base-component */ "./js/components/base-component.js");
-/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../../controller */ "./js/controller.js");
-/* harmony import */ var _services_time_travel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../../services/time-travel */ "./js/services/time-travel.js");
+/* harmony import */ var micromodal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! micromodal */ "./node_modules/micromodal/dist/micromodal.es.js");
+/* harmony import */ var _base_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../base-component */ "./js/components/base-component.js");
+/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../../controller */ "./js/controller.js");
+/* harmony import */ var _services_time_travel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../../../services/time-travel */ "./js/services/time-travel.js");
+
 
 
 
@@ -1602,7 +1566,7 @@ __webpack_require__.r(__webpack_exports__);
 * This component handles the playback controls buttons.
 */
 
-var TimeTravelComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a(jquery__WEBPACK_IMPORTED_MODULE_2___default.a.extend({}, _base_component__WEBPACK_IMPORTED_MODULE_3__["default"], {
+var TimeTravelComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a(jquery__WEBPACK_IMPORTED_MODULE_2___default.a.extend({}, _base_component__WEBPACK_IMPORTED_MODULE_4__["default"], {
   methods: {
     /**
     * @function onBeforeInit
@@ -1637,17 +1601,32 @@ var TimeTravelComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_
     * This function calls the PlaybackService callbacks as per the button clicked
     */
     bindEvents: function bindEvents() {
+      micromodal__WEBPACK_IMPORTED_MODULE_3__["default"].init();
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-jump").on('click', function (e) {
         var jumpVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-jump-input').val();
-        _services_time_travel__WEBPACK_IMPORTED_MODULE_5__["default"].jump(_controller__WEBPACK_IMPORTED_MODULE_4__["default"], parseInt(jumpVal));
+        _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].jump(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(jumpVal));
       });
-      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-backward").on('click', function (e) {
-        var backVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-backward-input').val();
-        _services_time_travel__WEBPACK_IMPORTED_MODULE_5__["default"].goBackwards(_controller__WEBPACK_IMPORTED_MODULE_4__["default"], backVal);
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-event-backward").on('click', function (e) {
+        var backVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-event-input').val();
+        _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].goEventBackwards(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(backVal));
       });
-      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-forward").on('click', function (e) {
-        var frontVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-forward-input').val();
-        _services_time_travel__WEBPACK_IMPORTED_MODULE_5__["default"].goForwards(_controller__WEBPACK_IMPORTED_MODULE_4__["default"], frontVal);
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-event-forward").on('click', function (e) {
+        var frontVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-event-input').val();
+        _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].goEventForwards(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(frontVal));
+      });
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-expansion-backward").on('click', function (e) {
+        var backVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-expansion-input').val();
+        _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].goExpansionBackwards(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(backVal));
+      });
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-expansion-forward").on('click', function (e) {
+        var frontVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-expansion-input').val();
+        _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].goExpansionForwards(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(frontVal));
+      });
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#go-tt").on('click', function (e) {
+        var input = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#tt-input").val();
+        var type = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#tt-type").val();
+        var direction = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#tt-direction").val();
+        _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].travel(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], type, direction, parseInt(input));
       });
     }
   }
@@ -1666,7 +1645,7 @@ var TimeTravelComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 var template = function template() {
-  return "\n  <input type=\"number\" id=\"travel-jump-input\" min=\"1\">\n  <button id='travel-jump' title='Travel Jump'><i class='fas fa-2x fa-plane'/></button>\n  <input type=\"number\" id=\"travel-backward-input\" min=\"1\">\n  <button id='travel-backward' title='Travel Back'><i class='fas fa-2x fa-fast-backward'/></button>\n  <input type=\"number\" id=\"travel-forward-input\" min=\"1\">\n  <button id='travel-forward' title='Travel Forward'><i class='fas fa-2x fa-fast-forward'/></button>\n";
+  return "\n  <!--<input type=\"number\" id=\"travel-jump-input\" min=\"1\">\n  <button id='travel-jump' title='Travel Jump'><i class='fas fa-2x fa-plane'/></button>\n  <input type=\"number\" id=\"travel-backward-input\" min=\"1\">-->\n  <button id='travel-event-backward' title='Travel Back(Event)'><i class='fas fa-2x fa-step-backward'/></button>\n  <input type=\"number\" id=\"travel-event-input\" min=\"1\">\n  <button id='travel-event-forward' title='Travel Forward(Event)'><i class='fas fa-2x fa-step-forward'/></button>\n  <button id='travel-expansion-backward' title='Travel Back(Expansion)'><i class='fas fa-2x fa-fast-backward'/></button>\n  <input type=\"number\" id=\"travel-expansion-input\" min=\"1\">\n  <button id='travel-expansion-forward' title='Travel Forward(Expansion)'><i class='fas fa-2x fa-fast-forward'/></button>\n\n  <button id='tt-btn' class=\"btn btn-primary\" data-micromodal-trigger=\"tt-modal\" title='Time Travel'><i class='fas fa-2x fa-stopwatch'/></button>\n  <div class=\"modal micromodal-slide\" id=\"tt-modal\" aria-hidden=\"true\">\n    <div class=\"modal__overlay\" tabindex=\"-1\" data-micromodal-close>\n      <div class=\"modal__container\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"tt-modal-title\">\n        <header class=\"modal__header\">\n          <h2 class=\"modal__title\" id=\"tt-modal-title\">\n            Move in steps\n          </h2>\n        </header>\n        <hr>\n        <main class=\"modal__content\" id=\"tt-modal-content\">\n          <div class=\"row\">\n            <div class=\"col-sm\">\n              <input type=\"number\" id=\"tt-input\" min=\"1\">\n            </div>\n            <div class=\"col-sm\">\n              <select id=\"tt-type\">\n                <option>Event</option>\n                <option>Expansion</option>\n                <option>Breakpoint</option>\n              </select>\n            </div>\n            <div class=\"col-sm\">\n              <select id=\"tt-direction\">\n                <option>Forward</option>\n                <option>Backward</option>\n              </select>\n            </div>\n          </div>\n        </main>\n        <footer class=\"modal__footer\">\n          <button id='cancel-tt' class=\"modal__btn modal__btn-danger\" data-micromodal-close>Cancel</button>\n          <button id='go-tt' class=\"modal__btn modal__btn-primary\" data-micromodal-close>Go</button>\n        </footer>\n      </div>\n    </div>\n  </div>\n\n";
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (template);
@@ -1896,7 +1875,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var toastr__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(toastr__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components */ "./js/components/index.js");
 /* harmony import */ var _components_body_bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/body/bottom-body/side-panel/events-list/component */ "./js/components/body/bottom-body/side-panel/events-list/component.js");
-/* harmony import */ var _components_body_upper_body_top_panel_breakpoints_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/body/upper-body/top-panel/breakpoints/component */ "./js/components/body/upper-body/top-panel/breakpoints/component.js");
+/* harmony import */ var _services_breakpoint__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./services/breakpoint */ "./js/services/breakpoint.js");
 /* harmony import */ var _services_playback__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./services/playback */ "./js/services/playback.js");
 /* harmony import */ var _services_floatbox__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./services/floatbox */ "./js/services/floatbox.js");
 /* harmony import */ var _services_frontier__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./services/frontier */ "./js/services/frontier.js");
@@ -2138,6 +2117,8 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
     stepForward: function stepForward() {
       var _this2 = this;
 
+      var suppress = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
       if (this.preempt) {
         return;
       }
@@ -2154,13 +2135,20 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
       _components_body_bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_3__["default"].addEvent(currentStep);
 
       if (!this.timeTravelling) {
-        var bpMsg = _components_body_upper_body_top_panel_breakpoints_component__WEBPACK_IMPORTED_MODULE_4__["default"].check(currentStep);
+        var bpMsg = _services_breakpoint__WEBPACK_IMPORTED_MODULE_4__["default"].check(currentStep.node);
 
         if (bpMsg) {
           this.preempt = true;
-          toastr__WEBPACK_IMPORTED_MODULE_1__["error"](bpMsg);
+
+          if (!suppress) {
+            toastr__WEBPACK_IMPORTED_MODULE_1__["error"](bpMsg);
+          }
+
           setTimeout(function () {
-            _services_playback__WEBPACK_IMPORTED_MODULE_5__["default"].pause();
+            if (_this2.currentId <= _this2.totalSteps && _services_playback__WEBPACK_IMPORTED_MODULE_5__["default"].state != 'paused') {
+              _services_playback__WEBPACK_IMPORTED_MODULE_5__["default"].pause();
+            }
+
             _this2.preempt = false;
           }, 0);
         }
@@ -4358,6 +4346,81 @@ function () {
 
 /***/ }),
 
+/***/ "./js/services/breakpoint.js":
+/*!***********************************!*\
+  !*** ./js/services/breakpoint.js ***!
+  \***********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  bps: [],
+  bpFActive: true,
+  bpGActive: true,
+
+  get bpApplied() {
+    return !!this.bps.length;
+  },
+
+  check: function check(node) {
+    return this.manualCheck(node, this.bpApplied, this.bps) + this.automaticCheck(node);
+  },
+  manualCheck: function manualCheck(node, bpApplied, bps) {
+    var message = "";
+    var valid = true;
+
+    if (bpApplied) {
+      for (var i = 0; i < this.bps.length; i++) {
+        var bp = this.bps[i];
+        var compareVal = node[bp.operand];
+
+        switch (bp.operator) {
+          case "less than":
+            valid = compareVal < parseInt(bp.val) ? false : true;
+            break;
+
+          case "equal to":
+            valid = compareVal == parseInt(bp.val) ? false : true;
+            break;
+
+          case "greater than":
+            valid = compareVal > parseInt(bp.val) ? false : true;
+            break;
+        }
+
+        if (!valid) {
+          message += "The value of ".concat(bp.operand, " for the current node is ").concat(compareVal, " which is ").concat(bp.operator, " the breakpoint value i.e. ").concat(bp.val, " <br>");
+        }
+      }
+    }
+
+    return message;
+  },
+  automaticCheck: function automaticCheck(node) {
+    var message = "";
+
+    if (this.bpGActive && !node.gValid) {
+      message += "The g value of current node(".concat(node.g, ") being expanded is less than that of its parent(").concat(node.parentNode.g, "). This indicates that a negative cost cycle might exist in the graph and is certainly an error. <br>");
+    }
+
+    if (this.bpFActive && !node.fValid) {
+      message += "The f value of current node(".concat(node.f, ") being expanded is less than that of its parent(").concat(node.parentNode.f, "). This indicates an inadmissible heuristic function and might be an error. <br>");
+    }
+
+    return message;
+  },
+  monotinicF: function monotinicF(state) {
+    this.bpFActive = state;
+  },
+  monotinicG: function monotinicG(state) {
+    this.bpGActive = state;
+  }
+});
+
+/***/ }),
+
 /***/ "./js/services/error-notifier.js":
 /*!***************************************!*\
   !*** ./js/services/error-notifier.js ***!
@@ -6253,12 +6316,14 @@ window.store = Store;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _graphics_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./graphics-manager */ "./js/services/graphics-manager.js");
+/* harmony import */ var _breakpoint__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./breakpoint */ "./js/services/breakpoint.js");
+
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  goBackwards: function goBackwards(context, backVal) {
+  goEventBackwards: function goEventBackwards(context, backVal) {
     context.timeTravelling = true;
     var currentId = context.currentId;
-    var proposedId = currentId - parseInt(backVal);
+    var proposedId = currentId - backVal;
     proposedId = Math.max(proposedId, 1);
 
     while (context.currentId != proposedId + 1) {
@@ -6268,10 +6333,10 @@ __webpack_require__.r(__webpack_exports__);
     context.timeTravelling = false;
     context.stepBackward();
   },
-  goForwards: function goForwards(context, frontVal) {
+  goEventForwards: function goEventForwards(context, frontVal) {
     context.timeTravelling = true;
     var currentId = context.currentId;
-    var proposedId = currentId + parseInt(frontVal);
+    var proposedId = currentId + frontVal;
     proposedId = Math.min(proposedId, context.totalSteps);
 
     while (context.currentId != proposedId - 1) {
@@ -6281,6 +6346,126 @@ __webpack_require__.r(__webpack_exports__);
     context.timeTravelling = false;
     _graphics_manager__WEBPACK_IMPORTED_MODULE_0__["default"].flushBuffer(context);
     context.stepForward();
+  },
+  goExpansionBackwards: function goExpansionBackwards(context, backVal) {
+    context.timeTravelling = true;
+    var steps = context.steps;
+    var val = 0;
+
+    while (val != backVal && context.currentId != 0) {
+      context.stepBackward();
+      var currentId = context.currentId;
+      var currentStep = steps[currentId];
+
+      if (currentStep.isFrontier) {
+        val++;
+      }
+    }
+
+    context.timeTravelling = false;
+    context.stepForward(true);
+    context.stepBackward();
+  },
+  goExpansionForwards: function goExpansionForwards(context, frontVal) {
+    context.timeTravelling = true;
+    var steps = context.steps;
+    var val = 0;
+
+    while (val != frontVal && context.currentId != context.totalSteps) {
+      context.stepForward();
+      var currentId = context.currentId;
+      var currentStep = steps[currentId];
+
+      if (currentStep.isFrontier) {
+        val++;
+      }
+    }
+
+    context.timeTravelling = false;
+    _graphics_manager__WEBPACK_IMPORTED_MODULE_0__["default"].flushBuffer(context);
+    context.stepForward(true);
+    context.stepBackward();
+  },
+  goBreakpointBackwards: function goBreakpointBackwards(context, backVal) {
+    context.timeTravelling = true;
+    var steps = context.steps;
+    var val = 0;
+
+    while (val != backVal && context.currentId != 0) {
+      context.stepBackward();
+      var currentId = context.currentId;
+      var currentStep = steps[currentId];
+
+      if (!!_breakpoint__WEBPACK_IMPORTED_MODULE_1__["default"].check(currentStep.check)) {
+        val++;
+      }
+    }
+
+    context.timeTravelling = false;
+    context.stepForward(true);
+    context.stepBackward();
+  },
+  goBreakpointForwards: function goBreakpointForwards(context, frontVal) {
+    context.timeTravelling = true;
+    var steps = context.steps;
+    var val = 0;
+
+    while (val != frontVal && context.currentId != context.totalSteps) {
+      context.stepForward();
+      var currentId = context.currentId;
+      var currentStep = steps[currentId];
+
+      if (!!_breakpoint__WEBPACK_IMPORTED_MODULE_1__["default"].check(currentStep.node)) {
+        val++;
+      }
+    }
+
+    context.timeTravelling = false;
+    _graphics_manager__WEBPACK_IMPORTED_MODULE_0__["default"].flushBuffer(context);
+    context.stepForward(true);
+    context.stepBackward();
+  },
+  travel: function travel(context, type, direction, val) {
+    switch (type) {
+      case "Event":
+        switch (direction) {
+          case "Forward":
+            this.goEventForwards(context, val);
+            break;
+
+          case "Backward":
+            this.goEventBackwards(context, val);
+            break;
+        }
+
+        break;
+
+      case "Expansion":
+        switch (direction) {
+          case "Forward":
+            this.goExpansionForwards(context, val);
+            break;
+
+          case "Backward":
+            this.goExpansionBackwards(context, val);
+            break;
+        }
+
+        break;
+
+      case "Breakpoint":
+        switch (direction) {
+          case "Forward":
+            this.goBreakpointForwards(context, val);
+            break;
+
+          case "Backward":
+            this.goBreakpointBackwards(context, val);
+            break;
+        }
+
+        break;
+    }
   },
   jump: function jump(context, jumpVal) {
     var currentId = context.currentId;

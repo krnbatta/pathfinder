@@ -8,6 +8,7 @@ import MicroModal from 'micromodal';
 import BaseComponent from '../../../../base-component';
 import Controller from '../../../../../controller';
 import TimeTravelService from '../../../../../services/time-travel';
+import BreakpointService from '../../../../../services/breakpoint';
 
 /**
 * @module components/playback-controls
@@ -68,6 +69,7 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
       });
       htmlStr += `</select></div>`;
       htmlStr += `<div class='col-sm'><input class='bp-val' type='number'></div>`;
+      htmlStr += `<div class='col-sm'><label class="switch"><input class='bp-active' type="checkbox" checked=true><span class="slider round"></span></label></div>`;
       htmlStr += `<div class='col-sm'><a class="remove-bp modal__btn modal__btn-warning">Remove</a></div></div>`;
       $('#bps').append(htmlStr);
       $(".remove-bp").on('click', (e) => {
@@ -84,7 +86,6 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
       let self = this;
       $('#save-bp').on('click', () => {
         self.setValues();
-        MicroModal.close('bp-modal');
       });
       $('#remove-bp').on('click', () => {
         self.clearValues();
@@ -100,20 +101,25 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
       let bpOpds = $('.bp-opd');
       let bpOprs = $('.bp-opr');
       let bpVals = $('.bp-val');
+      let bpActive = $('.bp-active');
       for(let i=0; i<totalBps; i++){
         let operand = bpOpds[i].value;
         let operator = bpOprs[i].value;
         let val = bpVals[i].value;
-        if(val){
+        let active = bpActive[i].is(":checked");
+        if(active && val){
           bps.push({
             operand, operator, val
           });
         }
       }
-      this.bps = bps;
-      if(this.bps.length){
-        this.bpApplied = true;
-      }
+      $("#bp-f-active").on("change", () => {
+        BreakpointService.monotinicF($("#bp-f-active").is(":checked"));
+      });
+      $("#bp-g-active").on("change", () => {
+        BreakpointService.monotinicG($("#bp-g-active").is(":checked"));
+      });
+      BreakpointService.bps = bps;
     },
 
     clearValues(){
@@ -121,46 +127,9 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
       this.addBreakpoint();
     },
 
-    manualCheck(node){
-      let valid = true;
-      let message = ``;
-      if(this.bpApplied){
-        for(let i=0; i<this.bps.length; i++){
-          let bp = this.bps[i];
-          let compareVal = node[bp.operand];
-          switch (bp.operator) {
-            case "less than":
-              valid = compareVal < parseInt(bp.val) ? false : true;
-              break;
-            case "equal to":
-              valid = compareVal == parseInt(bp.val) ? false : true;
-              break;
-            case "greater than":
-              valid = compareVal > parseInt(bp.val) ? false : true;
-              break;
-          }
-          if(!valid){
-            message += `The value of ${bp.operand} for the current node is ${compareVal} which is ${bp.operator} the breakpoint value i.e. ${bp.val} <br>`;
-          }
-        }
-      }
-      return message;
-    },
-
-    automaticCheck(node){
-      let message = ``;
-      if(!node.gValid){
-        message += `The g value of current node(${node.g}) being expanded is less than that of its parent(${node.parentNode.g}). This indicates that a negative cost cycle might exist in the graph and is certainly an error. <br>`;
-      }
-      if(!node.fValid){
-        message += `The f value of current node(${node.f}) being expanded is less than that of its parent(${node.parentNode.f}). This indicates an inadmissible heuristic function and might be an error. <br>`;
-      }
-      return message;
-    },
-
     check(step){
       let node = step.node;
-      return this.manualCheck(node) + this.automaticCheck(node);
+      return BreakpointService.check(node);
     }
   }
 }));

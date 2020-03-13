@@ -267,14 +267,14 @@ class Node {
 
   get fValid(){
     if(this.type == "expanding" && this.parentNode){
-      return this.f >= this.parentNode.f ? true : false;
+      return (this.f >= this.parentNode.f ? true : false);
     }
     return true;
   }
 
   get gValid(){
     if(this.type == "expanding" && this.parentNode){
-      return this.g >= this.parentNode.g ? true : false;
+      return (this.g >= this.parentNode.g ? true : false);
     }
     return true;
   }

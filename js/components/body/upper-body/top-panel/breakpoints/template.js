@@ -9,7 +9,19 @@ let template = () => `
           </h2>
           <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
         </header>
+        <hr>
         <main class="modal__content" id="bp-modal-content">
+          <div class="row">
+            <div class="col-sm">
+              <label>Monotinic f value: </label>
+              <label class="switch"><input id="bp-f-active" type="checkbox" checked=true><span class="slider round"></span></label>
+            </div>
+            <div class="col-sm">
+              <label>Monotinic g value: </label>
+              <label class="switch"><input id="bp-g-active" type="checkbox" checked=true><span class="slider round"></span></label>
+            </div>
+          </div>
+          <br>
           <div id="bps"></div>
           <br>
           <div id="add-bp">
@@ -18,7 +30,7 @@ let template = () => `
         </main>
         <footer class="modal__footer">
           <button id='remove-bp' class="modal__btn modal__btn-danger" data-micromodal-close>Remove</button>
-          <button id='save-bp' class="modal__btn modal__btn-primary">Save</button>
+          <button id='save-bp' class="modal__btn modal__btn-primary" data-micromodal-close>Save</button>
         </footer>
       </div>
     </div>

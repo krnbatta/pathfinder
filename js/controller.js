@@ -2,7 +2,7 @@ import StateMachine from "javascript-state-machine";
 import * as Toastr from 'toastr';
 import Components from './components';
 import EventsListComponent from './components/body/bottom-body/side-panel/events-list/component';
-import BreakpointsComponent from './components/body/upper-body/top-panel/breakpoints/component';
+import BreakpointService from './services/breakpoint';
 import PlaybackService from './services/playback';
 import FloatboxService from './services/floatbox';
 import FrontierService from './services/frontier';
@@ -216,7 +216,7 @@ let Controller = new StateMachine({
       * @function stepForward
       * This function calls runner to draw the current step and also add step text.
       */
-      stepForward() {
+      stepForward(suppress=false) {
         if(this.preempt){
           return;
         }
@@ -229,12 +229,16 @@ let Controller = new StateMachine({
         this.runner();
         EventsListComponent.addEvent(currentStep);
         if(!this.timeTravelling){
-          let bpMsg = BreakpointsComponent.check(currentStep);
+          let bpMsg = BreakpointService.check(currentStep.node);
           if(bpMsg){
             this.preempt = true;
-            Toastr.error(bpMsg);
+            if(!suppress){
+              Toastr.error(bpMsg);
+            }
             setTimeout(() => {
-              PlaybackService.pause();
+              if(this.currentId <= this.totalSteps && PlaybackService.state != 'paused'){
+                PlaybackService.pause();
+              }
               this.preempt = false;
             }, 0);
           }

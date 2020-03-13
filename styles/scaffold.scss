@@ -69,24 +69,16 @@ body{
 }
 
 
-#playback-controls,#breakpoints,#time-travel,#camera-controls{
+#playback-controls,#breakpoints,#camera-controls{
   display: inline-block;
   vertical-align: bottom;
   margin: 0 10px;
 }
-#play,#pause,#stop,#step-backward,#step-forward,#bp-btn,#fit-map,#fit-debugger,#fit-scale,#travel-jump,#travel-forward,#travel-backward{
+#play,#pause,#stop,#step-backward,#step-forward,#bp-btn,#fit-map,#fit-debugger,#fit-scale{
   height: 30px;
   width: 40px;
   border-radius: 5px;
   cursor: pointer;
-}
-#travel-jump-input,#travel-backward-input,#travel-forward-input{
-  height: 24px;
-  vertical-align: middle;
-  width: 50px;
-}
-#travel-jump,#travel-forward,#travel-backward{
-  vertical-align: bottom;
 }
 #fit-map,#fit-debugger,#fit-scale{
   position: relative;
