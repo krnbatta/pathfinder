@@ -64,7 +64,6 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     pause() {
       $("#events").show();
-      this.clearHighlighting();
       this.highlightNodes();
     },
 
@@ -73,6 +72,7 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     },
 
     highlightNodes(){
+      this.clearHighlighting();
       let currentNodeId = Controller.currentId - 1;
       let currentNode = Store.findById("Node", currentNodeId);
       let siblingNodes = currentNode.siblingNodes;

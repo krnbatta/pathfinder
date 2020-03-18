@@ -106,7 +106,7 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
         let operand = bpOpds[i].value;
         let operator = bpOprs[i].value;
         let val = bpVals[i].value;
-        let active = bpActive[i].is(":checked");
+        let active = $(bpActive[i]).is(":checked");
         if(active && val){
           bps.push({
             operand, operator, val

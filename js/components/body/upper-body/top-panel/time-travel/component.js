@@ -7,6 +7,8 @@ import MicroModal from 'micromodal';
 import BaseComponent from '../../../../base-component';
 import Controller from '../../../../../controller';
 import TimeTravelService from '../../../../../services/time-travel';
+import EventsListComponent from '../../../bottom-body/side-panel/events-list/component';
+
 
 /**
 * @module components/playback-controls
@@ -53,28 +55,34 @@ let TimeTravelComponent = new StateMachine($.extend({}, BaseComponent, {
       $("#travel-jump").on('click', (e) => {
         let jumpVal = $('#travel-jump-input').val();
         TimeTravelService.jump(Controller, parseInt(jumpVal));
+        EventsListComponent.highlightNodes();
       });
       $("#travel-event-backward").on('click', (e) => {
         let backVal = $('#travel-event-input').val();
         TimeTravelService.goEventBackwards(Controller, parseInt(backVal));
+        EventsListComponent.highlightNodes();
       });
       $("#travel-event-forward").on('click', (e) => {
         let frontVal = $('#travel-event-input').val();
         TimeTravelService.goEventForwards(Controller, parseInt(frontVal));
+        EventsListComponent.highlightNodes();
       });
       $("#travel-expansion-backward").on('click', (e) => {
         let backVal = $('#travel-expansion-input').val();
         TimeTravelService.goExpansionBackwards(Controller, parseInt(backVal));
+        EventsListComponent.highlightNodes();
       });
       $("#travel-expansion-forward").on('click', (e) => {
         let frontVal = $('#travel-expansion-input').val();
         TimeTravelService.goExpansionForwards(Controller, parseInt(frontVal));
+        EventsListComponent.highlightNodes();
       });
       $("#go-tt").on('click', (e) => {
         let input = $("#tt-input").val();
         let type = $("#tt-type").val();
         let direction = $("#tt-direction").val();
         TimeTravelService.travel(Controller, type, direction, parseInt(input));
+        EventsListComponent.highlightNodes();
       });
     }
   }
