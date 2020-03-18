@@ -106,13 +106,15 @@ export default {
   },
   sendToServer(resolve, reject) {
     let roadNetwork = Store.find('RoadNetwork');
+    let fileName = roadNetwork.map.fileName;
     roadNetwork.roadCoordinates.coData.then((coData) => {
       roadNetwork.roadGraph.grData.then((grData) => {
         fetch(config.processRoadNetworkUrl, {
           method: "POST",
           body: JSON.stringify({
             coData: coData,
-            grData: grData
+            grData: grData,
+            fileName: fileName
           }),
           headers: {
             'Content-Type': 'application/json'

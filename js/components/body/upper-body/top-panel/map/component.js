@@ -67,7 +67,7 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
         let coFile = file1Type == "co" ? file1 : file2;
         let grFile = file1Type == "gr" ? file1 : file2;
         let map = Store.createRecord("Map", {fileType, fileName});
-        Store.createRecord('RoadNetwork', {coFile, grFile});
+        Store.createRecord('RoadNetwork', {coFile, grFile, map});
         config.mapType = 'roadnetwork';
         this.fileName = `${file1Name}(roadnetwork)`;
         let roadNetworkPromise = RoadNetworkService.process();

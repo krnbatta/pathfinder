@@ -5,7 +5,8 @@ import config from '../config';
 import environment from '../environment';
 import errorNotifier from './error-notifier';
 import nodeFactory from '../utils/node-factory';
-import GraphicsManager from '../services/graphics-manager';
+import GraphicsManager from './graphics-manager';
+import MapProcessor from './map-processor';
 import Controller from '../controller';
 import $ from "jquery";
 
@@ -181,105 +182,11 @@ export default {
 
   process(){
     return new Promise((resolve, reject) => {
-      this.checkMap(resolve, reject);
-    });
-  },
-
-  processMe(){
-    let grid = Store.find('Grid');
-    grid.gridData.then((gridData) => {
-      let height = gridData.height;
-      let width = gridData.width;
-      let gridStr = gridData.gridStr;
-      Controller.setupRenderer();
-      let canvas = document.createElement("canvas");
-      // canvas.id = "map-canvas";
-      // let screen = document.getElementsByClassName("screen")[0];
-      // screen.appendChild(canvas);
-      // let canvas = document.getElementById("map-canvas");
-      let webglCanvas = document.getElementById("canvas");
-      // canvas.style.position = 'absolute';
-      canvas.width = width * config.nodeSize;
-      canvas.height = height * config.nodeSize;
-      // canvas.style.top = 0;
-      // canvas.style.left = 0;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "black";
-      for (var y = 0; y <= height; y++) {
-        for (var x = 0; x <= width; x++) {
-          var stringIndex = y * width + x;
-          if (gridStr[stringIndex] == '@') {
-            ctx.fillRect(x*config.nodeSize, y*config.nodeSize, config.nodeSize, config.nodeSize);
-          }
-        }
-      }
-      ctx.fillStyle = "green";
-      for (var y = 0; y <= height; y++) {
-        for (var x = 0; x <= width; x++) {
-          var stringIndex = y * width + x;
-          if (gridStr[stringIndex] == 'T') {
-            ctx.fillRect(x*config.nodeSize, y*config.nodeSize, config.nodeSize, config.nodeSize);
-          }
-        }
-      }
-      for(var i=0; i<=width; i++){
-        let line = new PIXI.Graphics();
-        let x1, x2, y1, y2;
-        x1 = i*config.nodeSize;
-        x2 = i*config.nodeSize;
-        y1 = 0;
-        y2 = height * config.nodeSize;
-        if(i==0){
-          x1 += 1;
-          x2 += 1;
-        }
-        if(i==width){
-          x1 -= 1;
-          x2 -= 1;
-        }
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
-      }
-
-      for(var i=0; i<=height; i++){
-        let line = new PIXI.Graphics();
-        let x1, x2, y1, y2;
-        y1 = i*config.nodeSize;
-        y2 = i*config.nodeSize;
-        x1 = 0;
-        x2 = width * config.nodeSize;
-        if(i==0){
-          y1 += 1;
-          y2 += 1;
-        }
-        if(i==height){
-          y1 -= 1;
-          y2 -= 1;
-        }
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
-      }
-      let data = canvas.toDataURL();
-      let img = new Image();
-      img.src = data;
-      img.onload = function(){
-        let baseTexture = new PIXI.BaseTexture(img);
-        let texture = new PIXI.Texture(baseTexture);
-        let mapSprite = PIXI.Sprite.from(texture);
-        // mapSprite.width = 800;
-        // mapSprite.height = 500;
-        GraphicsManager.insert(Controller, mapSprite);
-        // document.body.appendChild(img);
-      }
-
-      // let mapSprite = PIXI.Sprite.from("maps/tfs.png");
-      // GraphicsManager.insert(Controller, mapSprite);
+      let grid = Store.find("Grid");
+      let map = Store.find("Map");
+      grid.gridData.then((gridData) => {
+        MapProcessor.processGrid({width: gridData.width, height: gridData.height, gridStr: gridData.gridStr, fileName: map.mapName, resolve: resolve, reject: reject});
+      });
     });
   }
 }

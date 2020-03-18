@@ -8,7 +8,7 @@ class RoadNetwork {
   * Create a grid
   * @param {object} files - RoadNetwork files(co and gr) uploaded by the user
   */
-  constructor({coFile, grFile}) {
+  constructor({coFile, grFile, map}) {
     /**
     * _id is unique id of the road network that is set to 0.
     * @type  {number}
@@ -27,6 +27,9 @@ class RoadNetwork {
     * @public
     */
     this.grFile = grFile;
+
+    this.map = map;
+    
     this.setupMap();
   }
 

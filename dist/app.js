@@ -1004,9 +1004,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _breakpoints_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./breakpoints/component */ "./js/components/body/upper-body/top-panel/breakpoints/component.js");
 /* harmony import */ var _debugger_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./debugger/component */ "./js/components/body/upper-body/top-panel/debugger/component.js");
 /* harmony import */ var _map_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./map/component */ "./js/components/body/upper-body/top-panel/map/component.js");
-/* harmony import */ var _playback_controls_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./playback-controls/component */ "./js/components/body/upper-body/top-panel/playback-controls/component.js");
-/* harmony import */ var _time_travel_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./time-travel/component */ "./js/components/body/upper-body/top-panel/time-travel/component.js");
-/* harmony import */ var _camera_controls_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./camera-controls/component */ "./js/components/body/upper-body/top-panel/camera-controls/component.js");
+/* harmony import */ var _map_processor_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./map-processor/component */ "./js/components/body/upper-body/top-panel/map-processor/component.js");
+/* harmony import */ var _playback_controls_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./playback-controls/component */ "./js/components/body/upper-body/top-panel/playback-controls/component.js");
+/* harmony import */ var _time_travel_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./time-travel/component */ "./js/components/body/upper-body/top-panel/time-travel/component.js");
+/* harmony import */ var _camera_controls_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./camera-controls/component */ "./js/components/body/upper-body/top-panel/camera-controls/component.js");
+
 
 
 
@@ -1041,7 +1043,7 @@ var TopPanelComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0_
       this.bindEvents();
     },
     onReady: function onReady() {
-      var components = [_map_component__WEBPACK_IMPORTED_MODULE_6__["default"], _debugger_component__WEBPACK_IMPORTED_MODULE_5__["default"], _playback_controls_component__WEBPACK_IMPORTED_MODULE_7__["default"], _breakpoints_component__WEBPACK_IMPORTED_MODULE_4__["default"], _time_travel_component__WEBPACK_IMPORTED_MODULE_8__["default"], _camera_controls_component__WEBPACK_IMPORTED_MODULE_9__["default"]];
+      var components = [_map_component__WEBPACK_IMPORTED_MODULE_6__["default"], _debugger_component__WEBPACK_IMPORTED_MODULE_5__["default"], _map_processor_component__WEBPACK_IMPORTED_MODULE_7__["default"], _playback_controls_component__WEBPACK_IMPORTED_MODULE_8__["default"], _breakpoints_component__WEBPACK_IMPORTED_MODULE_4__["default"], _time_travel_component__WEBPACK_IMPORTED_MODULE_9__["default"], _camera_controls_component__WEBPACK_IMPORTED_MODULE_10__["default"]];
       components.forEach(function (component) {
         component.init();
       });
@@ -1160,6 +1162,229 @@ var template = function template() {
 
 /***/ }),
 
+/***/ "./js/components/body/upper-body/top-panel/map-processor/component.js":
+/*!****************************************************************************!*\
+  !*** ./js/components/body/upper-body/top-panel/map-processor/component.js ***!
+  \****************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var javascript_state_machine__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! javascript-state-machine */ "./node_modules/javascript-state-machine/lib/state-machine.js");
+/* harmony import */ var javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(javascript_state_machine__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _template__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./template */ "./js/components/body/upper-body/top-panel/map-processor/template.js");
+/* harmony import */ var _models_Grid__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../models/Grid */ "./js/models/Grid.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _base_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../base-component */ "./js/components/base-component.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../../config */ "./js/config.js");
+/* harmony import */ var _environment__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../../../environment */ "./js/environment.js");
+/* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../../../services/store */ "./js/services/store.js");
+/* harmony import */ var _services_grid__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../../../services/grid */ "./js/services/grid.js");
+/* harmony import */ var _services_mesh__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../../../../services/mesh */ "./js/services/mesh.js");
+/* harmony import */ var _services_road_network__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../../../../services/road-network */ "./js/services/road-network.js");
+/* harmony import */ var micromodal__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! micromodal */ "./node_modules/micromodal/dist/micromodal.es.js");
+/* harmony import */ var _services_progress_bar__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../../../../services/progress-bar */ "./js/services/progress-bar.js");
+/* harmony import */ var _services_spinner__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../../../../services/spinner */ "./js/services/spinner.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+* @module components/playback-controls
+* This component handles the playback controls buttons.
+*/
+
+var MapProcessorComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a(jquery__WEBPACK_IMPORTED_MODULE_3___default.a.extend({}, _base_component__WEBPACK_IMPORTED_MODULE_4__["default"], {
+  data: {},
+  methods: {
+    /**
+    * @function onBeforeInit
+    * This function creates component div container and appends it to the page.
+    */
+    onBeforeInit: function onBeforeInit() {
+      jquery__WEBPACK_IMPORTED_MODULE_3___default()("#top-panel").append("<div id='map-processor'></div>");
+    },
+
+    /**
+    * @function onLeaveNone
+    * This function fills the component container with the template file and initiates event binding.
+    */
+    onLeaveNone: function onLeaveNone() {
+      jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map-processor").html(_template__WEBPACK_IMPORTED_MODULE_1__["default"]);
+      this.hide();
+      this.bindEvents();
+    },
+    onReady: function onReady() {
+      this.show(); // this.addBreakpoint();
+    },
+    hide: function hide() {
+      this.shown = false;
+      jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map-processor").hide();
+    },
+    show: function show() {
+      if (!this.shown) {
+        this.shown = true;
+        jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map-processor").show();
+      }
+    },
+    processSucess: function processSucess() {},
+    processFail: function processFail() {},
+
+    /**
+    * @function bindEvents
+    * This function calls the PlaybackService callbacks as per the button clicked
+    */
+    bindEvents: function bindEvents() {
+      var _this = this;
+
+      micromodal__WEBPACK_IMPORTED_MODULE_11__["default"].init();
+      jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map-processor-input").on('change', function (e) {
+        _services_spinner__WEBPACK_IMPORTED_MODULE_13__["default"].show();
+
+        if (_this.validateFiles(e.target.files)) {
+          var progressElem = _services_progress_bar__WEBPACK_IMPORTED_MODULE_12__["default"].init(_this.processSucess, _this.processFail);
+          jquery__WEBPACK_IMPORTED_MODULE_3___default()("#progress-container").html(progressElem);
+
+          _this.processFiles(e.target.files);
+        } else {
+          _services_spinner__WEBPACK_IMPORTED_MODULE_13__["default"].hide();
+          alert("Invalid format(s)");
+        }
+      });
+    },
+    processFiles: function processFiles(files) {
+      if (files.length > 1) {
+        var file1 = files[0];
+        var file2 = files[1];
+        var file1Name = file1.name.split(".");
+        var file2Name = file2.name.split(".");
+        var file1Type = file1Name.pop();
+        file1Name = file1Name.join("");
+        var file2Type = file2Name.pop();
+        file2Name = file2Name.join("");
+        var fileType = 'roadnetwork';
+        var fileName = file1Type == "gr" ? file1Name : file2Name;
+        var coFile = file1Type == "co" ? file1 : file2;
+        var grFile = file1Type == "gr" ? file1 : file2;
+        var map = _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord("Map", {
+          fileType: fileType,
+          fileName: fileName
+        });
+        _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('RoadNetwork', {
+          coFile: coFile,
+          grFile: grFile,
+          map: map
+        });
+        _config__WEBPACK_IMPORTED_MODULE_5__["default"].mapType = 'roadnetwork';
+        this.fileName = "".concat(file1Name, "(roadnetwork)");
+        var roadNetworkPromise = _services_road_network__WEBPACK_IMPORTED_MODULE_10__["default"].process();
+        roadNetworkPromise.finally(function () {
+          _services_progress_bar__WEBPACK_IMPORTED_MODULE_12__["default"].progress = 101;
+          _services_spinner__WEBPACK_IMPORTED_MODULE_13__["default"].hide();
+        });
+      } else {
+        var file = files[0];
+
+        var _fileName = file.name.split(".");
+
+        var _fileType = _fileName.pop();
+
+        _fileName = _fileName.join("");
+
+        var _map = _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord("Map", {
+          fileType: _fileType,
+          fileName: _fileName
+        });
+
+        if (_fileType == "grid") {
+          _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Grid', file);
+          _config__WEBPACK_IMPORTED_MODULE_5__["default"].mapType = 'grid';
+          var gridPromise = _services_grid__WEBPACK_IMPORTED_MODULE_8__["default"].process();
+          gridPromise.finally(function () {
+            _services_progress_bar__WEBPACK_IMPORTED_MODULE_12__["default"].progress = 101;
+            _services_spinner__WEBPACK_IMPORTED_MODULE_13__["default"].hide();
+          });
+        } else if (_fileType == "mesh") {
+          _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('Mesh', file);
+          _config__WEBPACK_IMPORTED_MODULE_5__["default"].mapType = 'mesh';
+          var meshPromise = _services_mesh__WEBPACK_IMPORTED_MODULE_9__["default"].process();
+          meshPromise.finally(function () {
+            _services_progress_bar__WEBPACK_IMPORTED_MODULE_12__["default"].progress = 101;
+            _services_spinner__WEBPACK_IMPORTED_MODULE_13__["default"].hide();
+          });
+        }
+
+        this.fileName = "".concat(_fileName, "(").concat(_fileType, ")");
+      }
+    },
+    validateFiles: function validateFiles(files) {
+      if (files.length > 1) {
+        var file1 = files[0];
+        var file2 = files[1];
+        var file1Type = file1.name.split(".").pop();
+        var file2Type = file2.name.split(".").pop();
+        var hasCo = false;
+        var hasGr = false;
+
+        if (file1Type == "co" || file2Type == "co") {
+          hasCo = true;
+        }
+
+        if (file1Type == "gr" || file2Type == "gr") {
+          hasGr = true;
+        }
+
+        if (hasCo && hasGr) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        var file = files[0];
+        var fileType = file.name.split(".").pop();
+
+        if (fileType == "co" || fileType == "gr") {
+          return false;
+        }
+
+        return true;
+      }
+    }
+  }
+}));
+/* harmony default export */ __webpack_exports__["default"] = (MapProcessorComponent);
+
+/***/ }),
+
+/***/ "./js/components/body/upper-body/top-panel/map-processor/template.js":
+/*!***************************************************************************!*\
+  !*** ./js/components/body/upper-body/top-panel/map-processor/template.js ***!
+  \***************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var template = function template() {
+  return "\n  <button id='mp-btn' class=\"btn btn-primary\" data-micromodal-trigger=\"mp-modal\" title='Map Convertor'><i class='fas fa-2x fa-map-marked-alt'/></button>\n  <div class=\"modal micromodal-slide\" id=\"mp-modal\" aria-hidden=\"true\">\n    <div class=\"modal__overlay\" tabindex=\"-1\" data-micromodal-close>\n      <div class=\"modal__container\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"mp-modal-title\">\n        <header class=\"modal__header\">\n          <h2 class=\"modal__title\" id=\"mp-modal-title\">\n            Map to Image Convert\n          </h2>\n          <button class=\"modal__close\" aria-label=\"Close modal\" data-micromodal-close></button>\n        </header>\n        <hr>\n        <main class=\"modal__content\" id=\"mp-modal-content\">\n          <label id=\"map-processor-label\" for=\"map-input\"><i class=\"fa fa-map\"></i> Upload map</label>\n          <input type = 'file' id='map-processor-input' multiple=true accept='.grid,.co,.gr' />\n          <br>\n          <div id=\"progress-container\"></div>\n        </main>\n        <footer class=\"modal__footer\">\n          <button id='close-mp' class=\"modal__btn modal__btn-danger\" data-micromodal-close>Close</button>\n        </footer>\n      </div>\n    </div>\n  </div>\n";
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (template);
+
+/***/ }),
+
 /***/ "./js/components/body/upper-body/top-panel/map/component.js":
 /*!******************************************************************!*\
   !*** ./js/components/body/upper-body/top-panel/map/component.js ***!
@@ -1259,7 +1484,8 @@ var MapComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___def
         });
         _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].createRecord('RoadNetwork', {
           coFile: coFile,
-          grFile: grFile
+          grFile: grFile,
+          map: map
         });
         _config__WEBPACK_IMPORTED_MODULE_5__["default"].mapType = 'roadnetwork';
         this.fileName = "".concat(file1Name, "(roadnetwork)");
@@ -4297,7 +4523,8 @@ function () {
   */
   function RoadNetwork(_ref) {
     var coFile = _ref.coFile,
-        grFile = _ref.grFile;
+        grFile = _ref.grFile,
+        map = _ref.map;
 
     _classCallCheck(this, RoadNetwork);
 
@@ -4321,6 +4548,7 @@ function () {
     */
 
     this.grFile = grFile;
+    this.map = map;
     this.setupMap();
   }
 
@@ -4725,10 +4953,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _environment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../environment */ "./js/environment.js");
 /* harmony import */ var _error_notifier__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./error-notifier */ "./js/services/error-notifier.js");
 /* harmony import */ var _utils_node_factory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/node-factory */ "./js/utils/node-factory.js");
-/* harmony import */ var _services_graphics_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../services/graphics-manager */ "./js/services/graphics-manager.js");
-/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_8__);
+/* harmony import */ var _graphics_manager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./graphics-manager */ "./js/services/graphics-manager.js");
+/* harmony import */ var _map_processor__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./map-processor */ "./js/services/map-processor.js");
+/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_9__);
+
 
 
 
@@ -4748,11 +4978,11 @@ __webpack_require__.r(__webpack_exports__);
       var grid = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find("Grid");
       var map = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find("Map");
       grid.gridData.then(function (gridData) {
-        _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
+        _controller__WEBPACK_IMPORTED_MODULE_8__["default"].setupRenderer();
         var mapSprite = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from("".concat(_config__WEBPACK_IMPORTED_MODULE_2__["default"].clientAddr, "/maps/images/").concat(map.mapName, ".png"));
         mapSprite.width = gridData.width * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
         mapSprite.height = gridData.height * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
-        _services_graphics_manager__WEBPACK_IMPORTED_MODULE_6__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], mapSprite);
+        _graphics_manager__WEBPACK_IMPORTED_MODULE_6__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_8__["default"], mapSprite);
         setTimeout(function () {
           resolve();
         }, 1000);
@@ -4909,14 +5139,14 @@ __webpack_require__.r(__webpack_exports__);
       var mapContainer = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Container"]();
       var grid = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find('Grid');
       grid.cells.then(function (cells) {
-        _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
+        _controller__WEBPACK_IMPORTED_MODULE_8__["default"].setupRenderer();
         grid.gridData.then(function (gridData) {
           cells.forEach(function (cell) {
             cell.isMap = true;
             var cellElement = Object(_utils_node_factory__WEBPACK_IMPORTED_MODULE_5__["default"])(cell);
             mapContainer.addChild(cellElement);
           });
-          _services_graphics_manager__WEBPACK_IMPORTED_MODULE_6__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], mapContainer);
+          _graphics_manager__WEBPACK_IMPORTED_MODULE_6__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_8__["default"], mapContainer);
         });
       }, function (err) {
         Object(_error_notifier__WEBPACK_IMPORTED_MODULE_4__["default"])(err);
@@ -4924,127 +5154,19 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   process: function process() {
-    var _this4 = this;
-
     return new Promise(function (resolve, reject) {
-      _this4.checkMap(resolve, reject);
-    });
-  },
-  processMe: function processMe() {
-    var grid = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find('Grid');
-    grid.gridData.then(function (gridData) {
-      var height = gridData.height;
-      var width = gridData.width;
-      var gridStr = gridData.gridStr;
-      _controller__WEBPACK_IMPORTED_MODULE_7__["default"].setupRenderer();
-      var canvas = document.createElement("canvas"); // canvas.id = "map-canvas";
-      // let screen = document.getElementsByClassName("screen")[0];
-      // screen.appendChild(canvas);
-      // let canvas = document.getElementById("map-canvas");
-
-      var webglCanvas = document.getElementById("canvas"); // canvas.style.position = 'absolute';
-
-      canvas.width = width * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
-      canvas.height = height * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize; // canvas.style.top = 0;
-      // canvas.style.left = 0;
-
-      var ctx = canvas.getContext('2d');
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "black";
-
-      for (var y = 0; y <= height; y++) {
-        for (var x = 0; x <= width; x++) {
-          var stringIndex = y * width + x;
-
-          if (gridStr[stringIndex] == '@') {
-            ctx.fillRect(x * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize, y * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize, _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize, _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize);
-          }
-        }
-      }
-
-      ctx.fillStyle = "green";
-
-      for (var y = 0; y <= height; y++) {
-        for (var x = 0; x <= width; x++) {
-          var stringIndex = y * width + x;
-
-          if (gridStr[stringIndex] == 'T') {
-            ctx.fillRect(x * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize, y * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize, _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize, _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize);
-          }
-        }
-      }
-
-      for (var i = 0; i <= width; i++) {
-        var line = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]();
-        var x1 = void 0,
-            x2 = void 0,
-            y1 = void 0,
-            y2 = void 0;
-        x1 = i * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
-        x2 = i * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
-        y1 = 0;
-        y2 = height * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
-
-        if (i == 0) {
-          x1 += 1;
-          x2 += 1;
-        }
-
-        if (i == width) {
-          x1 -= 1;
-          x2 -= 1;
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
-      }
-
-      for (var i = 0; i <= height; i++) {
-        var _line = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]();
-
-        var _x = void 0,
-            _x2 = void 0,
-            _y = void 0,
-            _y2 = void 0;
-
-        _y = i * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
-        _y2 = i * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
-        _x = 0;
-        _x2 = width * _config__WEBPACK_IMPORTED_MODULE_2__["default"].nodeSize;
-
-        if (i == 0) {
-          _y += 1;
-          _y2 += 1;
-        }
-
-        if (i == height) {
-          _y -= 1;
-          _y2 -= 1;
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(_x, _y);
-        ctx.lineTo(_x2, _y2);
-        ctx.stroke();
-      }
-
-      var data = canvas.toDataURL();
-      var img = new Image();
-      img.src = data;
-
-      img.onload = function () {
-        var baseTexture = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["BaseTexture"](img);
-        var texture = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Texture"](baseTexture);
-        var mapSprite = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"].from(texture); // mapSprite.width = 800;
-        // mapSprite.height = 500;
-
-        _services_graphics_manager__WEBPACK_IMPORTED_MODULE_6__["default"].insert(_controller__WEBPACK_IMPORTED_MODULE_7__["default"], mapSprite); // document.body.appendChild(img);
-      }; // let mapSprite = PIXI.Sprite.from("maps/tfs.png");
-      // GraphicsManager.insert(Controller, mapSprite);
-
+      var grid = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find("Grid");
+      var map = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find("Map");
+      grid.gridData.then(function (gridData) {
+        _map_processor__WEBPACK_IMPORTED_MODULE_7__["default"].processGrid({
+          width: gridData.width,
+          height: gridData.height,
+          gridStr: gridData.gridStr,
+          fileName: map.mapName,
+          resolve: resolve,
+          reject: reject
+        });
+      });
     });
   }
 });
@@ -5178,6 +5300,163 @@ function () {
 
 var Injector = new InjectorService();
 /* harmony default export */ __webpack_exports__["default"] = (Injector);
+
+/***/ }),
+
+/***/ "./js/services/map-processor.js":
+/*!**************************************!*\
+  !*** ./js/services/map-processor.js ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _progress_bar__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./progress-bar */ "./js/services/progress-bar.js");
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  processGrid: function processGrid(gridObj) {
+    _progress_bar__WEBPACK_IMPORTED_MODULE_0__["default"].progress = 1;
+    var fileName = gridObj.fileName;
+    var height = gridObj.height;
+    var width = gridObj.width;
+    var gridStr = gridObj.gridStr;
+    var canvas = document.createElement("canvas");
+    canvas.width = width * 16;
+    canvas.height = height * 16;
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "black";
+    var progressInterval = height / 12;
+    var progressSnaps = Array.from(Array(12).keys()).map(function (e) {
+      return e * progressInterval;
+    });
+
+    for (var _y = 0; _y <= height; _y++) {
+      for (var x = 0; x <= width; x++) {
+        var stringIndex = _y * width + x;
+
+        if (gridStr[stringIndex] == '@') {
+          ctx.fillRect(x * 16, _y * 16, 16, 16);
+        }
+      }
+
+      if (progressSnaps.indexOf(_y) != -1) {
+        _progress_bar__WEBPACK_IMPORTED_MODULE_0__["default"].progress = (progressSnaps.indexOf(_y) + 1) * 5;
+      }
+    }
+
+    _progress_bar__WEBPACK_IMPORTED_MODULE_0__["default"].progress = 60;
+    ctx.fillStyle = "green";
+
+    for (var y = 0; y <= height; y++) {
+      for (var x = 0; x <= width; x++) {
+        var stringIndex = y * width + x;
+
+        if (gridStr[stringIndex] == 'T') {
+          ctx.fillRect(x * 16, y * 16, 16, 16);
+        }
+      }
+    }
+
+    _progress_bar__WEBPACK_IMPORTED_MODULE_0__["default"].progress = 80;
+
+    for (var i = 0; i <= width; i++) {
+      var x1 = void 0,
+          x2 = void 0,
+          y1 = void 0,
+          y2 = void 0;
+      x1 = i * 16;
+      x2 = i * 16;
+      y1 = 0;
+      y2 = height * 16;
+
+      if (i == 0) {
+        x1 += 1;
+        x2 += 1;
+      }
+
+      if (i == width) {
+        x1 -= 1;
+        x2 -= 1;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    _progress_bar__WEBPACK_IMPORTED_MODULE_0__["default"].progress = 90;
+
+    for (var i = 0; i <= height; i++) {
+      var _x = void 0,
+          _x2 = void 0,
+          _y2 = void 0,
+          _y3 = void 0;
+
+      _y2 = i * 16;
+      _y3 = i * 16;
+      _x = 0;
+      _x2 = width * 16;
+
+      if (i == 0) {
+        _y2 += 1;
+        _y3 += 1;
+      }
+
+      if (i == height) {
+        _y2 -= 1;
+        _y3 -= 1;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(_x, _y2);
+      ctx.lineTo(_x2, _y3);
+      ctx.stroke();
+    }
+
+    _progress_bar__WEBPACK_IMPORTED_MODULE_0__["default"].progress = 100; //check if there is better export image
+    //check image quality
+
+    var img = canvas.toDataURL();
+    var link = document.createElement("a");
+    link.download = "".concat(fileName, ".png");
+    link.href = img;
+    link.click();
+  },
+  processRoadNetwork: function processRoadNetwork(roadnetworkObj) {
+    var coData = roadnetworkObj.coData;
+    var grData = roadnetworkObj.grData;
+    var fileName = roadnetworkObj.fileName;
+    var canvas = document.createElement("canvas");
+    var context = canvas.getContext('2d');
+    canvas.width = coData.maxX * 0.01 + 1;
+    canvas.height = coData.maxY * 0.01 + 1;
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = 'black';
+    context.strokeStyle = 'black';
+    coData.coordinates.forEach(function (p) {
+      context.beginPath();
+      context.arc(p.x * 0.01, p.y * 0.01, 1, 0, 2 * Math.PI);
+      context.fill();
+    });
+    grData.lines.forEach(function (l) {
+      var from = coData.coordinates[l[0]];
+      var to = coData.coordinates[l[1]];
+      context.beginPath();
+      context.moveTo(from.x * 0.01, from.y * 0.01);
+      context.lineTo(to.x * 0.01, to.y * 0.01);
+      context.lineWidth = 0.5;
+      context.stroke();
+    });
+    var img = canvas.toDataURL();
+    var link = document.createElement("a");
+    a.download = "".concat(fileName, ".png");
+  }
+});
 
 /***/ }),
 
@@ -5625,6 +5904,70 @@ var PlaybackService = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___
 
 /***/ }),
 
+/***/ "./js/services/progress-bar.js":
+/*!*************************************!*\
+  !*** ./js/services/progress-bar.js ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  promise: null,
+  resolve: null,
+  reject: null,
+  elem: null,
+  init: function init(resolveCallback, rejectCallback) {
+    var _this = this;
+
+    this.elem = this.createProgressElement();
+    this.promise = new Promise(function (resolve, reject) {
+      _this.resolve = resolve;
+      _this.reject = reject;
+    });
+    this.promise.then(function () {
+      if (resolveCallback) {
+        resolveCallback();
+      }
+    }, function () {
+      if (rejectCallback) {
+        rejectCallback();
+      }
+    }).finally(function () {
+      _this.clearValues();
+    });
+    return this.elem;
+  },
+  createProgressElement: function createProgressElement() {
+    var progress = document.createElement("div");
+    progress.id = "progress";
+    var bar = document.createElement("div");
+    bar.id = "bar";
+    progress.appendChild(bar);
+    return progress;
+  },
+
+  set progress(p) {
+    if (p > 100) {
+      this.resolve();
+    } else {
+      this.elem.style.width = p + "%";
+      this.elem.innerHTML = p + "%";
+    }
+  },
+
+  clearValues: function clearValues() {
+    this.elem.parentNode.removeChild(this.elem);
+    this.elem = null;
+    this.promise = null;
+    this.resolve = null;
+    this.reject = null;
+  }
+});
+
+/***/ }),
+
 /***/ "./js/services/renderer.js":
 /*!*********************************!*\
   !*** ./js/services/renderer.js ***!
@@ -5946,13 +6289,15 @@ __webpack_require__.r(__webpack_exports__);
     var _this = this;
 
     var roadNetwork = _store__WEBPACK_IMPORTED_MODULE_1__["default"].find('RoadNetwork');
+    var fileName = roadNetwork.map.fileName;
     roadNetwork.roadCoordinates.coData.then(function (coData) {
       roadNetwork.roadGraph.grData.then(function (grData) {
         fetch(_config__WEBPACK_IMPORTED_MODULE_4__["default"].processRoadNetworkUrl, {
           method: "POST",
           body: JSON.stringify({
             coData: coData,
-            grData: grData
+            grData: grData,
+            fileName: fileName
           }),
           headers: {
             'Content-Type': 'application/json'
