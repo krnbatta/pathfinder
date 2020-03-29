@@ -56,11 +56,12 @@ body {
   flex-flow: row nowrap; }
 
 #main-panel {
-  flex: 9; }
+  flex: 9;
+  border: 2px solid; }
 
 #side-panel {
   flex: 3;
-  border-left: 1px solid; }
+  border: 2px solid; }
 
 #upper-body, #lower-body {
   padding: 5px; }
@@ -97,7 +98,7 @@ body {
 #events-list {
   position: absolute;
   height: 100%;
-  overflow: auto; }
+  width: 100%; }
 
 #context-menu {
   display: none;
@@ -362,6 +363,9 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%; }
 
+.toast {
+  opacity: 1 !important; }
+
 #map-input {
   display: none; }
 
@@ -424,6 +428,11 @@ input:checked + .slider:before {
   vertical-align: middle;
   width: 50px; }
 
+#screen-heading {
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 2px solid; }
+
 .event {
   list-style: none;
   display: block;
@@ -443,7 +452,16 @@ input:checked + .slider:before {
 
 #events {
   counter-reset: item;
-  padding: 5px; }
+  padding: 5px;
+  margin: 0;
+  position: absolute;
+  height: calc(100% - 30px);
+  overflow: auto; }
+
+#events-heading {
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 2px solid; }
 
 .toast-title {
   font-weight: bold; }

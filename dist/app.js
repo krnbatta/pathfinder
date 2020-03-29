@@ -282,7 +282,7 @@ var ScreenComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 var template = function template() {
-  return "";
+  return "\n  <div id=\"screen-heading\">Map + Trace</div>\n";
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (template);
@@ -452,7 +452,11 @@ var EventsListComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_
       var currentNode = _services_store__WEBPACK_IMPORTED_MODULE_5__["default"].findById("Node", currentNodeId);
       var siblingNodes = currentNode.siblingNodes;
       var parentNode = currentNode.parentNode;
-      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#event-".concat(parentNode._id)).css("background-color", "#".concat(parentNode.attrs.fillStyle.toString(16)));
+
+      if (parentNode) {
+        jquery__WEBPACK_IMPORTED_MODULE_2___default()("#event-".concat(parentNode._id)).css("background-color", "#".concat(parentNode.attrs.fillStyle.toString(16)));
+      }
+
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#event-".concat(currentNode._id)).css("background-color", "#".concat(currentNode.attrs.fillStyle.toString(16)));
 
       if (currentNode.step.isFrontier) {
@@ -484,7 +488,7 @@ var EventsListComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_
       });
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events").append(li);
       window.requestAnimationFrame(function () {
-        jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events-list")[0].scrollTop = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events-list")[0].scrollHeight;
+        jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events")[0].scrollTop = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events")[0].scrollHeight;
       });
     },
 
@@ -495,7 +499,7 @@ var EventsListComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_
     removeEvent: function removeEvent() {
       this.events.pop();
       jquery__WEBPACK_IMPORTED_MODULE_2___default()('#events .event:last-child').remove();
-      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events-list")[0].scrollTop = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events")[0].offsetHeight;
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events")[0].scrollTop = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#events")[0].scrollHeight;
     },
 
     /**
@@ -525,7 +529,7 @@ var EventsListComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 var template = function template() {
-  return "\n  <ol id=\"events\"></ol>\n";
+  return "\n  <div id=\"events-heading\">Events List</div>\n  <ol id=\"events\"></ol>\n";
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (template);
@@ -786,6 +790,7 @@ var BreakpointsComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE
       var htmlStr = "<div class='row'><div class='bp col-sm'><select class='bp-opd'>";
       var operands = ['id', 'x', 'y', 'f', 'g', 'h'];
       var operators = ['less than', 'equal to', 'greater than'];
+      var nodeTypes = ['all', 'generating', 'updating', 'expanding'];
       operands.forEach(function (operand) {
         htmlStr += "<option>".concat(operand, "</option>");
       });
@@ -793,6 +798,11 @@ var BreakpointsComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE
       htmlStr += "<div class='col-sm'><select class='bp-opr'>";
       operators.forEach(function (operator) {
         htmlStr += "<option>".concat(operator, "</option>");
+      });
+      htmlStr += "</select></div>";
+      htmlStr += "<div class='col-sm'><select class='bp-nt'>";
+      nodeTypes.forEach(function (nodeType) {
+        htmlStr += "<option>".concat(nodeType, "</option>");
       });
       htmlStr += "</select></div>";
       htmlStr += "<div class='col-sm'><input class='bp-val' type='number'></div>";
@@ -826,12 +836,21 @@ var BreakpointsComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE
       var totalBps = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#bps .bp').length;
       var bpOpds = jquery__WEBPACK_IMPORTED_MODULE_2___default()('.bp-opd');
       var bpOprs = jquery__WEBPACK_IMPORTED_MODULE_2___default()('.bp-opr');
+      var bpNodeTypes = jquery__WEBPACK_IMPORTED_MODULE_2___default()('.bp-nt');
       var bpVals = jquery__WEBPACK_IMPORTED_MODULE_2___default()('.bp-val');
       var bpActive = jquery__WEBPACK_IMPORTED_MODULE_2___default()('.bp-active');
 
       for (var i = 0; i < totalBps; i++) {
         var operand = bpOpds[i].value;
         var operator = bpOprs[i].value;
+        var nodeType = bpNodeTypes[i].value;
+
+        if (nodeType == "all") {
+          nodeType = ["expanding", "updating", "generating"];
+        } else {
+          nodeType = [nodeType];
+        }
+
         var val = bpVals[i].value;
         var active = jquery__WEBPACK_IMPORTED_MODULE_2___default()(bpActive[i]).is(":checked");
 
@@ -839,6 +858,7 @@ var BreakpointsComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE
           bps.push({
             operand: operand,
             operator: operator,
+            nodeType: nodeType,
             val: val
           });
         }
@@ -1982,6 +2002,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
       toastr__WEBPACK_IMPORTED_MODULE_1__["options"].extendedTimeOut = 30; // How long the toast will display after a user hovers over it
 
       toastr__WEBPACK_IMPORTED_MODULE_1__["options"].closeButton = true;
+      toastr__WEBPACK_IMPORTED_MODULE_1__["options"].preventDuplicates = true; // show only one toastr at a time
     },
 
     /**
@@ -2149,6 +2170,7 @@ var Controller = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___defau
           this.preempt = true;
 
           if (!suppress) {
+            toastr__WEBPACK_IMPORTED_MODULE_1__["remove"]();
             toastr__WEBPACK_IMPORTED_MODULE_1__["error"](bpMsg);
           }
 
@@ -4382,6 +4404,12 @@ __webpack_require__.r(__webpack_exports__);
     if (bpApplied) {
       for (var i = 0; i < this.bps.length; i++) {
         var bp = this.bps[i];
+        var bpNodeType = bp.nodeType;
+
+        if (bpNodeType.indexOf(node.type) == -1) {
+          continue;
+        }
+
         var compareVal = node[bp.operand];
 
         switch (bp.operator) {

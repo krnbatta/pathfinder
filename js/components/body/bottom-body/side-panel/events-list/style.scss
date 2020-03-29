@@ -21,4 +21,13 @@
 #events {
   counter-reset: item;
   padding: 5px;
+  margin: 0;
+  position: absolute;
+  height: calc(100% - 30px);
+  overflow: auto;
+}
+#events-heading{
+  text-align: center;
+  font-weight: bold;
+  border-bottom: 2px solid;
 }

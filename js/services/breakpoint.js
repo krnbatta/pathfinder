@@ -14,6 +14,10 @@ export default{
     if(bpApplied){
       for(let i=0; i<this.bps.length; i++){
         let bp = this.bps[i];
+        let bpNodeType = bp.nodeType;
+        if(bpNodeType.indexOf(node.type) == -1){
+          continue;
+        }
         let compareVal = node[bp.operand];
         switch (bp.operator) {
           case "less than":

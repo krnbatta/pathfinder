@@ -77,7 +77,9 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
       let currentNode = Store.findById("Node", currentNodeId);
       let siblingNodes = currentNode.siblingNodes;
       let parentNode = currentNode.parentNode;
-      $(`#event-${parentNode._id}`).css("background-color", `#${parentNode.attrs.fillStyle.toString(16)}`);
+      if(parentNode){
+        $(`#event-${parentNode._id}`).css("background-color", `#${parentNode.attrs.fillStyle.toString(16)}`);
+      }
       $(`#event-${currentNode._id}`).css("background-color", `#${currentNode.attrs.fillStyle.toString(16)}`);
       if(currentNode.step.isFrontier){
         $(`#event-${currentNode._id}`).css("background-color", `#${config.nodeAttrs.frontier.fillColor.toString(16)}`);
@@ -108,7 +110,7 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
       });
       $("#events").append(li);
       window.requestAnimationFrame(() => {
-        $("#events-list")[0].scrollTop = $("#events-list")[0].scrollHeight;
+        $("#events")[0].scrollTop = $("#events")[0].scrollHeight;
       });
     },
 
@@ -119,7 +121,7 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     removeEvent(){
       this.events.pop();
       $('#events .event:last-child').remove();
-      $("#events-list")[0].scrollTop = $("#events")[0].offsetHeight;
+      $("#events")[0].scrollTop = $("#events")[0].scrollHeight;
     },
 
     /**

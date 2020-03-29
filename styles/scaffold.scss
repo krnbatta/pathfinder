@@ -59,10 +59,11 @@ body{
 }
 #main-panel{
   flex: 9;
+  border: 2px solid;
 }
 #side-panel{
   flex: 3;
-  border-left: 1px solid;
+  border: 2px solid;
 }
 #upper-body,#lower-body{
   padding: 5px;
@@ -104,5 +105,5 @@ body{
 #events-list{
   position: absolute;
   height: 100%;
-  overflow: auto;
+  width: 100%;
 }

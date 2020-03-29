@@ -59,6 +59,7 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
       let htmlStr = `<div class='row'><div class='bp col-sm'><select class='bp-opd'>`;
       const operands = ['id', 'x', 'y', 'f', 'g', 'h'];
       const operators = ['less than', 'equal to', 'greater than'];
+      const nodeTypes = ['all', 'generating', 'updating', 'expanding'];
       operands.forEach((operand) => {
         htmlStr += `<option>${operand}</option>`;
       });
@@ -66,6 +67,11 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
       htmlStr += `<div class='col-sm'><select class='bp-opr'>`;
       operators.forEach((operator) => {
         htmlStr += `<option>${operator}</option>`;
+      });
+      htmlStr += `</select></div>`;
+      htmlStr += `<div class='col-sm'><select class='bp-nt'>`;
+      nodeTypes.forEach((nodeType) => {
+        htmlStr += `<option>${nodeType}</option>`;
       });
       htmlStr += `</select></div>`;
       htmlStr += `<div class='col-sm'><input class='bp-val' type='number'></div>`;
@@ -100,16 +106,24 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
       const totalBps = $('#bps .bp').length;
       let bpOpds = $('.bp-opd');
       let bpOprs = $('.bp-opr');
+      let bpNodeTypes = $('.bp-nt');
       let bpVals = $('.bp-val');
       let bpActive = $('.bp-active');
       for(let i=0; i<totalBps; i++){
         let operand = bpOpds[i].value;
         let operator = bpOprs[i].value;
+        let nodeType = bpNodeTypes[i].value;
+        if(nodeType == "all"){
+          nodeType = ["expanding", "updating", "generating"];
+        }
+        else{
+          nodeType = [nodeType];
+        }
         let val = bpVals[i].value;
         let active = $(bpActive[i]).is(":checked");
         if(active && val){
           bps.push({
-            operand, operator, val
+            operand, operator, nodeType, val
           });
         }
       }

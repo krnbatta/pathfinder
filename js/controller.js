@@ -84,6 +84,7 @@ let Controller = new StateMachine({
         Toastr.options.timeOut = 0; // How long the toast will display without user interaction
         Toastr.options.extendedTimeOut = 30; // How long the toast will display after a user hovers over it
         Toastr.options.closeButton = true;
+        Toastr.options.preventDuplicates = true; // show only one toastr at a time
       },
 
       /**
@@ -233,6 +234,7 @@ let Controller = new StateMachine({
           if(bpMsg){
             this.preempt = true;
             if(!suppress){
+              Toastr.remove();
               Toastr.error(bpMsg);
             }
             setTimeout(() => {
