@@ -74,9 +74,11 @@ let HistoryService = {
 
   getGraphicsContainer(id){
     let step = this.context.steps[id];
-    let node = step.node;
-    let graphicsContainer = node.graphics;
-    return graphicsContainer;
+    if(step){
+      let node = step.node;
+      let graphicsContainer = node.graphics;
+      return graphicsContainer;      
+    }
   },
 
   retraceHistory(id){

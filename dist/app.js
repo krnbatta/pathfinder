@@ -1575,6 +1575,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../../controller */ "./js/controller.js");
 /* harmony import */ var _services_time_travel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../../../services/time-travel */ "./js/services/time-travel.js");
 /* harmony import */ var _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../bottom-body/side-panel/events-list/component */ "./js/components/body/bottom-body/side-panel/events-list/component.js");
+/* harmony import */ var _services_spinner__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../../../services/spinner */ "./js/services/spinner.js");
+
 
 
 
@@ -1584,24 +1586,24 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /**
-* @module components/playback-controls
-* This component handles the playback controls buttons.
-*/
+ * @module components/playback-controls
+ * This component handles the playback controls buttons.
+ */
 
 var TimeTravelComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a(jquery__WEBPACK_IMPORTED_MODULE_2___default.a.extend({}, _base_component__WEBPACK_IMPORTED_MODULE_4__["default"], {
   methods: {
     /**
-    * @function onBeforeInit
-    * This function creates component div container and appends it to the page.
-    */
+     * @function onBeforeInit
+     * This function creates component div container and appends it to the page.
+     */
     onBeforeInit: function onBeforeInit() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#top-panel").append("<div id='time-travel'></div>");
     },
 
     /**
-    * @function onLeaveNone
-    * This function fills the component container with the template file and initiates event binding.
-    */
+     * @function onLeaveNone
+     * This function fills the component container with the template file and initiates event binding.
+     */
     onLeaveNone: function onLeaveNone() {
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#time-travel").html(_template__WEBPACK_IMPORTED_MODULE_1__["default"]);
       this.hide();
@@ -1619,42 +1621,114 @@ var TimeTravelComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_
     },
 
     /**
-    * @function bindEvents
-    * This function calls the PlaybackService callbacks as per the button clicked
-    */
+     * @function bindEvents
+     * This function calls the PlaybackService callbacks as per the button clicked
+     */
     bindEvents: function bindEvents() {
       micromodal__WEBPACK_IMPORTED_MODULE_3__["default"].init();
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-jump").on('click', function (e) {
-        var jumpVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-jump-input').val();
-        _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].jump(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(jumpVal));
-        _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__["default"].highlightNodes();
+        _services_spinner__WEBPACK_IMPORTED_MODULE_8__["default"].show();
+        var promise = new Promise(function (resolve, reject) {
+          setTimeout(function () {
+            try {
+              var jumpVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-jump-input').val();
+              _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].jump(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(jumpVal));
+              _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__["default"].highlightNodes();
+            } finally {
+              resolve();
+            }
+          }, 200);
+        });
+        promise.then(function () {
+          _services_spinner__WEBPACK_IMPORTED_MODULE_8__["default"].hide();
+        });
       });
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-event-backward").on('click', function (e) {
-        var backVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-event-input').val();
-        _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].goEventBackwards(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(backVal));
-        _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__["default"].highlightNodes();
+        _services_spinner__WEBPACK_IMPORTED_MODULE_8__["default"].show();
+        var promise = new Promise(function (resolve, reject) {
+          setTimeout(function () {
+            try {
+              var backVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-event-input').val();
+              _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].goEventBackwards(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(backVal));
+              _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__["default"].highlightNodes();
+            } finally {
+              resolve();
+            }
+          }, 200);
+        });
+        promise.then(function () {
+          _services_spinner__WEBPACK_IMPORTED_MODULE_8__["default"].hide();
+        });
       });
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-event-forward").on('click', function (e) {
-        var frontVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-event-input').val();
-        _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].goEventForwards(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(frontVal));
-        _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__["default"].highlightNodes();
+        _services_spinner__WEBPACK_IMPORTED_MODULE_8__["default"].show();
+        var promise = new Promise(function (resolve, reject) {
+          setTimeout(function () {
+            try {
+              var frontVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-event-input').val();
+              _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].goEventForwards(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(frontVal));
+              _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__["default"].highlightNodes();
+            } finally {
+              resolve();
+            }
+          }, 200);
+        });
+        promise.then(function () {
+          _services_spinner__WEBPACK_IMPORTED_MODULE_8__["default"].hide();
+        });
       });
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-expansion-backward").on('click', function (e) {
-        var backVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-expansion-input').val();
-        _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].goExpansionBackwards(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(backVal));
-        _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__["default"].highlightNodes();
+        _services_spinner__WEBPACK_IMPORTED_MODULE_8__["default"].show();
+        var promise = new Promise(function (resolve, reject) {
+          setTimeout(function () {
+            try {
+              var backVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-expansion-input').val();
+              _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].goExpansionBackwards(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(backVal));
+              _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__["default"].highlightNodes();
+            } finally {
+              resolve();
+            }
+          }, 200);
+        });
+        promise.then(function () {
+          _services_spinner__WEBPACK_IMPORTED_MODULE_8__["default"].hide();
+        });
       });
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#travel-expansion-forward").on('click', function (e) {
-        var frontVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-expansion-input').val();
-        _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].goExpansionForwards(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(frontVal));
-        _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__["default"].highlightNodes();
+        _services_spinner__WEBPACK_IMPORTED_MODULE_8__["default"].show();
+        var promise = new Promise(function (resolve, reject) {
+          setTimeout(function () {
+            try {
+              var frontVal = jquery__WEBPACK_IMPORTED_MODULE_2___default()('#travel-expansion-input').val();
+              _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].goExpansionForwards(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], parseInt(frontVal));
+              _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__["default"].highlightNodes();
+            } finally {
+              resolve();
+            }
+          }, 200);
+        });
+        promise.then(function () {
+          _services_spinner__WEBPACK_IMPORTED_MODULE_8__["default"].hide();
+        });
       });
       jquery__WEBPACK_IMPORTED_MODULE_2___default()("#go-tt").on('click', function (e) {
-        var input = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#tt-input").val();
-        var type = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#tt-type").val();
-        var direction = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#tt-direction").val();
-        _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].travel(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], type, direction, parseInt(input));
-        _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__["default"].highlightNodes();
+        _services_spinner__WEBPACK_IMPORTED_MODULE_8__["default"].show();
+        var promise = new Promise(function (resolve, reject) {
+          setTimeout(function () {
+            try {
+              var input = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#tt-input").val();
+              var type = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#tt-type").val();
+              var direction = jquery__WEBPACK_IMPORTED_MODULE_2___default()("#tt-direction").val();
+              _services_time_travel__WEBPACK_IMPORTED_MODULE_6__["default"].travel(_controller__WEBPACK_IMPORTED_MODULE_5__["default"], type, direction, parseInt(input));
+              _bottom_body_side_panel_events_list_component__WEBPACK_IMPORTED_MODULE_7__["default"].highlightNodes();
+            } finally {
+              resolve();
+            }
+          }, 200);
+        });
+        promise.then(function () {
+          _services_spinner__WEBPACK_IMPORTED_MODULE_8__["default"].hide();
+        });
       });
     }
   }
@@ -5207,9 +5281,12 @@ var HistoryService = {
   },
   getGraphicsContainer: function getGraphicsContainer(id) {
     var step = this.context.steps[id];
-    var node = step.node;
-    var graphicsContainer = node.graphics;
-    return graphicsContainer;
+
+    if (step) {
+      var node = step.node;
+      var graphicsContainer = node.graphics;
+      return graphicsContainer;
+    }
   },
   retraceHistory: function retraceHistory(id) {
     for (var i = 1; i <= id; i++) {
