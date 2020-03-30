@@ -7,6 +7,7 @@ import BaseComponent from '../../../../base-component';
 import Controller from '../../../../../controller';
 import MapComponent from '../map/component';
 import BreakpointsComponent from '../breakpoints/component';
+import ComparatorComponent from '../comparator/component';
 import TimeTravelComponent from '../time-travel/component';
 import CameraControlsComponent from '../camera-controls/component';
 
@@ -50,6 +51,7 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
         let fileName = debugFile.name.split(".")[0];
         $("#algorithm").html(`<div id='debug-label'>Trace: ${fileName}</div>`);
         BreakpointsComponent.show();
+        ComparatorComponent.show();
         TimeTravelComponent.show();
         CameraControlsComponent.showDebuggerControl();
         CameraControlsComponent.showScaleControl();

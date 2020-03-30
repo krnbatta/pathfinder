@@ -70,12 +70,12 @@ body{
 }
 
 
-#playback-controls,#breakpoints,#camera-controls{
+#playback-controls,#breakpoints,#comparator,#camera-controls{
   display: inline-block;
   vertical-align: bottom;
   margin: 0 10px;
 }
-#play,#pause,#stop,#step-backward,#step-forward,#bp-btn,#fit-map,#fit-debugger,#fit-scale{
+#play,#pause,#stop,#step-backward,#step-forward,#bp-btn,#cp-btn,#fit-map,#fit-debugger,#fit-scale{
   height: 30px;
   width: 40px;
   border-radius: 5px;

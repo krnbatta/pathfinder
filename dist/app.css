@@ -66,12 +66,12 @@ body {
 #upper-body, #lower-body {
   padding: 5px; }
 
-#playback-controls, #breakpoints, #camera-controls {
+#playback-controls, #breakpoints, #comparator, #camera-controls {
   display: inline-block;
   vertical-align: bottom;
   margin: 0 10px; }
 
-#play, #pause, #stop, #step-backward, #step-forward, #bp-btn, #fit-map, #fit-debugger, #fit-scale {
+#play, #pause, #stop, #step-backward, #step-forward, #bp-btn, #cp-btn, #fit-map, #fit-debugger, #fit-scale {
   height: 30px;
   width: 40px;
   border-radius: 5px;
@@ -427,6 +427,41 @@ input:checked + .slider:before {
   height: 24px;
   vertical-align: middle;
   width: 50px; }
+
+#faulty-trace-input {
+  display: none; }
+
+#faulty-trace-label {
+  display: block;
+  border: 1px solid #ddd;
+  background: #ccc;
+  padding: 5px 10px;
+  cursor: pointer; }
+  #faulty-trace-label:hover {
+    background: #a3a3a3; }
+  #faulty-trace-label:active {
+    background: #b7b7b7; }
+
+#cp-bps ol {
+  max-height: 200px;
+  overflow: auto;
+  counter-reset: item; }
+  #cp-bps ol li {
+    list-style: none;
+    display: block;
+    cursor: pointer;
+    padding: 2px 0;
+    border-bottom: 1px solid #d2d2d2; }
+    #cp-bps ol li:hover {
+      color: white;
+      background: #284570;
+      border-radius: 2px; }
+    #cp-bps ol li:before {
+      content: counter(item) ".) ";
+      counter-increment: item;
+      color: black; }
+    #cp-bps ol li:hover:before {
+      color: white; }
 
 #screen-heading {
   text-align: center;

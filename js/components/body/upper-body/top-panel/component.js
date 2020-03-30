@@ -5,6 +5,7 @@ import $ from 'jquery';
 import BaseComponent from '../../../base-component';
 
 import BreakpointsComponent from './breakpoints/component';
+import ComparatorComponent from './comparator/component';
 import DebuggerComponent from './debugger/component';
 import MapComponent from './map/component';
 import PlaybackControlsComponent from './playback-controls/component';
@@ -35,7 +36,7 @@ let TopPanelComponent = new StateMachine($.extend({}, BaseComponent, {
     },
 
     onReady(){
-      let components = [MapComponent, DebuggerComponent, PlaybackControlsComponent, BreakpointsComponent, TimeTravelComponent, CameraControlsComponent];
+      let components = [MapComponent, DebuggerComponent, PlaybackControlsComponent, BreakpointsComponent, ComparatorComponent, TimeTravelComponent, CameraControlsComponent];
       components.forEach((component) => {
         component.init();
       });

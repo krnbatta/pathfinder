@@ -58,6 +58,10 @@ class StoreSingleton {
     where(modelName, condition){
       return Object.values(this.data[modelName]).filter(record => Object.keys(condition).every(key => record[key] == condition[key]));
     }
+
+    findBy(modelName, condition){
+      return this.where(modelName, condition)[0];
+    }
 }
 let Store = new StoreSingleton();
 window.store = Store;

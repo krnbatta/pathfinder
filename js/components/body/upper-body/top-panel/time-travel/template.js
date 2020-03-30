@@ -2,12 +2,12 @@ let template = () => `
   <!--<input type="number" id="travel-jump-input" min="1">
   <button id='travel-jump' title='Travel Jump'><i class='fas fa-2x fa-plane'/></button>
   <input type="number" id="travel-backward-input" min="1">-->
-  <button id='travel-event-backward' title='Travel Back(Event)'><i class='fas fa-2x fa-step-backward'/></button>
+  <!--<button id='travel-event-backward' title='Travel Back(Event)'><i class='fas fa-2x fa-step-backward'/></button>
   <input type="number" id="travel-event-input" min="1">
   <button id='travel-event-forward' title='Travel Forward(Event)'><i class='fas fa-2x fa-step-forward'/></button>
   <button id='travel-expansion-backward' title='Travel Back(Expansion)'><i class='fas fa-2x fa-fast-backward'/></button>
   <input type="number" id="travel-expansion-input" min="1">
-  <button id='travel-expansion-forward' title='Travel Forward(Expansion)'><i class='fas fa-2x fa-fast-forward'/></button>
+  <button id='travel-expansion-forward' title='Travel Forward(Expansion)'><i class='fas fa-2x fa-fast-forward'/></button>-->
 
   <button id='tt-btn' class="btn btn-primary" data-micromodal-trigger="tt-modal" title='Time Travel'><i class='fas fa-2x fa-stopwatch'/></button>
   <div class="modal micromodal-slide" id="tt-modal" aria-hidden="true">

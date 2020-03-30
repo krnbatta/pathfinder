@@ -2,11 +2,19 @@ export default{
   bps: [],
   bpFActive: true,
   bpGActive: true,
+  comparatorNodes: [],
   get bpApplied(){
     return !!this.bps.length;
   },
   check(node){
-    return this.manualCheck(node, this.bpApplied, this.bps) + this.automaticCheck(node);
+    return this.manualCheck(node, this.bpApplied, this.bps) + this.automaticCheck(node) + this.comparatorCheck(node);
+  },
+  comparatorCheck(node){
+    let message = ``;
+    if(this.comparatorNodes[node._id]){
+      message += `The value of g for the current node is ${node.g} which is different from the value of uploaded faulty trace i.e. ${this.comparatorNodes[node._id]} <br>`;
+    }
+    return message;
   },
   manualCheck(node, bpApplied, bps){
     let message = ``;

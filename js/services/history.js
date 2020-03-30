@@ -40,7 +40,7 @@ let HistoryService = {
       GraphicsManager.insert(this.context, graphicsContainer);
     }
   },
-
+//preallocate array based on jump value! to avoid lazy copying
   flush(){
     this.timeTravelEndId = this.currentId;
     let timeTravelContainer = new PIXI.Container();
@@ -77,7 +77,7 @@ let HistoryService = {
     if(step){
       let node = step.node;
       let graphicsContainer = node.graphics;
-      return graphicsContainer;      
+      return graphicsContainer;
     }
   },
 

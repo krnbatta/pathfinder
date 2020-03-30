@@ -1006,6 +1006,150 @@ var template = function template() {
 
 /***/ }),
 
+/***/ "./js/components/body/upper-body/top-panel/comparator/component.js":
+/*!*************************************************************************!*\
+  !*** ./js/components/body/upper-body/top-panel/comparator/component.js ***!
+  \*************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var javascript_state_machine__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! javascript-state-machine */ "./node_modules/javascript-state-machine/lib/state-machine.js");
+/* harmony import */ var javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(javascript_state_machine__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _template__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./template */ "./js/components/body/upper-body/top-panel/comparator/template.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var micromodal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! micromodal */ "./node_modules/micromodal/dist/micromodal.es.js");
+/* harmony import */ var _utils_tracer_parser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../../utils/tracer-parser */ "./js/utils/tracer-parser.js");
+/* harmony import */ var _base_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../base-component */ "./js/components/base-component.js");
+/* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../../../controller */ "./js/controller.js");
+/* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../../../services/store */ "./js/services/store.js");
+/* harmony import */ var _services_breakpoint__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../../../services/breakpoint */ "./js/services/breakpoint.js");
+
+
+
+
+
+
+
+
+
+/**
+* @module components/playback-controls
+* This component handles the playback controls buttons.
+*/
+
+var ComparatorComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a(jquery__WEBPACK_IMPORTED_MODULE_2___default.a.extend({}, _base_component__WEBPACK_IMPORTED_MODULE_5__["default"], {
+  data: {
+    bpApplied: false,
+    bps: [],
+    shown: false
+  },
+  methods: {
+    /**
+    * @function onBeforeInit
+    * This function creates component div container and appends it to the page.
+    */
+    onBeforeInit: function onBeforeInit() {
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#top-panel").append("<div id='comparator'></div>");
+    },
+
+    /**
+    * @function onLeaveNone
+    * This function fills the component container with the template file and initiates event binding.
+    */
+    onLeaveNone: function onLeaveNone() {
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#comparator").html(_template__WEBPACK_IMPORTED_MODULE_1__["default"]);
+      this.hide();
+      this.bindEvents();
+    },
+    hide: function hide() {
+      this.shown = false;
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#comparator").hide();
+    },
+    show: function show() {
+      if (!this.shown) {
+        this.shown = true;
+        jquery__WEBPACK_IMPORTED_MODULE_2___default()("#comparator").show();
+      }
+    },
+
+    /**
+    * @function bindEvents
+    * This function calls the PlaybackService callbacks as per the button clicked
+    */
+    //TODO: add comparison for type: expanding only!
+    bindEvents: function bindEvents() {
+      micromodal__WEBPACK_IMPORTED_MODULE_3__["default"].init();
+      var self = this;
+      var debugFile;
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#faulty-trace-input").on('change', function (e) {
+        debugFile = e.target.files[0];
+        var fileName = debugFile.name.split(".")[0];
+        jquery__WEBPACK_IMPORTED_MODULE_2___default()("#faulty-trace").html("<div id='faulty-trace-label'>Trace: ".concat(fileName, "</div>"));
+        debugFile = debugFile;
+      });
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#run-cp").on("click", function () {
+        var errorNodes = {};
+        new Promise(function (resolve, reject) {
+          Object(_utils_tracer_parser__WEBPACK_IMPORTED_MODULE_4__["default"])(debugFile, resolve);
+        }).then(function (debugJson) {
+          debugJson.eventList.forEach(function (event) {
+            var variables = event.variables;
+            variables["type"] = event.type;
+            var matchedNode = _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].findBy("Node", variables);
+
+            if (matchedNode && matchedNode.g != event.g) {
+              errorNodes[matchedNode._id] = event.g;
+            }
+          });
+
+          for (var nodeId in errorNodes) {
+            var incorrectValue = errorNodes[nodeId];
+            var node = _services_store__WEBPACK_IMPORTED_MODULE_7__["default"].findById("Node", nodeId);
+            var liStr = "<li>EventId: ".concat(node._id, ", NodeId: ").concat(node.id, ", Type: ").concat(node.type, ", ");
+
+            for (var variableKey in node.variables) {
+              liStr += "".concat(variableKey, ": ").concat(node.variables[variableKey], ", ");
+            }
+
+            liStr += "Original G value: ".concat(node.g, ", Incorrect G value: ").concat(incorrectValue, "</li>");
+            jquery__WEBPACK_IMPORTED_MODULE_2___default()("#cp-bps ol").append(liStr);
+          }
+
+          _services_breakpoint__WEBPACK_IMPORTED_MODULE_8__["default"].comparatorNodes = errorNodes;
+        });
+      });
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()("#cancel-cp").on("click", function () {
+        _services_breakpoint__WEBPACK_IMPORTED_MODULE_8__["default"].comparatorNodes = {};
+        jquery__WEBPACK_IMPORTED_MODULE_2___default()("#faulty-trace").html("<label id=\"faulty-trace-label\" for=\"faulty-trace-input\"><i class=\"fa fa-terminal\"></i> Upload Trace</label><input type = 'file' id='faulty-trace-input' accept='.json' />");
+        jquery__WEBPACK_IMPORTED_MODULE_2___default()("#cp-bps ol").html("");
+      });
+    }
+  }
+}));
+/* harmony default export */ __webpack_exports__["default"] = (ComparatorComponent);
+
+/***/ }),
+
+/***/ "./js/components/body/upper-body/top-panel/comparator/template.js":
+/*!************************************************************************!*\
+  !*** ./js/components/body/upper-body/top-panel/comparator/template.js ***!
+  \************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var template = function template() {
+  return "\n  <button id='cp-btn' class=\"btn btn-primary\" data-micromodal-trigger=\"cp-modal\" title='Compare Traces'><i class='fa fa-2x fa-files-o'/></button>\n  <div class=\"modal micromodal-slide\" id=\"cp-modal\" aria-hidden=\"true\">\n    <div class=\"modal__overlay\" tabindex=\"-1\" data-micromodal-close>\n      <div class=\"modal__container\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cp-modal-title\">\n        <header class=\"modal__header\">\n          <h2 class=\"modal__title\" id=\"cp-modal-title\">\n            Compare Trace\n          </h2>\n          <button class=\"modal__close\" aria-label=\"Close modal\" data-micromodal-close></button>\n        </header>\n        <hr>\n        <main class=\"modal__content\" id=\"cp-modal-content\">\n          <div id=\"faulty-trace\">\n            <label id=\"faulty-trace-label\" for=\"faulty-trace-input\"><i class=\"fa fa-terminal\"></i> Upload Trace</label>\n            <input type = 'file' id='faulty-trace-input' accept='.json' />\n          </div>\n          <hr>\n          <div id=\"cp-bps\">\n            <ol></ol>\n          </div>\n        </main>\n        <footer class=\"modal__footer\">\n          <button id='cancel-cp' class=\"modal__btn modal__btn-danger\" data-micromodal-close>Close</button>\n          <button id='run-cp' class=\"modal__btn modal__btn-primary\">Compare</button>\n        </footer>\n      </div>\n    </div>\n  </div>\n";
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (template);
+
+/***/ }),
+
 /***/ "./js/components/body/upper-body/top-panel/component.js":
 /*!**************************************************************!*\
   !*** ./js/components/body/upper-body/top-panel/component.js ***!
@@ -1022,11 +1166,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _base_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../base-component */ "./js/components/base-component.js");
 /* harmony import */ var _breakpoints_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./breakpoints/component */ "./js/components/body/upper-body/top-panel/breakpoints/component.js");
-/* harmony import */ var _debugger_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./debugger/component */ "./js/components/body/upper-body/top-panel/debugger/component.js");
-/* harmony import */ var _map_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./map/component */ "./js/components/body/upper-body/top-panel/map/component.js");
-/* harmony import */ var _playback_controls_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./playback-controls/component */ "./js/components/body/upper-body/top-panel/playback-controls/component.js");
-/* harmony import */ var _time_travel_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./time-travel/component */ "./js/components/body/upper-body/top-panel/time-travel/component.js");
-/* harmony import */ var _camera_controls_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./camera-controls/component */ "./js/components/body/upper-body/top-panel/camera-controls/component.js");
+/* harmony import */ var _comparator_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./comparator/component */ "./js/components/body/upper-body/top-panel/comparator/component.js");
+/* harmony import */ var _debugger_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./debugger/component */ "./js/components/body/upper-body/top-panel/debugger/component.js");
+/* harmony import */ var _map_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./map/component */ "./js/components/body/upper-body/top-panel/map/component.js");
+/* harmony import */ var _playback_controls_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./playback-controls/component */ "./js/components/body/upper-body/top-panel/playback-controls/component.js");
+/* harmony import */ var _time_travel_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./time-travel/component */ "./js/components/body/upper-body/top-panel/time-travel/component.js");
+/* harmony import */ var _camera_controls_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./camera-controls/component */ "./js/components/body/upper-body/top-panel/camera-controls/component.js");
+
 
 
 
@@ -1061,7 +1207,7 @@ var TopPanelComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0_
       this.bindEvents();
     },
     onReady: function onReady() {
-      var components = [_map_component__WEBPACK_IMPORTED_MODULE_6__["default"], _debugger_component__WEBPACK_IMPORTED_MODULE_5__["default"], _playback_controls_component__WEBPACK_IMPORTED_MODULE_7__["default"], _breakpoints_component__WEBPACK_IMPORTED_MODULE_4__["default"], _time_travel_component__WEBPACK_IMPORTED_MODULE_8__["default"], _camera_controls_component__WEBPACK_IMPORTED_MODULE_9__["default"]];
+      var components = [_map_component__WEBPACK_IMPORTED_MODULE_7__["default"], _debugger_component__WEBPACK_IMPORTED_MODULE_6__["default"], _playback_controls_component__WEBPACK_IMPORTED_MODULE_8__["default"], _breakpoints_component__WEBPACK_IMPORTED_MODULE_4__["default"], _comparator_component__WEBPACK_IMPORTED_MODULE_5__["default"], _time_travel_component__WEBPACK_IMPORTED_MODULE_9__["default"], _camera_controls_component__WEBPACK_IMPORTED_MODULE_10__["default"]];
       components.forEach(function (component) {
         component.init();
       });
@@ -1092,8 +1238,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../../controller */ "./js/controller.js");
 /* harmony import */ var _map_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../map/component */ "./js/components/body/upper-body/top-panel/map/component.js");
 /* harmony import */ var _breakpoints_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../breakpoints/component */ "./js/components/body/upper-body/top-panel/breakpoints/component.js");
-/* harmony import */ var _time_travel_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../time-travel/component */ "./js/components/body/upper-body/top-panel/time-travel/component.js");
-/* harmony import */ var _camera_controls_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../camera-controls/component */ "./js/components/body/upper-body/top-panel/camera-controls/component.js");
+/* harmony import */ var _comparator_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../comparator/component */ "./js/components/body/upper-body/top-panel/comparator/component.js");
+/* harmony import */ var _time_travel_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../time-travel/component */ "./js/components/body/upper-body/top-panel/time-travel/component.js");
+/* harmony import */ var _camera_controls_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../camera-controls/component */ "./js/components/body/upper-body/top-panel/camera-controls/component.js");
+
 
 
 
@@ -1148,9 +1296,10 @@ var DebuggerComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0_
         var fileName = debugFile.name.split(".")[0];
         jquery__WEBPACK_IMPORTED_MODULE_3___default()("#algorithm").html("<div id='debug-label'>Trace: ".concat(fileName, "</div>"));
         _breakpoints_component__WEBPACK_IMPORTED_MODULE_7__["default"].show();
-        _time_travel_component__WEBPACK_IMPORTED_MODULE_8__["default"].show();
-        _camera_controls_component__WEBPACK_IMPORTED_MODULE_9__["default"].showDebuggerControl();
-        _camera_controls_component__WEBPACK_IMPORTED_MODULE_9__["default"].showScaleControl();
+        _comparator_component__WEBPACK_IMPORTED_MODULE_8__["default"].show();
+        _time_travel_component__WEBPACK_IMPORTED_MODULE_9__["default"].show();
+        _camera_controls_component__WEBPACK_IMPORTED_MODULE_10__["default"].showDebuggerControl();
+        _camera_controls_component__WEBPACK_IMPORTED_MODULE_10__["default"].showScaleControl();
 
         if (!_map_component__WEBPACK_IMPORTED_MODULE_6__["default"].fileName) {
           jquery__WEBPACK_IMPORTED_MODULE_3___default()("#map").html("<div id='map-label'>No Map Uploaded</div>");
@@ -1173,7 +1322,7 @@ var DebuggerComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0_
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 var template = function template() {
-  return "\n    <label id=\"debug-label\" for=\"debug-input\"><i class=\"fa fa-terminal\"></i> Upload Trace</label>\n    <input type = 'file' id='debug-input'='.json' accept />\n";
+  return "\n    <label id=\"debug-label\" for=\"debug-input\"><i class=\"fa fa-terminal\"></i> Upload Trace</label>\n    <input type = 'file' id='debug-input' accept='.json' />\n";
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (template);
@@ -1747,7 +1896,7 @@ var TimeTravelComponent = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 var template = function template() {
-  return "\n  <!--<input type=\"number\" id=\"travel-jump-input\" min=\"1\">\n  <button id='travel-jump' title='Travel Jump'><i class='fas fa-2x fa-plane'/></button>\n  <input type=\"number\" id=\"travel-backward-input\" min=\"1\">-->\n  <button id='travel-event-backward' title='Travel Back(Event)'><i class='fas fa-2x fa-step-backward'/></button>\n  <input type=\"number\" id=\"travel-event-input\" min=\"1\">\n  <button id='travel-event-forward' title='Travel Forward(Event)'><i class='fas fa-2x fa-step-forward'/></button>\n  <button id='travel-expansion-backward' title='Travel Back(Expansion)'><i class='fas fa-2x fa-fast-backward'/></button>\n  <input type=\"number\" id=\"travel-expansion-input\" min=\"1\">\n  <button id='travel-expansion-forward' title='Travel Forward(Expansion)'><i class='fas fa-2x fa-fast-forward'/></button>\n\n  <button id='tt-btn' class=\"btn btn-primary\" data-micromodal-trigger=\"tt-modal\" title='Time Travel'><i class='fas fa-2x fa-stopwatch'/></button>\n  <div class=\"modal micromodal-slide\" id=\"tt-modal\" aria-hidden=\"true\">\n    <div class=\"modal__overlay\" tabindex=\"-1\" data-micromodal-close>\n      <div class=\"modal__container\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"tt-modal-title\">\n        <header class=\"modal__header\">\n          <h2 class=\"modal__title\" id=\"tt-modal-title\">\n            Move in steps\n          </h2>\n        </header>\n        <hr>\n        <main class=\"modal__content\" id=\"tt-modal-content\">\n          <div class=\"row\">\n            <div class=\"col-sm\">\n              <input type=\"number\" id=\"tt-input\" min=\"1\">\n            </div>\n            <div class=\"col-sm\">\n              <select id=\"tt-type\">\n                <option>Event</option>\n                <option>Expansion</option>\n                <option>Breakpoint</option>\n              </select>\n            </div>\n            <div class=\"col-sm\">\n              <select id=\"tt-direction\">\n                <option>Forward</option>\n                <option>Backward</option>\n              </select>\n            </div>\n          </div>\n        </main>\n        <footer class=\"modal__footer\">\n          <button id='cancel-tt' class=\"modal__btn modal__btn-danger\" data-micromodal-close>Cancel</button>\n          <button id='go-tt' class=\"modal__btn modal__btn-primary\" data-micromodal-close>Go</button>\n        </footer>\n      </div>\n    </div>\n  </div>\n\n";
+  return "\n  <!--<input type=\"number\" id=\"travel-jump-input\" min=\"1\">\n  <button id='travel-jump' title='Travel Jump'><i class='fas fa-2x fa-plane'/></button>\n  <input type=\"number\" id=\"travel-backward-input\" min=\"1\">-->\n  <!--<button id='travel-event-backward' title='Travel Back(Event)'><i class='fas fa-2x fa-step-backward'/></button>\n  <input type=\"number\" id=\"travel-event-input\" min=\"1\">\n  <button id='travel-event-forward' title='Travel Forward(Event)'><i class='fas fa-2x fa-step-forward'/></button>\n  <button id='travel-expansion-backward' title='Travel Back(Expansion)'><i class='fas fa-2x fa-fast-backward'/></button>\n  <input type=\"number\" id=\"travel-expansion-input\" min=\"1\">\n  <button id='travel-expansion-forward' title='Travel Forward(Expansion)'><i class='fas fa-2x fa-fast-forward'/></button>-->\n\n  <button id='tt-btn' class=\"btn btn-primary\" data-micromodal-trigger=\"tt-modal\" title='Time Travel'><i class='fas fa-2x fa-stopwatch'/></button>\n  <div class=\"modal micromodal-slide\" id=\"tt-modal\" aria-hidden=\"true\">\n    <div class=\"modal__overlay\" tabindex=\"-1\" data-micromodal-close>\n      <div class=\"modal__container\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"tt-modal-title\">\n        <header class=\"modal__header\">\n          <h2 class=\"modal__title\" id=\"tt-modal-title\">\n            Move in steps\n          </h2>\n        </header>\n        <hr>\n        <main class=\"modal__content\" id=\"tt-modal-content\">\n          <div class=\"row\">\n            <div class=\"col-sm\">\n              <input type=\"number\" id=\"tt-input\" min=\"1\">\n            </div>\n            <div class=\"col-sm\">\n              <select id=\"tt-type\">\n                <option>Event</option>\n                <option>Expansion</option>\n                <option>Breakpoint</option>\n              </select>\n            </div>\n            <div class=\"col-sm\">\n              <select id=\"tt-direction\">\n                <option>Forward</option>\n                <option>Backward</option>\n              </select>\n            </div>\n          </div>\n        </main>\n        <footer class=\"modal__footer\">\n          <button id='cancel-tt' class=\"modal__btn modal__btn-danger\" data-micromodal-close>Cancel</button>\n          <button id='go-tt' class=\"modal__btn modal__btn-primary\" data-micromodal-close>Go</button>\n        </footer>\n      </div>\n    </div>\n  </div>\n\n";
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (template);
@@ -4482,13 +4631,23 @@ __webpack_require__.r(__webpack_exports__);
   bps: [],
   bpFActive: true,
   bpGActive: true,
+  comparatorNodes: [],
 
   get bpApplied() {
     return !!this.bps.length;
   },
 
   check: function check(node) {
-    return this.manualCheck(node, this.bpApplied, this.bps) + this.automaticCheck(node);
+    return this.manualCheck(node, this.bpApplied, this.bps) + this.automaticCheck(node) + this.comparatorCheck(node);
+  },
+  comparatorCheck: function comparatorCheck(node) {
+    var message = "";
+
+    if (this.comparatorNodes[node._id]) {
+      message += "The value of g for the current node is ".concat(node.g, " which is different from the value of uploaded faulty trace i.e. ").concat(this.comparatorNodes[node._id], " <br>");
+    }
+
+    return message;
   },
   manualCheck: function manualCheck(node, bpApplied, bps) {
     var message = "";
@@ -5245,6 +5404,7 @@ var HistoryService = {
       _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, graphicsContainer);
     }
   },
+  //preallocate array based on jump value! to avoid lazy copying
   flush: function flush() {
     this.timeTravelEndId = this.currentId;
     var timeTravelContainer = new pixi_js__WEBPACK_IMPORTED_MODULE_3__["Container"]();
@@ -6480,6 +6640,11 @@ function () {
           return record[key] == condition[key];
         });
       });
+    }
+  }, {
+    key: "findBy",
+    value: function findBy(modelName, condition) {
+      return this.where(modelName, condition)[0];
     }
   }]);
 
