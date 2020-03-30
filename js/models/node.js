@@ -249,6 +249,24 @@ class Node {
     return this._linePoints;
   }
 
+  get searchPath(){
+    if(!this._searchPath){
+      let line = new PIXI.Graphics();
+      let lineColor = config.lineColor;
+      line.lineStyle(1.5, lineColor);
+      this.linePoints.forEach((point, index) => {
+        if(index == 0){
+          line.moveTo(point.x, point.y);
+        }
+        else{
+          line.lineTo(point.x, point.y);
+        }
+      });
+      this._searchPath = line;
+    }
+    return this._searchPath;
+  }
+
   /**
   * values is search specific values i.e. type, id, parent id, f, g and h values for that node.
   * @type {object}

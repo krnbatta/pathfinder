@@ -17,12 +17,18 @@ let FrontierService = {
     return this.context.currentId;
   },
 
+  get timeTravelling(){
+    return this.context.timeTravelling;
+  },
+
   /**
   * @function add
   * This function checks if the node can be frontier. If so, it adds it changes it creates a new node with frontier color and node attributes and renders it on the screen. Additionally, it adds it to the current and history as well.
   * @param {Node} node
   */
-  add(node){
+  update(){
+    let step = this.context.steps[this.currentId];
+    let node = step.node;
     if (node.step.changeColor) {
       let attrs = node.attrs;
       attrs['fillStyle'] = config.nodeAttrs['frontier'].fillColor;
@@ -37,6 +43,9 @@ let FrontierService = {
       this.current.push(graphicsContainer);
     }
     this.history[this.currentId] = this.current.slice();
+    if (step.type == 'closing') {
+      this.clearCurrent();
+    }
   },
 
   /**

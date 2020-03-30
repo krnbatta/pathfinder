@@ -3171,6 +3171,25 @@ function () {
 
       return this._linePoints;
     }
+  }, {
+    key: "searchPath",
+    get: function get() {
+      if (!this._searchPath) {
+        var line = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]();
+        var lineColor = _config__WEBPACK_IMPORTED_MODULE_3__["default"].lineColor;
+        line.lineStyle(1.5, lineColor);
+        this.linePoints.forEach(function (point, index) {
+          if (index == 0) {
+            line.moveTo(point.x, point.y);
+          } else {
+            line.lineTo(point.x, point.y);
+          }
+        });
+        this._searchPath = line;
+      }
+
+      return this._searchPath;
+    }
     /**
     * values is search specific values i.e. type, id, parent id, f, g and h values for that node.
     * @type {object}
@@ -4615,12 +4634,19 @@ var FrontierService = {
     return this.context.currentId;
   },
 
+  get timeTravelling() {
+    return this.context.timeTravelling;
+  },
+
   /**
   * @function add
   * This function checks if the node can be frontier. If so, it adds it changes it creates a new node with frontier color and node attributes and renders it on the screen. Additionally, it adds it to the current and history as well.
   * @param {Node} node
   */
-  add: function add(node) {
+  update: function update() {
+    var step = this.context.steps[this.currentId];
+    var node = step.node;
+
     if (node.step.changeColor) {
       var attrs = node.attrs;
       attrs['fillStyle'] = _config__WEBPACK_IMPORTED_MODULE_1__["default"].nodeAttrs['frontier'].fillColor;
@@ -4637,6 +4663,10 @@ var FrontierService = {
     }
 
     this.history[this.currentId] = this.current.slice();
+
+    if (step.type == 'closing') {
+      this.clearCurrent();
+    }
   },
 
   /**
@@ -5099,6 +5129,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _controller__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../controller */ "./js/controller.js");
 /* harmony import */ var _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/graphics-manager */ "./js/services/graphics-manager.js");
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/pixi.es.js");
+
 
 
 
@@ -5107,10 +5139,16 @@ var HistoryService = {
     this.context = context; //history => History is array of all the nodes at each step of the algorithm
 
     this.history = [];
+    this.timeTravelStartId = null;
+    this.timeTravelEndId = null;
   },
 
   get currentId() {
     return this.context.currentId;
+  },
+
+  get timeTravelling() {
+    return this.context.timeTravelling;
   },
 
   /**
@@ -5118,18 +5156,46 @@ var HistoryService = {
   * This function adds the node graphicsContainer as the current history node identified by the current id.
   */
   update: function update() {
-    //hide non persisted previous step node
-    if (this.currentId > 1) {
-      var previousStep = this.context.steps[this.currentId - 1];
-      previousStep.node.hideUnPersistedPart();
+    if (this.timeTravelling) {
+      if (!this.timeTravelStartId) {
+        this.timeTravelStartId = this.currentId;
+      }
+    } else {
+      //hide non persisted previous step node
+      if (this.currentId > 1) {
+        var previousStep = this.context.steps[this.currentId - 1];
+        previousStep.node.hideUnPersistedPart();
+      }
+
+      var graphicsContainer = this.getGraphicsContainer(this.currentId);
+      _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, graphicsContainer);
+    }
+  },
+  flush: function flush() {
+    this.timeTravelEndId = this.currentId;
+    var timeTravelContainer = new pixi_js__WEBPACK_IMPORTED_MODULE_3__["Container"]();
+    var nodeHash = {};
+
+    for (var id = this.timeTravelEndId - 1; id >= this.timeTravelStartId; id--) {
+      var step = this.context.steps[id];
+      var node = step.node;
+
+      if (!nodeHash[node.id]) {
+        nodeHash[node.id] = this.getGraphicsContainer(id);
+      }
     }
 
-    var step = this.context.steps[this.currentId];
-    var node = step.node;
-    var graphicsContainer = node.graphics;
+    for (var _id in nodeHash) {
+      timeTravelContainer.addChild(nodeHash[_id]);
+    }
+
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, timeTravelContainer);
+    var previousStep = this.context.steps[this.timeTravelEndId - 1];
+    previousStep.node.hideUnPersistedPart();
+    var graphicsContainer = this.getGraphicsContainer(this.timeTravelEndId);
     _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, graphicsContainer);
-    this.history[this.currentId] = node.graphics;
-    return step;
+    this.timeTravelStartId = null;
+    this.timeTravelEndId = null;
   },
 
   /**
@@ -5139,29 +5205,33 @@ var HistoryService = {
   updateId: function updateId() {
     this.context.currentId += 1;
   },
+  getGraphicsContainer: function getGraphicsContainer(id) {
+    var step = this.context.steps[id];
+    var node = step.node;
+    var graphicsContainer = node.graphics;
+    return graphicsContainer;
+  },
   retraceHistory: function retraceHistory(id) {
     for (var i = 1; i <= id; i++) {
-      var graphicsContainer = this.history[i];
+      var graphicsContainer = this.getGraphicsContainer(i);
       _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, graphicsContainer);
     }
 
     this.context.currentId = id + 1;
   },
-  clearFuture: function clearFuture() {
-    this.history.length = this.currentId;
+  clearFuture: function clearFuture() {// this.history.length = this.currentId;
   },
   clean: function clean() {
     for (var i = 1; i <= this.currentId; i++) {
-      var graphicsContainer = this.history[i];
+      var graphicsContainer = this.getGraphicsContainer(i);
       _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, graphicsContainer);
     }
   },
   reset: function reset() {
-    this.context.currentId = 1;
-    this.history = [];
+    this.context.currentId = 1; // this.history = [];
   },
   stepBackward: function stepBackward() {
-    var graphicsContainer = this.history.pop();
+    var graphicsContainer = this.getGraphicsContainer(this.currentId + 1);
     _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, graphicsContainer);
   }
 };
@@ -6083,15 +6153,10 @@ var runnerFactory = function runnerFactory(steps) {
     } //update history
 
 
-    var step = _services_history__WEBPACK_IMPORTED_MODULE_2__["default"].update();
-    _services_frontier__WEBPACK_IMPORTED_MODULE_0__["default"].add(step.node);
+    _services_history__WEBPACK_IMPORTED_MODULE_2__["default"].update();
+    _services_frontier__WEBPACK_IMPORTED_MODULE_0__["default"].update(); //update search path
 
-    if (step.type == 'closing') {
-      _services_frontier__WEBPACK_IMPORTED_MODULE_0__["default"].clearCurrent();
-    } //update search path
-
-
-    _services_search_path__WEBPACK_IMPORTED_MODULE_1__["default"].update(step.node); //update id
+    _services_search_path__WEBPACK_IMPORTED_MODULE_1__["default"].update(); //update id
 
     _services_history__WEBPACK_IMPORTED_MODULE_2__["default"].updateId();
   };
@@ -6138,33 +6203,41 @@ var SearchPathService = {
   * This function removes the previous line drawn and adds the current line on the screen. Line is from source to the current node.
   * @param {Node} node
   */
-  update: function update(node) {
-    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, this.history[this.currentId - 1]);
-    this.current = Object(_utils_draw_line__WEBPACK_IMPORTED_MODULE_3__["default"])(this.context, node);
-    this.history[this.currentId] = this.current;
+  update: function update() {
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, this.getLine(this.currentId - 1));
+    var line = this.getLine(this.currentId);
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, line);
+  },
+  getLine: function getLine(id) {
+    var step = this.context.steps[id];
+
+    if (step) {
+      var node = step.node;
+      var line = node.searchPath;
+      return line;
+    }
   },
   retraceHistory: function retraceHistory(id) {
-    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, this.current);
-    this.current = this.history[id];
-    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, this.current);
+    var currentLine = this.getLine(this.currentId);
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, currentLine);
+    var line = this.getLine(id);
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, line);
   },
-  clearFuture: function clearFuture() {
-    this.history.length = this.currentId;
+  clearFuture: function clearFuture() {// this.history.length = this.currentId;
   },
   clean: function clean() {
     for (var i = 1; i <= this.currentId; i++) {
-      var line = this.history[i];
+      var line = this.getLine(i);
       _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, line);
     }
   },
   reset: function reset() {
-    this.context.currentId = 1;
-    this.history = [];
+    this.context.currentId = 1; // this.history = [];
   },
   stepBackward: function stepBackward() {
-    var line = this.history.pop();
+    var line = this.getLine(this.currentId + 1);
     _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].remove(this.context, line);
-    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, this.history[this.history.length - 1]);
+    _services_graphics_manager__WEBPACK_IMPORTED_MODULE_2__["default"].insert(this.context, this.getLine(this.currentId));
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (SearchPathService);
@@ -6353,6 +6426,10 @@ window.store = Store;
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _graphics_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./graphics-manager */ "./js/services/graphics-manager.js");
 /* harmony import */ var _breakpoint__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./breakpoint */ "./js/services/breakpoint.js");
+/* harmony import */ var _history__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./history */ "./js/services/history.js");
+/* harmony import */ var _search_path__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./search-path */ "./js/services/search-path.js");
+
+
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -6380,6 +6457,8 @@ __webpack_require__.r(__webpack_exports__);
     }
 
     context.timeTravelling = false;
+    _history__WEBPACK_IMPORTED_MODULE_2__["default"].flush();
+    _search_path__WEBPACK_IMPORTED_MODULE_3__["default"].update();
     _graphics_manager__WEBPACK_IMPORTED_MODULE_0__["default"].flushBuffer(context);
     context.stepForward();
   },
@@ -6418,6 +6497,8 @@ __webpack_require__.r(__webpack_exports__);
     }
 
     context.timeTravelling = false;
+    _history__WEBPACK_IMPORTED_MODULE_2__["default"].flush();
+    _search_path__WEBPACK_IMPORTED_MODULE_3__["default"].update();
     _graphics_manager__WEBPACK_IMPORTED_MODULE_0__["default"].flushBuffer(context);
     context.stepForward(true);
     context.stepBackward();
@@ -6457,6 +6538,8 @@ __webpack_require__.r(__webpack_exports__);
     }
 
     context.timeTravelling = false;
+    _history__WEBPACK_IMPORTED_MODULE_2__["default"].flush();
+    _search_path__WEBPACK_IMPORTED_MODULE_3__["default"].update();
     _graphics_manager__WEBPACK_IMPORTED_MODULE_0__["default"].flushBuffer(context);
     context.stepForward(true);
     context.stepBackward();
@@ -6580,22 +6663,14 @@ __webpack_require__.r(__webpack_exports__);
  * @param {Node} node
  * @return {PIXI.Graphics}
 */
-// let element = document.getElementsByClassName('screen')[0];
-// let done = false;
 
 /* harmony default export */ __webpack_exports__["default"] = (function (context, node, color) {
-  // if(!element){
-  //   element = document.getElementsByClassName('screen')[0]
-  // }
   var line = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]();
   var lineColor = color ? color : _config__WEBPACK_IMPORTED_MODULE_1__["default"].lineColor;
   line.lineStyle(1.5, lineColor);
   node.linePoints.forEach(function (point, index) {
     if (index == 0) {
-      line.moveTo(point.x, point.y); // if(!done){
-      //   element.scroll(point.x - 200, point.y - 200);
-      //   done = true;
-      // }
+      line.moveTo(point.x, point.y);
     } else {
       line.lineTo(point.x, point.y);
     }

@@ -37,15 +37,12 @@ let runnerFactory = function(steps) {
             return;
         }
         //update history
-        let step = HistoryService.update();
+        HistoryService.update();
 
-        FrontierService.add(step.node);
-        if (step.type == 'closing') {
-          FrontierService.clearCurrent();
-        }
+        FrontierService.update();
 
         //update search path
-        SearchPathService.update(step.node);
+        SearchPathService.update();
 
         //update id
         HistoryService.updateId();

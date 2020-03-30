@@ -1,5 +1,7 @@
 import GraphicsManager from './graphics-manager';
 import BreakpointService from './breakpoint';
+import HistoryService from './history';
+import SearchPathService from './search-path';
 
 export default {
   goEventBackwards(context, backVal) {
@@ -23,6 +25,8 @@ export default {
       context.stepForward();
     }
     context.timeTravelling = false;
+    HistoryService.flush();
+    SearchPathService.update();
     GraphicsManager.flushBuffer(context);
     context.stepForward();
   },
@@ -57,6 +61,8 @@ export default {
       }
     }
     context.timeTravelling = false;
+    HistoryService.flush();
+    SearchPathService.update();
     GraphicsManager.flushBuffer(context);
     context.stepForward(true);
     context.stepBackward();
@@ -92,6 +98,8 @@ export default {
       }
     }
     context.timeTravelling = false;
+    HistoryService.flush();
+    SearchPathService.update();
     GraphicsManager.flushBuffer(context);
     context.stepForward(true);
     context.stepBackward();

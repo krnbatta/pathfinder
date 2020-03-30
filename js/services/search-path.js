@@ -21,38 +21,48 @@ let SearchPathService = {
   * This function removes the previous line drawn and adds the current line on the screen. Line is from source to the current node.
   * @param {Node} node
   */
-  update(node){
-    GraphicsManager.remove(this.context, this.history[this.currentId-1]);
-    this.current = drawLine(this.context, node);
-    this.history[this.currentId] = this.current;
+  update(){
+    GraphicsManager.remove(this.context, this.getLine(this.currentId - 1));
+    let line = this.getLine(this.currentId);
+    GraphicsManager.insert(this.context, line);
+  },
+
+  getLine(id){
+    let step = this.context.steps[id];
+    if(step){
+      let node = step.node;
+      let line = node.searchPath;
+      return line;
+    }
   },
 
   retraceHistory(id){
-    GraphicsManager.remove(this.context, this.current);
-    this.current = this.history[id];
-    GraphicsManager.insert(this.context, this.current);
+    let currentLine = this.getLine(this.currentId);
+    GraphicsManager.remove(this.context, currentLine);
+    let line = this.getLine(id);
+    GraphicsManager.insert(this.context, line);
   },
 
   clearFuture(){
-    this.history.length = this.currentId;
+    // this.history.length = this.currentId;
   },
 
   clean(){
     for(let i = 1; i<=this.currentId; i++){
-      let line = this.history[i];
+      let line = this.getLine(i);
       GraphicsManager.remove(this.context, line);
     }
   },
 
   reset(){
     this.context.currentId = 1;
-    this.history = [];
+    // this.history = [];
   },
 
   stepBackward(){
-    let line = this.history.pop();
+    let line = this.getLine(this.currentId + 1);
     GraphicsManager.remove(this.context, line);
-    GraphicsManager.insert(this.context, this.history[this.history.length-1]);
+    GraphicsManager.insert(this.context, this.getLine(this.currentId));
   }
 }
 
