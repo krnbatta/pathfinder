@@ -3430,7 +3430,7 @@ function () {
   }, {
     key: "values",
     get: function get() {
-      return {
+      var obj = {
         id: this.id,
         type: this.type,
         pId: this.pId,
@@ -3438,6 +3438,13 @@ function () {
         g: this.g,
         h: this.h
       };
+
+      if (_config__WEBPACK_IMPORTED_MODULE_3__["default"].mapType == "mesh") {
+        obj['root'] = "(".concat(this.variables.cx, ", ").concat(this.variables.cy, ")");
+        obj['interval'] = "(".concat(this.variables.x1, ", ").concat(this.variables.y1, ") - (").concat(this.variables.x2, ", ").concat(this.variables.y2, ")");
+      }
+
+      return obj;
     }
   }, {
     key: "fValid",
@@ -3473,9 +3480,17 @@ function () {
     get: function get() {
       if (!this._text) {
         if (this.type == "source" || this.type == "destination") {
-          this._text = "".concat(this.type.toUpperCase(), " Node(id: ").concat(this.id, ", x: ").concat(this.variables.x, ", y: ").concat(this.variables.y, ")");
+          if (_config__WEBPACK_IMPORTED_MODULE_3__["default"].mapType == "mesh") {
+            this._text = "".concat(this.type.toUpperCase(), " Node(id: ").concat(this.id, ", root: (").concat(this.variables.cx, ", ").concat(this.variables.cy, "), interval: (").concat(this.variables.x1, ", ").concat(this.variables.y1, ") - (").concat(this.variables.x2, ", ").concat(this.variables.y2, "))");
+          } else {
+            this._text = "".concat(this.type.toUpperCase(), " Node(id: ").concat(this.id, ", x: ").concat(this.variables.x, ", y: ").concat(this.variables.y, ")");
+          }
         } else {
-          this._text = "".concat(this.type.toUpperCase(), " Node(id: ").concat(this.id, ", x: ").concat(this.variables.x, ", y: ").concat(this.variables.y, ", f: ").concat(this.f, ", g: ").concat(this.g, ", h: ").concat(this.h, ", pId: ").concat(this.pId, ")");
+          if (_config__WEBPACK_IMPORTED_MODULE_3__["default"].mapType == "mesh") {
+            this._text = "".concat(this.type.toUpperCase(), " Node(id: ").concat(this.id, ", root: (").concat(this.variables.cx, ", ").concat(this.variables.cy, "), interval: (").concat(this.variables.x1, ", ").concat(this.variables.y1, ") - (").concat(this.variables.x2, ", ").concat(this.variables.y2, "), f: ").concat(this.f, ", g: ").concat(this.g, ", h: ").concat(this.h, ", pId: ").concat(this.pId, ")");
+          } else {
+            this._text = "".concat(this.type.toUpperCase(), " Node(id: ").concat(this.id, ", x: ").concat(this.variables.x, ", y: ").concat(this.variables.y, ", f: ").concat(this.f, ", g: ").concat(this.g, ", h: ").concat(this.h, ", pId: ").concat(this.pId, ")");
+          }
         }
       }
 
@@ -4837,7 +4852,14 @@ var FloatboxService = new javascript_state_machine__WEBPACK_IMPORTED_MODULE_0___
     * This function returns ul element with latest values loaded.
     */
     htmlStr: function htmlStr() {
-      return "\n          <ul id='node-details'>\n            <li>id: ".concat(this.values.id, "</li>\n            <li>type: ").concat(this.values.type, "</li>\n            <li>pId: ").concat(this.values.pId, "</li>\n            <li>f: ").concat(this.values.f, "</li>\n            <li>g: ").concat(this.values.g, "</li>\n            <li>h: ").concat(this.values.h, "</li>\n          </ul>\n        ");
+      var str = "<ul id='node-details'>";
+
+      for (var variable in this.values) {
+        str += "<li>".concat(variable, ": ").concat(this.values[variable], "</li>");
+      }
+
+      str += "</ul>";
+      return str;
     }
   }
 });

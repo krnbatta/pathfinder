@@ -87,16 +87,12 @@ let FloatboxService = new StateMachine({
       * This function returns ul element with latest values loaded.
       */
       htmlStr() {
-        return `
-          <ul id='node-details'>
-            <li>id: ${this.values.id}</li>
-            <li>type: ${this.values.type}</li>
-            <li>pId: ${this.values.pId}</li>
-            <li>f: ${this.values.f}</li>
-            <li>g: ${this.values.g}</li>
-            <li>h: ${this.values.h}</li>
-          </ul>
-        `;
+        let str = `<ul id='node-details'>`;
+        for(let variable in this.values){
+          str+= `<li>${variable}: ${this.values[variable]}</li>`;
+        }
+        str+= `</ul>`;
+        return str;
       }
     }
 });

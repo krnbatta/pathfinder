@@ -273,7 +273,7 @@ class Node {
   * @public
   */
   get values(){
-    return {
+    let obj = {
       id: this.id,
       type: this.type,
       pId: this.pId,
@@ -281,6 +281,11 @@ class Node {
       g: this.g,
       h: this.h
     }
+    if(config.mapType == "mesh"){
+      obj['root'] = `(${this.variables.cx}, ${this.variables.cy})`
+      obj['interval'] = `(${this.variables.x1}, ${this.variables.y1}) - (${this.variables.x2}, ${this.variables.y2})`
+    }
+    return obj;
   }
 
   get fValid(){
@@ -309,10 +314,20 @@ class Node {
   get text() {
     if(!this._text){
       if(this.type == "source" || this.type == "destination"){
-        this._text = `${this.type.toUpperCase()} Node(id: ${this.id}, x: ${this.variables.x}, y: ${this.variables.y})`;
+        if(config.mapType == "mesh"){
+          this._text = `${this.type.toUpperCase()} Node(id: ${this.id}, root: (${this.variables.cx}, ${this.variables.cy}), interval: (${this.variables.x1}, ${this.variables.y1}) - (${this.variables.x2}, ${this.variables.y2}))`;
+        }
+        else{
+          this._text = `${this.type.toUpperCase()} Node(id: ${this.id}, x: ${this.variables.x}, y: ${this.variables.y})`;
+        }
       }
       else{
-        this._text = `${this.type.toUpperCase()} Node(id: ${this.id}, x: ${this.variables.x}, y: ${this.variables.y}, f: ${this.f}, g: ${this.g}, h: ${this.h}, pId: ${this.pId})`;
+        if(config.mapType == "mesh"){
+          this._text = `${this.type.toUpperCase()} Node(id: ${this.id}, root: (${this.variables.cx}, ${this.variables.cy}), interval: (${this.variables.x1}, ${this.variables.y1}) - (${this.variables.x2}, ${this.variables.y2}), f: ${this.f}, g: ${this.g}, h: ${this.h}, pId: ${this.pId})`;
+        }
+        else{
+          this._text = `${this.type.toUpperCase()} Node(id: ${this.id}, x: ${this.variables.x}, y: ${this.variables.y}, f: ${this.f}, g: ${this.g}, h: ${this.h}, pId: ${this.pId})`;
+        }
       }
     }
     return this._text;
