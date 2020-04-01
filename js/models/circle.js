@@ -4,6 +4,7 @@ import NodeObject from './node-object';
 import config from '../config';
 import Injector from '../services/injector';
 import Store from '../services/store';
+import FloatboxService from '../services/floatbox';
 import debounce from '../utils/debounce';
 import drawLine from '../utils/draw-line';
 import GraphicsManager from '../services/graphics-manager';
@@ -35,6 +36,11 @@ class Circle extends NodeObject {
     Injector.inject(this, ['controller', 'renderer']);
     _graphics.on("mouseover", (e) => {
       _graphics.tint=attrs.fillStyle;
+      let position  = {
+        x: self.controller.x,
+        y: self.controller.y
+      }
+      FloatboxService.execute(e, self.node.values, position);
     });
     _graphics.on("mouseout", () => {
       _graphics.tint="0xFFFFFF";

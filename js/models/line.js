@@ -9,12 +9,14 @@ let _id = 1;
 class Line extends NodeObject {
   constructor(options){
     super(options.nodeConf);
+    this._id =_id;
     Object.assign(this, options.coordinates);
+    _id++;
   }
   createGraphics(attrs){
-    if(config.mapType=='roadnetwork'){
-      return null;
-    }
+    // if(config.mapType=='roadnetwork'){
+    //   return null;
+    // }
     let _graphics = new PIXI.Graphics();
     _graphics.lineStyle(1, attrs.fillStyle);
     _graphics.beginFill(attrs.fillStyle);

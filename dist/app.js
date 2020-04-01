@@ -2511,9 +2511,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../config */ "./js/config.js");
 /* harmony import */ var _services_injector__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/injector */ "./js/services/injector.js");
 /* harmony import */ var _services_store__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../services/store */ "./js/services/store.js");
-/* harmony import */ var _utils_debounce__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/debounce */ "./js/utils/debounce.js");
-/* harmony import */ var _utils_draw_line__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/draw-line */ "./js/utils/draw-line.js");
-/* harmony import */ var _services_graphics_manager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../services/graphics-manager */ "./js/services/graphics-manager.js");
+/* harmony import */ var _services_floatbox__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../services/floatbox */ "./js/services/floatbox.js");
+/* harmony import */ var _utils_debounce__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/debounce */ "./js/utils/debounce.js");
+/* harmony import */ var _utils_draw_line__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../utils/draw-line */ "./js/utils/draw-line.js");
+/* harmony import */ var _services_graphics_manager__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../services/graphics-manager */ "./js/services/graphics-manager.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2531,6 +2532,7 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -2588,6 +2590,11 @@ function (_NodeObject) {
 
       _graphics.on("mouseover", function (e) {
         _graphics.tint = attrs.fillStyle;
+        var position = {
+          x: self.controller.x,
+          y: self.controller.y
+        };
+        _services_floatbox__WEBPACK_IMPORTED_MODULE_5__["default"].execute(e, self.node.values, position);
       });
 
       _graphics.on("mouseout", function () {
@@ -2595,7 +2602,7 @@ function (_NodeObject) {
       });
 
       self.nodesHidden = true;
-      var toggleNodes = Object(_utils_debounce__WEBPACK_IMPORTED_MODULE_5__["default"])(function () {
+      var toggleNodes = Object(_utils_debounce__WEBPACK_IMPORTED_MODULE_6__["default"])(function () {
         var circles = _services_store__WEBPACK_IMPORTED_MODULE_4__["default"].where("Circle", {
           cx: self.cx,
           cy: self.cy
@@ -2605,13 +2612,13 @@ function (_NodeObject) {
           circles.forEach(function (circle) {
             circle.node.showUnPersistedPart();
           });
-          self.line = Object(_utils_draw_line__WEBPACK_IMPORTED_MODULE_6__["default"])(self.controller, self.node, 0xF9D276);
+          self.line = Object(_utils_draw_line__WEBPACK_IMPORTED_MODULE_7__["default"])(self.controller, self.node, 0xF9D276);
           self.nodesHidden = false;
         } else {
           circles.forEach(function (circle) {
             circle.node.hideUnPersistedPart();
           });
-          _services_graphics_manager__WEBPACK_IMPORTED_MODULE_7__["default"].remove(self.controller, self.line);
+          _services_graphics_manager__WEBPACK_IMPORTED_MODULE_8__["default"].remove(self.controller, self.line);
           self.nodesHidden = true;
         }
       });
@@ -2850,17 +2857,18 @@ function (_NodeObject) {
     _classCallCheck(this, Line);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Line).call(this, options.nodeConf));
+    _this._id = _id;
     Object.assign(_assertThisInitialized(_this), options.coordinates);
+    _id++;
     return _this;
   }
 
   _createClass(Line, [{
     key: "createGraphics",
     value: function createGraphics(attrs) {
-      if (_config__WEBPACK_IMPORTED_MODULE_2__["default"].mapType == 'roadnetwork') {
-        return null;
-      }
-
+      // if(config.mapType=='roadnetwork'){
+      //   return null;
+      // }
       var _graphics = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]();
 
       _graphics.lineStyle(1, attrs.fillStyle);
@@ -5745,22 +5753,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   process: function process(node) {
-    var _this = this;
+    var map = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Map');
+    var mapType;
 
+    if (map) {
+      mapType = map.mapType;
+    }
+
+    this.preprocess(node, mapType);
     return node.step.tracer.nodeStructure.map(function (obj) {
-      var map = _store__WEBPACK_IMPORTED_MODULE_0__["default"].find('Map');
-      var mapType;
-
-      if (map) {
-        mapType = map.mapType;
-      }
-
       var nodeConf = JSON.parse(JSON.stringify(obj));
       delete nodeConf.variables;
       nodeConf.node = node;
-
-      _this.preprocess(node, mapType);
-
       var coordinates = {};
       Object.keys(obj.variables).forEach(function (key) {
         if (key == "points") {

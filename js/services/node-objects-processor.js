@@ -3,16 +3,16 @@ import config from '../config';
 
 export default {
   process(node){
+    let map = Store.find('Map');
+    let mapType;
+    if(map){
+      mapType = map.mapType;
+    }
+    this.preprocess(node, mapType);
     return node.step.tracer.nodeStructure.map((obj) => {
-      let map = Store.find('Map');
-      let mapType;
-      if(map){
-        mapType = map.mapType;
-      }
       let nodeConf = JSON.parse(JSON.stringify(obj));
       delete nodeConf.variables;
       nodeConf.node = node;
-      this.preprocess(node, mapType);
       let coordinates = {};
       Object.keys(obj.variables).forEach((key) => {
         if(key=="points"){
