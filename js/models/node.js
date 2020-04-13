@@ -36,12 +36,13 @@ class Node {
 
     Object.assign(this, options);
 
-    variables = {variables: this.setVariables(variables)};
+    if(!this.step.tracer.computeXY){
+      variables = {variables: this.setVariables(variables)};
 
-
-    Object.assign(this, variables);
-    //setting up node nodeObjects
-    this.setNodeObjects();
+      Object.assign(this, variables);
+      //setting up node nodeObjects
+      this.setNodeObjects();
+    }
 
     //incrementing the _id for next object
     _id++;
@@ -57,36 +58,6 @@ class Node {
 
   setNodeObjects(){
     this.nodeObjects = NodeObjectsProcessor.process(this);
-    return;
-
-    this.step.tracer.nodeStructure.map((obj) => {
-      let nodeConf = JSON.parse(JSON.stringify(obj));
-      delete nodeConf.variables;
-      nodeConf.node = this;
-      let coordinates = {};
-      Object.keys(obj.variables).forEach((key) => {
-        if(key=="points"){
-          coordinates['points'] = [];
-          obj.variables['points'].forEach((pt) => {
-            coordinates['points'].push(variables[pt]);
-          });
-        }
-        else{
-          coordinates[key] = variables[obj.variables[key]];
-        }
-      });
-      let options = {nodeConf: nodeConf, coordinates: coordinates};
-      switch (obj.type) {
-        case "rectangle":
-          return Store.createRecord('Rectangle', options);
-        case "circle":
-          return Store.createRecord('Circle', options);
-        case "line":
-          return Store.createRecord('Line', options);
-        case "polygon":
-          return Store.createRecord('Polygon', options);
-      }
-    });
   }
 
   get unPersistedObjects(){
@@ -200,11 +171,28 @@ class Node {
       return nodes;
     }
     for(let i=this._id-1; i>=0; i--){
-      let node = Store.data.Node[i];
+      let node = Store.find("Node", i);
       if(!node || node._id == this._id){
         return nodes;
       }
       if(node.pId == this.id){
+        nodes.push(node);
+      }
+    }
+    return nodes;
+  }
+
+  get UniqueChildNodes(){
+    let nodes = [];
+    if(this.type != "expanding"){
+      return nodes;
+    }
+    for(let i=this._id-1; i>=0; i--){
+      let node = Store.find("Node", i);
+      if(!node || node._id == this._id){
+        return nodes;
+      }
+      if(node.pId == this.id && nodes.every((n) => n.id !== node.id)){
         nodes.push(node);
       }
     }

@@ -1,8 +1,8 @@
 const config = {
-  clientAddr: "http://localhost:8001",
-  serverAddr: "http://localhost:8000",
-  processGridUrl: "http://localhost:8000/processGrid",
-  processRoadNetworkUrl: "http://localhost:8000/processRoadNetwork",
+  clientAddr: "http://0.0.0.0:8001",
+  serverAddr: "http://0.0.0.0:8000",
+  processGridUrl: "http://0.0.0.0:8000/processGrid",
+  processRoadNetworkUrl: "http://0.0.0.0:8000/processRoadNetwork",
   zooming: true,
   operationsPerSecond: 300,
   lineColor: 0x6B3838,

@@ -3,7 +3,7 @@ import config from '../config';
 import tracerParser from '../utils/tracer-parser';
 import $ from 'jquery';
 import environment from '../environment';
-
+import ConstraintForceLayoutService from '../services/constraint-force-layout';
 /** Class representing a tracer of the algorithm */
 class Tracer {
   /**
@@ -97,12 +97,15 @@ class Tracer {
     if(!this._steps){
       this._steps = this.debugJson.then((json) => {
         this.nodeStructure = json.nodeStructure;
+        this.computeXY = json.computeXY;
         let eventsList = json.eventList;
         eventsList.forEach((event) => {
           event.tracer = this;
           let step = Store.createRecord('Step', event);
-          this.checkMax(step.node);
-          this.checkMin(step.node);
+          if(!this.computeXY){
+            this.checkMax(step.node);
+            this.checkMin(step.node);
+          }
           if(event.type=="source"){
             this.source = step;
           }
@@ -110,6 +113,14 @@ class Tracer {
             this.destination = step;
           }
         });
+        if(this.computeXY){
+          ConstraintForceLayoutService.process();
+          Store.all('Node').forEach((node) => {
+            node.setNodeObjects();
+            this.checkMax(node);
+            this.checkMin(node);
+          });
+        }
         return Store.data.Step;
       });
     }

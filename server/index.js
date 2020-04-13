@@ -10,7 +10,7 @@ const cors = require('cors');
 const {PIXI} = require('node-pixi');
 
 app.use(cors({
-  origin: 'http://localhost:8001'
+  origin: 'http://0.0.0.0:8001'
 }));
 
 app.use(express.urlencoded({ limit: '24mb', extended: true, parameterLimit: 50000 }));

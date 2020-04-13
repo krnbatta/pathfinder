@@ -55,6 +55,10 @@ class StoreSingleton {
       }
     }
 
+    all(modelName, id){
+      return Object.values(this.data[modelName]);
+    }
+
     where(modelName, condition){
       return Object.values(this.data[modelName]).filter(record => Object.keys(condition).every(key => record[key] == condition[key]));
     }
