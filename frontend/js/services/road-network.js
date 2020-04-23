@@ -88,7 +88,7 @@ export default {
       roadNetwork.roadCoordinates.coData.then((coData) => {
         roadNetwork.roadGraph.grData.then((grData) => {
           Controller.setupRenderer();
-          let mapSprite = new PIXI.Sprite.from(`${config.clientAddr}/maps/images/ny.png`);
+          let mapSprite = new PIXI.Sprite.from(`${config.clientAddr}/maps/ny`);
           mapSprite.width = Controller.getDimensions().width;
           mapSprite.height = Controller.getDimensions().height;
           mapSprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
@@ -141,7 +141,7 @@ export default {
       self.renderMap(resolve, reject);
       img = null;
     }
-    img.src = `${config.clientAddr}/maps/images/ny.png`;
+    img.src = `${config.clientAddr}/maps/ny`;
   },
   process() {
     return new Promise((resolve, reject) => {

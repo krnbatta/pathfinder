@@ -6,16 +6,25 @@ const app = express();
 const fs = require('fs');
 const sys = require('sys');
 const cors = require('cors');
-// const PIXI = require('pixi');
-const {PIXI} = require('node-pixi');
+const fse = require('fs-extra');
+
+const {
+  PIXI
+} = require('node-pixi');
 
 app.use(cors({
-  origin: 'http://localhost:8001'
+  origin: 'http://localhost:8000'
 }));
 
-app.use(express.urlencoded({ limit: '24mb', extended: true, parameterLimit: 50000 }));
+app.use(express.urlencoded({
+  limit: '24mb',
+  extended: true,
+  parameterLimit: 50000
+}));
 
-app.use(express.json({limit: '24mb'}));
+app.use(express.json({
+  limit: '24mb'
+}));
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/frontend/index.html');
@@ -23,8 +32,45 @@ app.get('/', (req, res) => {
 
 app.post("/", (req, res) => {
   const data = req.body;
-  console.log(data);
-  res.sendFile(__dirname + '/frontend/index.html');
+  let coFile, grFile, gridFile, meshFile, traceFile;
+  switch (data['mapType']) {
+    case "roadnetwork":
+      coFile = `frontend/maps/roadnetwork/${data['roadnetworkFileName']}/${data['coFileName']}`;
+      grFile = `frontend/maps/roadnetwork/${data['roadnetworkFileName']}/${data['grFileName']}`;
+      traceFile = `frontend/algorithms/${data['traceFileName']}`;
+      fse.outputFileSync(coFile, data['co']);
+      fse.outputFileSync(grFile, data['gr']);
+      fse.outputFileSync(traceFile, data['trace']);
+      res.sendFile(__dirname + `/frontend/index.html?mapType=roadnetwork&coFile=${data['coFileName']}&grFile=${data['grFileName']}&traceFile=${data['traceFileName']}`);
+      break;
+    case "grid":
+      gridFile = `frontend/maps/grid/${data['gridFileName']}`;
+      traceFile = `frontend/algorithms/${data['traceFileName']}`;
+      fse.outputFileSync(gridFile, data['grid']);
+      fse.outputFileSync(traceFile, data['trace']);
+      fse.outputFileSync('frontend/files.js', `window.mapType="grid";\nwindow.gridFile="${gridFile}";\nwindow.traceFile="${traceFile}";\n`);
+      res.sendFile(__dirname + `/frontend/index.html`);
+      break;
+    case "mesh":
+      meshFile = `frontend/maps/grid/${data['meshFileName']}`;
+      traceFile = `frontend/algorithms/${data['traceFileName']}`;
+      fse.outputFileSync(meshFile, data['mesh']);
+      fse.outputFileSync(traceFile, data['trace']);
+      res.sendFile(__dirname + `/frontend/index.html?mapType=mesh&meshFile=${data['meshFileName']}&traceFile=${data['traceFileName']}`);
+      break;
+    default:
+      traceFile = `frontend/algorithms/${data['traceFileName']}`;
+      fse.outputFileSync(traceFile, data['trace']);
+      res.sendFile(__dirname + `/frontend/index.html?traceFile=${data['traceFileName']}`);
+  }
+});
+
+app.get("/maps/:map", (req, res) => {
+  res.sendFile(__dirname + `/frontend/maps/images/${req.params.map}.png`);
+});
+
+app.get("/files.js", (req, res) => {
+  res.sendFile(__dirname + '/frontend/files.js');
 });
 
 app.get("/dist/app.js", (req, res) => {
@@ -57,7 +103,7 @@ app.post('/processRoadNetwork', (req, res) => {
   context.strokeStyle = 'black';
   coData.coordinates.forEach((p) => {
     context.beginPath();
-    context.arc(p.x*0.01, p.y*0.01, 1, 0, 2 * Math.PI);
+    context.arc(p.x * 0.01, p.y * 0.01, 1, 0, 2 * Math.PI);
     context.fill();
   });
 
@@ -74,13 +120,14 @@ app.post('/processRoadNetwork', (req, res) => {
   let img = canvas.toDataURL();
   let data = img.replace(/^data:image\/\w+;base64,/, "");
   var buf = Buffer.from(data, 'base64');
-  fs.writeFile(`../pathfinder/maps/images/ny.png`, buf, function(err){
-    if(err){
+  fs.writeFile(`../pathfinder/maps/images/ny.png`, buf, function(err) {
+    if (err) {
       console.log(err);
       res.send(err);
-    }
-    else{
-      res.send({done: true});
+    } else {
+      res.send({
+        done: true
+      });
     }
   });
 });
@@ -170,13 +217,14 @@ app.post('/processGrid', (req, res) => {
   let img = canvas.toDataURL();
   let data = img.replace(/^data:image\/\w+;base64,/, "");
   var buf = Buffer.from(data, 'base64');
-  fs.writeFile(`../pathfinder/maps/images/${fileName}.png`, buf, function(err){
-    if(err){
+  fs.writeFile(`../pathfinder/maps/images/${fileName}.png`, buf, function(err) {
+    if (err) {
       console.log(err);
       res.send(err);
-    }
-    else{
-      res.send({done: true});
+    } else {
+      res.send({
+        done: true
+      });
     }
   });
 

@@ -1,5 +1,5 @@
 const config = {
-  clientAddr: "http://0.0.0.0:8001",
+  clientAddr: "http://0.0.0.0:8000",
   serverAddr: "http://0.0.0.0:8000",
   processGridUrl: "http://0.0.0.0:8000/processGrid",
   processRoadNetworkUrl: "http://0.0.0.0:8000/processRoadNetwork",

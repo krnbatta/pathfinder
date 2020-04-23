@@ -19,7 +19,7 @@ export default {
       let map = Store.find("Map");
       grid.gridData.then((gridData) => {
         Controller.setupRenderer();
-        let mapSprite = new PIXI.Sprite.from(`${config.clientAddr}/maps/images/${map.mapName}.png`);
+        let mapSprite = new PIXI.Sprite.from(`${config.clientAddr}/maps/${map.mapName}`);
         mapSprite.width = gridData.width * config.nodeSize;
         mapSprite.height = gridData.height * config.nodeSize;
         GraphicsManager.insert(Controller, mapSprite);
@@ -46,7 +46,7 @@ export default {
       self.renderMap(resolve, reject);
       img = null;
     }
-    img.src = `${config.clientAddr}/maps/images/${map.mapName}.png`;
+    img.src = `${config.clientAddr}/maps/${map.mapName}`;
   },
 
   sendToServer(resolve, reject){

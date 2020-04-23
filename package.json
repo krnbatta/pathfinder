@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -12,6 +13,7 @@
     "canvas": "^2.6.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "fs-extra": "^9.0.0",
     "gl": "^4.4.1",
     "node-pixi": "^0.4.5",
     "pixi": "^0.3.1"
