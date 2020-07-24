@@ -33,6 +33,7 @@ let FrontierService = {
       let attrs = node.attrs;
       attrs['fillStyle'] = config.nodeAttrs['frontier'].fillColor;
       let graphicsContainer = new PIXI.Container();
+      graphicsContainer.zIndex = 10;
       node.nodeObjects.forEach((nodeObject) => {
         let graphics = nodeObject.createGraphics(attrs);
         if(graphics){

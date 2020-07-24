@@ -8,6 +8,7 @@ import FloatboxService from './services/floatbox';
 import FrontierService from './services/frontier';
 import HistoryService from './services/history';
 import SearchPathService from './services/search-path';
+import NodeStateService from './services/node-state';
 import Store from './services/store';
 import config from './config';
 import $ from 'jquery';
@@ -94,6 +95,7 @@ let Controller = new StateMachine({
       onReady() {
         PlaybackService.addCallback('play', this.loop.bind(this));
         PlaybackService.addCallback('reset', this.reset.bind(this));
+        PlaybackService.addCallback('pause', this.pause.bind(this));
       },
 
       /**
@@ -104,6 +106,9 @@ let Controller = new StateMachine({
         this.tracer = Store.find('Tracer');
         let that = this;
         this.tracer.steps.then((steps) => {
+          if(this.tracer.stateExpansion){
+            NodeStateService.init(this.tracer.stateStructure);
+          }
           this.steps = steps;
           that.setupRenderer();
           this.totalSteps = Object.keys(this.steps).length;
@@ -222,7 +227,7 @@ let Controller = new StateMachine({
           return;
         }
         this.clearFutureData();
-        if(this.currentId >= this.totalSteps && PlaybackService.state != 'paused'){
+        if(this.currentId > this.totalSteps && PlaybackService.state != 'paused'){
           PlaybackService.pause();
           return;
         }
@@ -255,6 +260,18 @@ let Controller = new StateMachine({
         HistoryService.clean();
         FrontierService.clean();
         SearchPathService.clean();
+      },
+
+      /**
+      * @function pause
+      * This function is called when PLayback Service is paused. It reshuffles the children
+      */
+      pause() {
+        // this.stage.children.sort(function(a,b) {
+        //   a.zIndex = a.zIndex || 0;
+        //   b.zIndex = b.zIndex || 0;
+        //   return b.zIndex - a.zIndex
+        // });
       },
 
       /**

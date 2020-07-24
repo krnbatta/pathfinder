@@ -99,7 +99,7 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
         }
         this.fileName = `${fileName}(${fileType})`;
       }
-      $("#map").html(`<div id='map-label'>Map: ${this.fileName}</div>`);
+      $("#map").html(`<div id='map-label'>Search Space: ${this.fileName}</div>`);
       CameraControlsComponent.showMapControl();
       CameraControlsComponent.showScaleControl();
     },

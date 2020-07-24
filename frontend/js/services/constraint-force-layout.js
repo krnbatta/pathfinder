@@ -3,7 +3,15 @@ import Store from './store';
 import * as d3 from 'd3-hierarchy';
 
 export default {
-  process(){
+  process(layout){
+    if(layout == "tree"){
+      this.processTree();
+    }
+    else if(layout == "graph"){
+      this.processGraph();
+    }
+  },
+  processTree(){
     let nodes = Store.all('Node');
     let obj = {};
     nodes.forEach((node) => {
@@ -28,5 +36,8 @@ export default {
         Store.data.Node[_id].variables = { x: node.x, y: node.y };
       });
     });
+  },
+  processGraph(){
+    
   }
 };

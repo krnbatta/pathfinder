@@ -47,6 +47,11 @@ export default{
   },
   automaticCheck(node){
     let message = ``;
+    //TODO: Compare each node's h value with source's h value and it should be less.
+    //Only for nodes that are on the path.
+    //Admissibility test:
+    //Take solution cost - g value of the node. > distance from node to the target. That optimal cost should always be never smaller than heuristic value estimates from every node on the path.
+    //
     if(this.bpGActive && !node.gValid){
       message += `The g value of current node(${node.g}) being expanded is less than that of its parent(${node.parentNode.g}). This indicates that a negative cost cycle might exist in the graph and is certainly an error. <br>`;
     }

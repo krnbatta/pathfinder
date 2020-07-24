@@ -1,4 +1,4 @@
-{"computeXY": true,
+{"layout": "tree",
 "nodeStructure": [{"type": "circle", "variables": {"cx": "x", "cy": "y"}, "persisted": true, "drawPath": true},{"type": "line", "variables": {"x1": "parent:x", "y1": "parent:y", "x2": "x", "y2": "y"}, "persisted": true}],
 "eventList":[
 {"type":"source","id":1736},

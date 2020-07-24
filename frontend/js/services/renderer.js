@@ -35,25 +35,12 @@ export default {
         interaction: context.app.renderer.plugins.interaction,
         stopPropagation: true
       });
-      viewport.drag().pinch().wheel().decelerate()
-              // .on("drag-end", function(){
-              //   if(this.getVisibleBounds().x > 0 || this.getVisibleBounds().y > 0){
-              //     this.ensureVisible(0,0);
-              //   }
-              // })
-              // .on("zoomed", function(){
-              //   if(this.lastViewport.scaleX < 1 || this.lastViewport.scaleY < 1){
-              //     let self = this;
-              //     this.ensureVisible(0,0);
-              //     setTimeout(() => {
-              //       self.fit(false, width, height);
-              //     }, 100);
-              //   }
-              // });
+      viewport.drag().pinch().wheel().decelerate();
     }
     else{
       viewport = new PIXI.Container();
     }
+    // viewport.sortableChildren = true;
     context.renderer = context.app.renderer;
     context.stage = viewport;
     context.renderer.render(context.app.stage);

@@ -3,13 +3,14 @@ import * as PIXI from 'pixi.js'
 export default {
   currentBuffer: null,
 
-  insert(context, graphics){
+  insert(context, graphics, zIndex = 10){
     if(!graphics){
       return;
     }
     if(context.timeTravelling){
       if(!this.currentBuffer){
         this.currentBuffer = new PIXI.Container();
+        this.currentBuffer.zIndex = 10;
       }
       this.currentBuffer.addChild(graphics);
     }

@@ -24,7 +24,7 @@ let SearchPathService = {
   update(){
     GraphicsManager.remove(this.context, this.getLine(this.currentId - 1));
     let line = this.getLine(this.currentId);
-    GraphicsManager.insert(this.context, line);
+    GraphicsManager.insert(this.context, line, 5);
   },
 
   getLine(id){
@@ -32,6 +32,7 @@ let SearchPathService = {
     if(step){
       let node = step.node;
       let line = node.searchPath;
+      line.zIndex = 5;
       return line;
     }
   },
@@ -40,7 +41,7 @@ let SearchPathService = {
     let currentLine = this.getLine(this.currentId);
     GraphicsManager.remove(this.context, currentLine);
     let line = this.getLine(id);
-    GraphicsManager.insert(this.context, line);
+    GraphicsManager.insert(this.context, line, 5);
   },
 
   clearFuture(){
@@ -62,7 +63,7 @@ let SearchPathService = {
   stepBackward(){
     let line = this.getLine(this.currentId + 1);
     GraphicsManager.remove(this.context, line);
-    GraphicsManager.insert(this.context, this.getLine(this.currentId));
+    GraphicsManager.insert(this.context, this.getLine(this.currentId), 5);
   }
 }
 

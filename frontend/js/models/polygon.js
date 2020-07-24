@@ -42,7 +42,7 @@ class Polygon extends NodeObject {
   }
   get graphics(){
     if(!this._graphics){
-      this._graphics = this.createGraphics(this.node.attrs);
+      this._graphics = this.createGraphics(this.node.polygonAttrs);
     }
     // return null;
     return this._graphics;

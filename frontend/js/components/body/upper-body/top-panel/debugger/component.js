@@ -46,18 +46,15 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
         this.tracer = Store.find('Tracer');
         Controller.start();
         if(!MapComponent.fileName){
-          $("#map").html(`<div id='map-label'>No Map Uploaded</div>`);
+          $("#map").html(`<div id='map-label'>No Search Space Uploaded</div>`);
         }
         let fileName = debugFile.name.split(".")[0];
-        $("#algorithm").html(`<div id='debug-label'>Trace: ${fileName}</div>`);
+        $("#algorithm").html(`<div id='debug-label'>Search Trace: ${fileName}</div>`);
         BreakpointsComponent.show();
         ComparatorComponent.show();
         TimeTravelComponent.show();
         CameraControlsComponent.showDebuggerControl();
         CameraControlsComponent.showScaleControl();
-        if(!MapComponent.fileName){
-          $("#map").html(`<div id='map-label'>No Map Uploaded</div>`);
-        }
       });
     }
   }

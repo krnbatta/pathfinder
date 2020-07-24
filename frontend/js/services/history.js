@@ -44,6 +44,7 @@ let HistoryService = {
   flush(){
     this.timeTravelEndId = this.currentId;
     let timeTravelContainer = new PIXI.Container();
+    timeTravelContainer.zIndex = 10;
     let nodeHash = {};
     for(let id = this.timeTravelEndId - 1; id>= this.timeTravelStartId; id--){
       let step = this.context.steps[id];

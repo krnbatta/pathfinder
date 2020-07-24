@@ -6,6 +6,7 @@ import config from '../config'
 import nodeColor from '../utils/node-color';
 import nodeFactory from '../utils/node-factory';
 import Injector from '../services/injector';
+import {GlowFilter} from '@pixi/filter-glow';
 
 let _id = 1;
 
@@ -36,7 +37,7 @@ class Node {
 
     Object.assign(this, options);
 
-    if(!this.step.tracer.computeXY){
+    if(!this.step.tracer.layout){
       variables = {variables: this.setVariables(variables)};
 
       Object.assign(this, variables);
@@ -69,7 +70,12 @@ class Node {
   }
 
   hideUnPersistedPart(){
-    this.unPersistedObjects.forEach((nodeObject) => nodeObject.hide());
+    if(this.type == "closing"){
+      let nodesToHide = Store.where("Node", { id: this.id });
+      nodesToHide.forEach((node) => {
+        node.unPersistedObjects.forEach((nodeObject) => nodeObject.hide());
+      });
+    }
   }
 
   showUnPersistedPart(){
@@ -100,6 +106,25 @@ class Node {
     }
   }
 
+  get polygonAttrs() {
+    //getting attributes of node based on its type
+    let nodeAttrs = config.nodeAttrs[nodeColor[this.type]];
+    //if current node is source, disregard if it is being opened/updated/closed. retain its color
+    if(this.id==this.step.tracer.source.node.id){
+      nodeAttrs=config.nodeAttrs['source'];
+    }
+    //if current node is destination, disregard if it is being opened/updated/closed. retain its color
+    if(this.id==this.step.tracer.destination.node.id){
+      nodeAttrs=config.nodeAttrs['destination'];
+    }
+
+    return {
+      fillStyle: nodeAttrs.lightColor,
+      strokeStyle: config.borderColor,
+      strokeWidth: config.borderWidth
+    }
+  }
+
   /**
   * graphics is PIXI.Graphics object that is a rectangle to drawn on canvas using nodeFactory.
   * @type {PIXI.Graphics}
@@ -108,6 +133,7 @@ class Node {
   get graphics() {
     if (!this._graphics){
       let container = new PIXI.Container();
+      container.zIndex = 10;
       this.nodeObjects.forEach((nodeObject) => {
         if(nodeObject.graphics){
           container.addChild(nodeObject.graphics)
@@ -158,7 +184,7 @@ class Node {
     }
     for(let i=this._id-1; i>=0; i--){
       let node = Store.data.Node[i];
-      if(node.id == this.pId){
+      if(node && node.id == this.pId){
         return node;
       }
     }
@@ -240,8 +266,9 @@ class Node {
   get searchPath(){
     if(!this._searchPath){
       let line = new PIXI.Graphics();
+      // line.filters = [new GlowFilter()];
       let lineColor = config.lineColor;
-      line.lineStyle(1.5, lineColor);
+      line.lineStyle(3, lineColor);
       this.linePoints.forEach((point, index) => {
         if(index == 0){
           line.moveTo(point.x, point.y);

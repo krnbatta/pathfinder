@@ -18,7 +18,7 @@ class Line extends NodeObject {
     //   return null;
     // }
     let _graphics = new PIXI.Graphics();
-    _graphics.lineStyle(1, attrs.fillStyle);
+    _graphics.lineStyle(2, attrs.fillStyle);
     _graphics.beginFill(attrs.fillStyle);
     // _graphics.drawPolygon(this.x1*config.nodeSize, this.y1*config.nodeSize, this.x2*config.nodeSize, this.y2*config.nodeSize);
     _graphics.moveTo(this.x1*config.nodeSize, this.y1*config.nodeSize);

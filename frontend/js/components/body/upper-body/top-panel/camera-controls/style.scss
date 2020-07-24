@@ -1,17 +1,21 @@
 #camera-controls {
+  .fa-desktop{
+    position: relative;
+    left: -2px;
+  }
   .fa-terminal{
     position: absolute;
-    top: 5px;
-    left: 13px;
+    top: 6px;
+    left: 12px;
   }
   .fa-map{
     position: absolute;
     top: 5px;
-    left: 13px;
+    left: 12px;
   }
   .fa-arrows-alt{
     position: absolute;
     top: 6px;
-    left: 14px;
+    left: 12px;
   }
 }

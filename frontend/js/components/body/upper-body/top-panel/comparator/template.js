@@ -1,5 +1,5 @@
 let template = () => `
-  <button id='cp-btn' class="btn btn-primary" data-micromodal-trigger="cp-modal" title='Compare Traces'><i class='fa fa-2x fa-files-o'/></button>
+  <button id='cp-btn' class="btn btn-primary" data-micromodal-trigger="cp-modal" title='Compare Traces'><i class='fa fa-2x fa-clone'></i></button>
   <div class="modal micromodal-slide" id="cp-modal" aria-hidden="true">
     <div class="modal__overlay" tabindex="-1" data-micromodal-close>
       <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="cp-modal-title">

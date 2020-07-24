@@ -73,20 +73,16 @@ app.get("/files.js", (req, res) => {
   res.sendFile(__dirname + '/frontend/files.js');
 });
 
-app.get("/dist/app.js", (req, res) => {
-  res.sendFile(__dirname + '/frontend/dist/app.js');
+app.get("/canvas-svg.js", (req, res) => {
+  res.sendFile(__dirname + '/frontend/canvas-svg.js');
 });
 
-app.get("/dist/app.css", (req, res) => {
-  res.sendFile(__dirname + '/frontend/dist/app.css');
+app.get("/dist/:file", (req, res) => {
+  res.sendFile(__dirname + `/frontend/dist/${req.params.file}`);
 });
 
-app.get("/images/favicon.jpg", (req, res) => {
-  res.sendFile(__dirname + '/frontend/images/favicon.jpg');
-});
-
-app.get("/images/monash.png", (req, res) => {
-  res.sendFile(__dirname + '/frontend/images/monash.png');
+app.get("/images/:image_file", (req, res) => {
+  res.sendFile(__dirname + `/frontend/images/${req.params.image_file}`);
 });
 
 app.post('/processRoadNetwork', (req, res) => {
@@ -120,7 +116,7 @@ app.post('/processRoadNetwork', (req, res) => {
   let img = canvas.toDataURL();
   let data = img.replace(/^data:image\/\w+;base64,/, "");
   var buf = Buffer.from(data, 'base64');
-  fs.writeFile(`../pathfinder/maps/images/ny.png`, buf, function(err) {
+  fs.writeFile(`frontend/maps/images/ny.png`, buf, function(err) {
     if (err) {
       console.log(err);
       res.send(err);
@@ -217,7 +213,7 @@ app.post('/processGrid', (req, res) => {
   let img = canvas.toDataURL();
   let data = img.replace(/^data:image\/\w+;base64,/, "");
   var buf = Buffer.from(data, 'base64');
-  fs.writeFile(`../pathfinder/maps/images/${fileName}.png`, buf, function(err) {
+  fs.writeFile(`frontend/maps/images/${fileName}.png`, buf, function(err) {
     if (err) {
       console.log(err);
       res.send(err);

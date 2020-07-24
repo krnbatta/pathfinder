@@ -97,12 +97,14 @@ class Tracer {
     if(!this._steps){
       this._steps = this.debugJson.then((json) => {
         this.nodeStructure = json.nodeStructure;
-        this.computeXY = json.computeXY;
+        this.layout = json.layout;
+        this.stateStructure = json.stateStructure;
+        this.stateExpansion = json.stateExpansion;
         let eventsList = json.eventList;
         eventsList.forEach((event) => {
           event.tracer = this;
           let step = Store.createRecord('Step', event);
-          if(!this.computeXY){
+          if(!this.layout){
             this.checkMax(step.node);
             this.checkMin(step.node);
           }
@@ -113,7 +115,7 @@ class Tracer {
             this.destination = step;
           }
         });
-        if(this.computeXY){
+        if(this.layout){
           ConstraintForceLayoutService.process();
           Store.all('Node').forEach((node) => {
             node.setNodeObjects();

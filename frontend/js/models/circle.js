@@ -3,6 +3,7 @@ import * as PIXI from 'pixi.js'
 import NodeObject from './node-object';
 import config from '../config';
 import Injector from '../services/injector';
+import NodeStateService from '../services/node-state';
 import Store from '../services/store';
 import FloatboxService from '../services/floatbox';
 import debounce from '../utils/debounce';
@@ -52,7 +53,7 @@ class Circle extends NodeObject {
         circles.forEach((circle) => {
           circle.node.showUnPersistedPart();
         });
-        self.line = drawLine(self.controller, self.node, 0xF9D276);
+        self.line = drawLine(self.controller, self.node, 0xE40E40);
         self.nodesHidden = false;
       }
       else{
@@ -66,6 +67,12 @@ class Circle extends NodeObject {
     _graphics.on("click", () => {
       toggleNodes();
     });
+    let tracer = Store.find("Tracer");
+    if(tracer.stateExpansion){
+      _graphics.on("click", () => {
+        NodeStateService.process(self.node.state_variables);
+      });
+    }
     // let texture = this.renderer.generateTexture(_graphics);
     // let circleSprite = new PIXI.Sprite(texture);
     return _graphics;
