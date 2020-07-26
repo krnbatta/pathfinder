@@ -116,7 +116,7 @@ class Tracer {
           }
         });
         if(this.layout){
-          ConstraintForceLayoutService.process();
+          ConstraintForceLayoutService.process(this.layout);
           Store.all('Node').forEach((node) => {
             node.setNodeObjects();
             this.checkMax(node);

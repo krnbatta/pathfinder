@@ -26,6 +26,7 @@ let FloatboxService = new StateMachine({
       values: null
     },
     methods: {
+
       /**
       * @function onInit
       * This lifecycle function is called when this service is initiated. It creates menu div element and appends it to the body. It also sets show and hide function for the div.
@@ -54,8 +55,8 @@ let FloatboxService = new StateMachine({
       onShow(transition, event, values, position){
         this.values = values;
         $("#context-menu").html(this.htmlStr());
-        $("#context-menu").css("left",position.x);
-        $("#context-menu").css("top",position.y);
+        $("#context-menu").css("left",position.x + 5);
+        $("#context-menu").css("top",position.y + 5);
         $("#context-menu").show();
       },
 

@@ -42,8 +42,5 @@
     "toastr": "^2.1.4",
     "webpack": "^4.36.0",
     "webpack-cli": "^3.3.12"
-  },
-  "dependencies": {
-    "jquery-ui-dist": "^1.12.1"
   }
 }

@@ -1,0 +1,35 @@
+#drag-resize-box{
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #CDCDCD;
+  width: 120px;
+  height: 120px;
+}
+.resizer{
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #000;
+  z-index: 1;
+  &.ne{
+    cursor: ne-resize;
+    top: 0;
+    right: 0;
+  }
+  &.nw{
+    cursor: nw-resize;
+    top: 0;
+    left: 0;
+  }
+  &.se{
+    cursor: se-resize;
+    bottom: 0;
+    right: 0;
+  }
+  &.sw{
+    cursor: sw-resize;
+    bottom: 0;
+    left: 0;
+  }
+}

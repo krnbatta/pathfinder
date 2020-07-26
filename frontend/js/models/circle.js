@@ -49,18 +49,15 @@ class Circle extends NodeObject {
     self.nodesHidden = true;
     let toggleNodes = debounce(function(){
       let circles = Store.where("Circle", {cx: self.cx, cy: self.cy});
+      circles.forEach((circle) => {
+        circle.node.showUnPersistedPart();
+      });
+      GraphicsManager.remove(self.controller, self.node.step.tracer.line);
       if(self.nodesHidden){
-        circles.forEach((circle) => {
-          circle.node.showUnPersistedPart();
-        });
-        self.line = drawLine(self.controller, self.node, 0xE40E40);
+        self.node.step.tracer.line = drawLine(self.controller, self.node, 0xE40E40);
         self.nodesHidden = false;
       }
       else{
-        circles.forEach((circle) => {
-          circle.node.hideUnPersistedPart();
-        });
-        GraphicsManager.remove(self.controller, self.line);
         self.nodesHidden = true;
       }
     });

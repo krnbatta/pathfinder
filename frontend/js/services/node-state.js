@@ -1,4 +1,5 @@
 import $ from "jquery";
+import DragResizeBoxService from "./drag-resize-box";
 
 export default {
   init(stateStructure){
@@ -9,9 +10,7 @@ export default {
     this.setStateVariables(state_variables);
     this.node = this.createNode(this.svg);
     let wrapper = this.htmlWrapper();
-    let mainPanel = document.getElementById("main-panel");
-    mainPanel.appendChild(wrapper);
-    // $("#node-state").draggable({});
+    DragResizeBoxService.init(wrapper);
   },
   setStateVariables(state_variables){
     let valVariables = state_variables.val;
@@ -45,13 +44,12 @@ export default {
     let wrapper = document.createElement("div");
     wrapper.id = "node-state";
     wrapper.style.position = "absolute";
-    wrapper.style.width = "200px";
-    wrapper.style.height = "200px";
-    wrapper.style.top = "20px";
-    wrapper.style.left = "0px";
-    wrapper.setAttribute("draggable", "true");
+    // wrapper.style.margin = "10px";
+    wrapper.style.width = "100%";
+    wrapper.style.height = "100%";
+    wrapper.style.top = "0";
+    wrapper.style.left = "0";
     wrapper.appendChild(this.node);
     return wrapper;
-  },
-
+  }
 }
