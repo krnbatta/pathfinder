@@ -23,8 +23,13 @@ export default {
       this.view.style.height = this.height;
       this.view.style.top = this.top;
       this.view.style.left = this.left;
-      this.svg.setAttributeNS(null, "width", this.width);
-      this.svg.setAttributeNS(null, "height", this.height);
+      this.svg.setAttributeNS(null, "width", this.svgWidth);
+      this.svg.setAttributeNS(null, "height", this.svgHeight);
+    }
+    else{
+      this.svgWidth = this.svg.width.baseVal.value;
+      this.svgHeight = this.svg.height.baseVal.value;
+      this.setDefaultAttrs();
     }
 
     $('body').append(this.view);
@@ -35,6 +40,15 @@ export default {
 
     DraggableService.init($(this.view), this.updateDims.bind(this));
     ResizerService.init($(this.view), this.updateDims.bind(this));
+  },
+
+  setDefaultAttrs(){
+    this.view.style.width = "120px";
+    this.view.style.height = "120px";
+    this.view.style.top = "0";
+    this.view.style.left = "0";
+    this.svg.setAttributeNS(null, "width", this.svgWidth);
+    this.svg.setAttributeNS(null, "height", this.svgHeight);
   },
 
   updateDims(dims){

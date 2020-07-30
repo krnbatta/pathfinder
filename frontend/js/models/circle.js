@@ -65,7 +65,7 @@ class Circle extends NodeObject {
       toggleNodes();
     });
     let tracer = Store.find("Tracer");
-    if(tracer.stateExpansion){
+    if(tracer.stateStructure){
       _graphics.on("click", () => {
         NodeStateService.process(self.node.state_variables);
       });

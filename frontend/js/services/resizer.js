@@ -6,7 +6,6 @@ export default {
   init(el, cb){
     this.el = el;
     this.cb = cb;
-    this.el[0].myvar = "sjks";
     this.mousemoveFn = this.mousemove.bind(this);
     this.mousedownFn = this.mousedown.bind(this);
     this.mouseupFn = this.mouseup.bind(this);

@@ -113,10 +113,13 @@ export default {
     height: null,
     gridStr: null,
 
-    build(gridData, callback) {
+    build(gridData, callback, nodeSize=null) {
       //Is object creation required?
       //Is Promises required?
       //Draw white background. Draw only black obstacles later.
+      if(!nodeSize){
+        nodeSize = config.nodeSize;
+      }
       this.gridStr = gridData.gridStr;
       this.width = gridData.width;
       this.height = gridData.height;
@@ -133,8 +136,8 @@ export default {
       return new Promise((resolve, reject) => {
         this.cells[rowId] = [];
         for (let colId = 0; colId < this.width; ++colId) {
-          let x = colId * config.nodeSize;
-          let y = rowId * config.nodeSize;
+          let x = colId * nodeSize;
+          let y = rowId * nodeSize;
           let stringIndex = rowId * this.width + colId;
           let fillColor = config.pathColor;
           if (this.gridStr[stringIndex] == '@') {
@@ -143,8 +146,8 @@ export default {
           let attrs = {
             x: x,
             y: y,
-            width: config.nodeSize,
-            height: config.nodeSize,
+            width: nodeSize,
+            height: nodeSize,
             fillStyle: fillColor,
             strokeStyle: config.borderColor,
           };

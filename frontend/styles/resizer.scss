@@ -33,3 +33,27 @@
     left: 0;
   }
 }
+#svg-popup{
+  width: 100px;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  font-size: 10pt;
+  background-color: white;
+  border-radius: 6px;
+  position: absolute;
+  display: none;
+  z-index: 2;
+}
+#node-state{
+  svg{
+    rect{
+      cursor: pointer;
+    }
+    circle{
+      cursor: pointer;
+    }
+    text{
+      cursor: pointer;
+    }
+  }
+}

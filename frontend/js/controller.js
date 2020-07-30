@@ -9,6 +9,7 @@ import FrontierService from './services/frontier';
 import HistoryService from './services/history';
 import SearchPathService from './services/search-path';
 import NodeStateService from './services/node-state';
+import DragResizeBoxService from './services/drag-resize-box';
 import Store from './services/store';
 import config from './config';
 import $ from 'jquery';
@@ -106,7 +107,7 @@ let Controller = new StateMachine({
         this.tracer = Store.find('Tracer');
         let that = this;
         this.tracer.steps.then((steps) => {
-          if(this.tracer.stateExpansion){
+          if(this.tracer.stateStructure){
             NodeStateService.init(this.tracer.stateStructure);
           }
           this.steps = steps;
@@ -165,15 +166,18 @@ let Controller = new StateMachine({
       fitMap(){
         let {width, height} = this.getDimensions();
         Renderer.fitMap(this, width, height);
+        DragResizeBoxService.setDefaultAttrs();
       },
 
       fitScale(){
         Renderer.fitScale(this);
+        DragResizeBoxService.setDefaultAttrs();
       },
 
       fitDebugger(){
         let tracer = this.tracer;
         Renderer.fitDebugger(this, tracer.minY, tracer.maxY, tracer.minX, tracer.maxX);
+        DragResizeBoxService.setDefaultAttrs();
       },
 
       /**

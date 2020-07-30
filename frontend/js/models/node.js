@@ -95,7 +95,7 @@ class Node {
       nodeAttrs=config.nodeAttrs['source'];
     }
     //if current node is destination, disregard if it is being opened/updated/closed. retain its color
-    if(this.id==this.step.tracer.destination.node.id){
+    if(this.step.tracer.destination && this.id==this.step.tracer.destination.node.id){
       nodeAttrs=config.nodeAttrs['destination'];
     }
 
@@ -114,7 +114,7 @@ class Node {
       nodeAttrs=config.nodeAttrs['source'];
     }
     //if current node is destination, disregard if it is being opened/updated/closed. retain its color
-    if(this.id==this.step.tracer.destination.node.id){
+    if(this.step.tracer.destination && this.id==this.step.tracer.destination.node.id){
       nodeAttrs=config.nodeAttrs['destination'];
     }
 
