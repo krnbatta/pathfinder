@@ -23,8 +23,8 @@ export default {
       this.view.style.height = this.height;
       this.view.style.top = this.top;
       this.view.style.left = this.left;
-      this.svg.setAttributeNS(null, "width", this.svgWidth);
-      this.svg.setAttributeNS(null, "height", this.svgHeight);
+      this.svg.setAttributeNS(null, "width", this.width);
+      this.svg.setAttributeNS(null, "height", this.height);
     }
     else{
       this.svgWidth = this.svg.width.baseVal.value;

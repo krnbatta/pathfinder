@@ -6,7 +6,7 @@ import Injector from '../services/injector';
 
 let _id = 1;
 
-class Line extends NodeObject {
+class Path extends NodeObject {
   constructor(options){
     super(options.nodeConf);
     this._id =_id;
@@ -17,16 +17,15 @@ class Line extends NodeObject {
     let _graphics = new PIXI.Graphics();
     _graphics.lineStyle(2, attrs.fillStyle);
     _graphics.beginFill(attrs.fillStyle);
-    _graphics.moveTo(this.x1*config.nodeSize, this.y1*config.nodeSize);
-    _graphics.lineTo(this.x2*config.nodeSize, this.y2*config.nodeSize);
+    attrs.linePoints.forEach((point, index) => {
+      if(index == 0){
+        _graphics.moveTo(point.x, point.y);
+      }
+      else{
+        _graphics.lineTo(point.x, point.y);
+      }
+    });
     _graphics.endFill();
-    _graphics.hitArea = new PIXI.Polygon([
-      this.x1*config.nodeSize, this.y1*config.nodeSize - 1,
-      this.x1*config.nodeSize, this.y1*config.nodeSize + 1,
-      this.x2*config.nodeSize, this.y2*config.nodeSize - 1,
-      this.x2*config.nodeSize, this.y2*config.nodeSize + 1
-    ]);
-    _graphics.interactive=true;
     _graphics.buttonMode=true;
     _graphics.on("mouseover", (e) => {
       _graphics.tint=attrs.fillStyle;
@@ -57,4 +56,4 @@ class Line extends NodeObject {
   }
 }
 
-export default Line;
+export default Path;
