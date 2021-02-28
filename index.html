@@ -15,9 +15,9 @@
   <div id="pathfinder">
     <div id="header">
       <div id="menu">
-        <a href="http://localhost:8000/">Home</a>
-        <a href="http://localhost:3000/">Docs</a>
-        <a href="http://localhost:8000/debugger">App</a>
+        <a class="home" href="http://localhost:8000/">Home</a>
+        <a class="docs" href="https://krnbatta.github.io/pathfinder/#/">Docs</a>
+        <a class="app" href="http://localhost:8000/debugger">App</a>
       </div>
       <h3>A Visual Tool for Understanding and Debugging Pathfinding Search</h3>
     </div>
@@ -29,6 +29,13 @@
       <p class="footer-credits"><span>Supervisors: Dr Daniel Harabor, Dr Michael Wybrow</span> <span>Developed By Karan Batta - </span> </p>
     </div>
   </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelector("#menu .home").href = `${document.location.protocol}//${document.location.host}/home`;
+      document.querySelector("#menu .app").href = `${document.location.protocol}//${document.location.host}/app`;
+    }, false);
+  </script>
 </body>
 
 </html>

@@ -15,9 +15,9 @@
   <div id="pathfinder">
     <div id="header">
       <div id="menu">
-        <a href="http://localhost:8000/">Home</a>
-        <a href="http://localhost:3000/">Docs</a>
-        <a href="http://localhost:8000/debugger">App</a>
+        <a class="home" href="http://localhost:8000/">Home</a>
+        <a class="docs" href="https://krnbatta.github.io/pathfinder/#/">Docs</a>
+        <a class="app" href="http://localhost:8000/debugger">App</a>
       </div>
       <h3>A Visual Tool for Understanding and Debugging Pathfinding Search</h3>
     </div>
@@ -41,6 +41,11 @@
         '/.*/_sidebar.md': '/_sidebar.md'
       }
     }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelector("#menu .home").href = `${document.location.protocol}//${document.location.host}/home`;
+      document.querySelector("#menu .app").href = `${document.location.protocol}//${document.location.host}/app`;
+    }, false);
   </script>
   <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>

@@ -26,12 +26,16 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
+app.post('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
 app.get('/style.css', (red, res) => {
   res.sendFile(__dirname + '/style.css');
 });
 
-app.post('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+app.get('/docs', (req, res) => {
+  res.redirect('https://krnbatta.github.io/pathfinder/#/');
 });
 
 app.get('/debugger', (req, res) => {
