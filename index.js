@@ -30,6 +30,14 @@ app.post('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/home', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
+app.post('/home', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
 app.get('/style.css', (red, res) => {
   res.sendFile(__dirname + '/style.css');
 });
