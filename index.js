@@ -46,11 +46,11 @@ app.get('/docs', (req, res) => {
   res.redirect('https://krnbatta.github.io/pathfinder/#/');
 });
 
-app.get('/debugger', (req, res) => {
+app.get('/app', (req, res) => {
   res.sendFile(__dirname + '/frontend/index.html');
 });
 
-app.post("/debugger", (req, res) => {
+app.post("/app", (req, res) => {
   const data = req.body;
   let coFile, grFile, gridFile, meshFile, traceFile;
   switch (data['mapType']) {

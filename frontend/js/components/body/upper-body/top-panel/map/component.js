@@ -1,7 +1,7 @@
 import StateMachine from "javascript-state-machine";
 
 import template from './template'
-import Grid from '../../../../../models/Grid';
+import Grid from '../../../../../models/grid';
 import $ from 'jquery';
 import BaseComponent from '../../../../base-component';
 import config from '../../../../../config';

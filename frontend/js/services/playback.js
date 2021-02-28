@@ -38,10 +38,10 @@ let PlaybackService = new StateMachine({
 
     methods: {
       onPendingTransition(transition, from, to) {
-        debugger
+        // debugger
       },
       onInvalidTransition(transition, from, to) {
-        debugger
+        // debugger
       },
       /**
       * @function onInit
