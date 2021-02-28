@@ -2,3 +2,5 @@
 /frontend/dist/
 /node_modules/
 /docs/node_modules/
+
+.vercel
