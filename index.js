@@ -8,10 +8,6 @@ const sys = require('sys');
 const cors = require('cors');
 const fse = require('fs-extra');
 
-const {
-  PIXI
-} = require('node-pixi');
-
 app.use(cors({
   origin: 'http://localhost:8000'
 }));
@@ -27,10 +23,22 @@ app.use(express.json({
 }));
 
 app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/style.css', (red, res) => {
+  res.sendFile(__dirname + '/style.css');
+});
+
+app.post('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/debugger', (req, res) => {
   res.sendFile(__dirname + '/frontend/index.html');
 });
 
-app.post("/", (req, res) => {
+app.post("/debugger", (req, res) => {
   const data = req.body;
   let coFile, grFile, gridFile, meshFile, traceFile;
   switch (data['mapType']) {
