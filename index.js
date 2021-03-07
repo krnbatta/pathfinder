@@ -9,7 +9,7 @@ const cors = require('cors');
 const fse = require('fs-extra');
 
 app.use(cors({
-  origin: 'http://localhost:8000'
+  origin: 'http://pf-algo-viz.org'
 }));
 
 app.use(express.urlencoded({
