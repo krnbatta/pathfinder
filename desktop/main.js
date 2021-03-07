@@ -7,7 +7,7 @@ const path = require('path')
 const fs = require('fs');
 
 const urls = [
-  "http://0.0.0.0:8000"
+  "http://pf-algo-viz.org"
 ]
 
 const createWindow = () => {

@@ -1,8 +1,8 @@
 const config = {
-  clientAddr: "http://0.0.0.0:8000",
-  serverAddr: "http://0.0.0.0:8000",
-  processGridUrl: "http://0.0.0.0:8000/processGrid",
-  processRoadNetworkUrl: "http://0.0.0.0:8000/processRoadNetwork",
+  clientAddr: "http://pf-algo-viz.org",
+  serverAddr: "http://pf-algo-viz.org",
+  processGridUrl: "http://pf-algo-viz.org/processGrid",
+  processRoadNetworkUrl: "http://pf-algo-viz.org/processRoadNetwork",
   zooming: true,
   operationsPerSecond: 300,
   lineColor: 0x00DD00,
