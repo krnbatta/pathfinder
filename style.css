@@ -1,3 +1,18 @@
+#demo-heading{
+    padding: 0 20px;
+    text-decoration: underline;
+}
+button{
+  border: none;
+  background: transparent;
+  font-weight: bold;
+}
+
+button:hover{
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 body{
   position: absolute;
   width: 100%;

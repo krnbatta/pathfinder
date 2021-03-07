@@ -4,6 +4,7 @@ import template from './template'
 import Grid from '../../../../../models/grid';
 import $ from 'jquery';
 import BaseComponent from '../../../../base-component';
+import Controller from '../../../../../controller';
 import config from '../../../../../config';
 import environment from '../../../../../environment';
 import Store from '../../../../../services/store';
@@ -97,9 +98,13 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
             Spinner.hide();
           });
         }
-        this.fileName = `${fileName}(${fileType})`;
+        Controller.mapTitle = `${fileName}(${fileType})`;
       }
-      $("#map").html(`<div id='map-label'>Search Space: ${this.fileName}</div>`);
+      this.postProcess();
+    },
+
+    postProcess(){
+      $("#map").html(`<div id='map-label'>Search Space: ${Controller.mapTitle}</div>`);
       CameraControlsComponent.showMapControl();
       CameraControlsComponent.showScaleControl();
     },

@@ -147,5 +147,8 @@ export default {
     return new Promise((resolve, reject) => {
       this.checkMap(resolve, reject);
     });
+  },
+  preProcess(resolve, reject) {
+    this.checkMap(resolve, reject);
   }
 }

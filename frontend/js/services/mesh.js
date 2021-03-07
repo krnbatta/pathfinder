@@ -113,26 +113,35 @@ export default {
       });
     }
   },
+
+  preProcess(resolve, reject){
+    this.renderMesh(resolve, reject);
+  },
+
   process(){
     return new Promise((resolve, reject) => {
-      let mesh = Store.find('Mesh');
-      mesh.meshData.then((meshData) => {
-        Controller.setupRenderer();
-        let container = new PIXI.Container();
-        for (let i = 0; i < meshData.polygonsArr.length; ++i) {
-          let points = meshData.polygonsArr[i];
-          let polygon = new PIXI.Graphics();
-          polygon.lineStyle(1, 0x000000);
-          polygon.beginFill(0xFFFFFF);
-          polygon.drawPolygon(points);
-          polygon.endFill();
-          container.addChild(polygon);
-        }
-        GraphicsManager.insert(Controller, container);
-        setTimeout(() => {
-          resolve();
-        }, 1000);
-      });
+      this.renderMesh(resolve, reject);
+    });
+  },
+
+  renderMesh(resolve, reject){
+    let mesh = Store.find('Mesh');
+    mesh.meshData.then((meshData) => {
+      Controller.setupRenderer();
+      let container = new PIXI.Container();
+      for (let i = 0; i < meshData.polygonsArr.length; ++i) {
+        let points = meshData.polygonsArr[i];
+        let polygon = new PIXI.Graphics();
+        polygon.lineStyle(1, 0x000000);
+        polygon.beginFill(0xFFFFFF);
+        polygon.drawPolygon(points);
+        polygon.endFill();
+        container.addChild(polygon);
+      }
+      GraphicsManager.insert(Controller, container);
+      setTimeout(() => {
+        resolve();
+      }, 1000);
     });
   }
 }

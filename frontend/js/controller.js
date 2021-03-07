@@ -2,6 +2,8 @@ import StateMachine from "javascript-state-machine";
 import * as Toastr from 'toastr';
 import Components from './components';
 import EventsListComponent from './components/body/bottom-body/side-panel/events-list/component';
+import MapComponent from './components/body/upper-body/top-panel/map/component';
+import DebuggerComponent from './components/body/upper-body/top-panel/debugger/component';
 import BreakpointService from './services/breakpoint';
 import PlaybackService from './services/playback';
 import FloatboxService from './services/floatbox';
@@ -10,6 +12,7 @@ import HistoryService from './services/history';
 import SearchPathService from './services/search-path';
 import NodeStateService from './services/node-state';
 import DragResizeBoxService from './services/drag-resize-box';
+import PreLoaderService from './services/pre-loader';
 import Store from './services/store';
 import config from './config';
 import $ from 'jquery';
@@ -80,6 +83,34 @@ let Controller = new StateMachine({
         FrontierService.init(this);
         SearchPathService.init(this);
         this.configureToastr();
+        this.preloadFiles();
+      },
+
+      preloadFiles(){
+        PreLoaderService.init(this);
+        if(PreLoaderService.preload){
+          let mapPromise = PreLoaderService.loadMap();
+          if(mapPromise){
+            mapPromise.then(() => {
+              PreLoaderService.loadTrace();
+            });
+          }
+          else{
+            PreLoaderService.loadTrace();
+          }
+        }
+      },
+      postLoadMap(){
+        this.mapTitle = PreLoaderService.mapTitle;
+        if(this.mapTitle){
+          MapComponent.postProcess();
+        }
+      },
+      postLoadTrace(){
+        this.traceTitle = PreLoaderService.traceName;
+        if(this.traceTitle){
+          DebuggerComponent.postProcess();
+        }
       },
 
       configureToastr(){

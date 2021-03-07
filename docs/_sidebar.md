@@ -1,6 +1,6 @@
 - Application
   - [Introduction](/)
-
+<!--
 - Search Traces
   - [Search Traces](search-traces/)
   - [Event List](search-traces/event-list.md)
@@ -25,3 +25,5 @@
   - [Bi-directional Search](applications/bi-directional.md)
   - [Path Planning on a Navigation Mesh](applications/mesh.md)
   - [Graphs without embedding](applications/no-embedding.md)
+)
+-->

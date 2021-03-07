@@ -182,6 +182,10 @@ export default {
     }
   },
 
+  preProcess(resolve, reject){
+    this.checkMap(resolve, reject);
+  },
+
   process(){
     return new Promise((resolve, reject) => {
       this.checkMap(resolve, reject);

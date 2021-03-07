@@ -23,18 +23,22 @@ app.use(express.json({
 }));
 
 app.get('/', (req, res) => {
+  fse.outputFileSync('frontend/files.js', `window.postFiles=null`);
   res.sendFile(__dirname + '/index.html');
 });
 
 app.post('/', (req, res) => {
+  fse.outputFileSync('frontend/files.js', `window.postFiles=null`);
   res.sendFile(__dirname + '/index.html');
 });
 
 app.get('/home', (req, res) => {
+  fse.outputFileSync('frontend/files.js', `window.postFiles=null`);
   res.sendFile(__dirname + '/index.html');
 });
 
 app.post('/home', (req, res) => {
+  fse.outputFileSync('frontend/files.js', `window.postFiles=null`);
   res.sendFile(__dirname + '/index.html');
 });
 
@@ -42,51 +46,76 @@ app.get('/style.css', (red, res) => {
   res.sendFile(__dirname + '/style.css');
 });
 
+app.get('/script.js', (red, res) => {
+  res.sendFile(__dirname + '/script.js');
+});
+
 app.get('/docs', (req, res) => {
   res.redirect('https://krnbatta.github.io/pathfinder/#/');
 });
 
 app.get('/app', (req, res) => {
+  fse.outputFileSync('frontend/files.js', `window.postFiles=null`);
   res.sendFile(__dirname + '/frontend/index.html');
+});
+
+app.post("/demo", (req, res) => {
+  const data = req.body;
+  console.log(data);
+  fse.outputFileSync('frontend/files.js', `window.postFiles=${JSON.stringify(data)}`);
+  res.sendFile(__dirname + `/frontend/index.html`);
 });
 
 app.post("/app", (req, res) => {
   const data = req.body;
-  let coFile, grFile, gridFile, meshFile, traceFile;
+  // console.log(data);
+  let mapType, mapName, trace, coFile, grFile, gridFile, meshFile, traceName, traceFile;
+  fse.outputFileSync('frontend/files.js', `window.postFiles=null`);
+  mapType = data['mapType'];
+  mapName = data['mapName'];
+  traceName = data['traceName'];
+  traceFile = `algorithms/${data['traceName']}.json`;
   switch (data['mapType']) {
     case "roadnetwork":
-      coFile = `frontend/maps/roadnetwork/${data['roadnetworkFileName']}/${data['coFileName']}`;
-      grFile = `frontend/maps/roadnetwork/${data['roadnetworkFileName']}/${data['grFileName']}`;
-      traceFile = `frontend/algorithms/${data['traceFileName']}`;
-      fse.outputFileSync(coFile, data['co']);
-      fse.outputFileSync(grFile, data['gr']);
-      fse.outputFileSync(traceFile, data['trace']);
-      res.sendFile(__dirname + `/frontend/index.html?mapType=roadnetwork&coFile=${data['coFileName']}&grFile=${data['grFileName']}&traceFile=${data['traceFileName']}`);
+      coFile = `maps/roadnetwork/${data['mapName']}.co`;
+      grFile = `maps/roadnetwork/${data['mapName']}.gr`;
+      fse.outputFileSync(`frontend/${coFile}`, data['co']);
+      fse.outputFileSync(`frontend/${grFile}`, data['gr']);
+      fse.outputFileSync(`frontend/${traceFile}`, data['trace']);
+      fse.outputFileSync('frontend/files.js', `window.postFiles={mapType:"roadnetwork",mapName:"${mapName}", coFile:"${coFile}",grFile:"${grFile}",traceName:"${traceName}",traceFile:"${traceFile}"}`);
+      res.sendFile(__dirname + `/frontend/index.html`);
       break;
     case "grid":
-      gridFile = `frontend/maps/grid/${data['gridFileName']}`;
-      traceFile = `frontend/algorithms/${data['traceFileName']}`;
-      fse.outputFileSync(gridFile, data['grid']);
-      fse.outputFileSync(traceFile, data['trace']);
-      fse.outputFileSync('frontend/files.js', `window.mapType="grid";\nwindow.gridFile="${gridFile}";\nwindow.traceFile="${traceFile}";\n`);
+      gridFile = `maps/grid/${data['mapName']}.grid`;
+      fse.outputFileSync(`frontend/${gridFile}`, data['grid']);
+      fse.outputFileSync(`frontend/${traceFile}`, data['trace']);
+      fse.outputFileSync('frontend/files.js', `window.postFiles={mapType:"grid",mapName:"${mapName}", gridFile:"${gridFile}",traceName:"${traceName}",traceFile:"${traceFile}"}`);
       res.sendFile(__dirname + `/frontend/index.html`);
       break;
     case "mesh":
-      meshFile = `frontend/maps/grid/${data['meshFileName']}`;
-      traceFile = `frontend/algorithms/${data['traceFileName']}`;
-      fse.outputFileSync(meshFile, data['mesh']);
-      fse.outputFileSync(traceFile, data['trace']);
-      res.sendFile(__dirname + `/frontend/index.html?mapType=mesh&meshFile=${data['meshFileName']}&traceFile=${data['traceFileName']}`);
+      meshFile = `maps/grid/${data['mapName']}.mesh`;
+      fse.outputFileSync(`frontend/${meshFile}`, data['mesh']);
+      fse.outputFileSync(`frontend/${traceFile}`, data['trace']);
+      fse.outputFileSync('frontend/files.js', `window.postFiles={mapType:"mesh",mapName:"${mapName}", meshFile:"${meshFile}",traceName:"${traceName}",traceFile:"${traceFile}"}`);
+      res.sendFile(__dirname + `/frontend/index.html`);
       break;
     default:
-      traceFile = `frontend/algorithms/${data['traceFileName']}`;
-      fse.outputFileSync(traceFile, data['trace']);
-      res.sendFile(__dirname + `/frontend/index.html?traceFile=${data['traceFileName']}`);
+      fse.outputFileSync(`frontend/${traceFile}`, data['trace']);
+      fse.outputFileSync('frontend/files.js', `window.postFiles={traceName:"${traceName}",traceFile:"${traceFile}"}`);
+      res.sendFile(__dirname + `/frontend/index.html`);
   }
 });
 
 app.get("/maps/:map", (req, res) => {
   res.sendFile(__dirname + `/frontend/maps/images/${req.params.map}.png`);
+});
+
+app.get("/maps/:mapType/:map", (req, res) => {
+  res.sendFile(__dirname + `/frontend/maps/${req.params.mapType}/${req.params.map}`);
+});
+
+app.get("/algorithms/:algorithm", (req, res) => {
+  res.sendFile(__dirname + `/frontend/algorithms/${req.params.algorithm}`);
 });
 
 app.get("/files.js", (req, res) => {

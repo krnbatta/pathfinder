@@ -43,19 +43,23 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
       $("#debug-input").on('change', (e) => {
         let debugFile = e.target.files[0];
         Store.createRecord('Tracer', debugFile);
-        this.tracer = Store.find('Tracer');
-        Controller.start();
-        if(!MapComponent.fileName){
-          $("#map").html(`<div id='map-label'>No Search Space Uploaded</div>`);
-        }
-        let fileName = debugFile.name.split(".")[0];
-        $("#algorithm").html(`<div id='debug-label'>Search Trace: ${fileName}</div>`);
-        BreakpointsComponent.show();
-        ComparatorComponent.show();
-        TimeTravelComponent.show();
-        CameraControlsComponent.showDebuggerControl();
-        CameraControlsComponent.showScaleControl();
+        Controller.traceTitle = debugFile.name.split(".")[0];
+        this.postProcess();
       });
+    },
+
+    postProcess(){
+      this.tracer = Store.find('Tracer');
+      if(!Controller.mapTitle){
+        $("#map").html(`<div id='map-label'>No Search Space Uploaded</div>`);
+      }
+      $("#algorithm").html(`<div id='debug-label'>Search Trace: ${Controller.traceTitle}</div>`);
+      Controller.start();
+      BreakpointsComponent.show();
+      ComparatorComponent.show();
+      TimeTravelComponent.show();
+      CameraControlsComponent.showDebuggerControl();
+      CameraControlsComponent.showScaleControl();
     }
   }
 }));
