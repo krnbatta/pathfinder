@@ -1,12 +1,12 @@
 - Application
   - [Introduction](/)
-<!--
 - Search Traces
   - [Search Traces](search-traces/)
   - [Event List](search-traces/event-list.md)
   - [Node Drawing Instructions](search-traces/node.md)
   - [Search Traces Without 2D Positions](search-traces/no-positions.md)
 
+<!--
 - Visualiser
   - [Visualiser](visualiser/)
   - [Playback](visualiser/playback.md)
