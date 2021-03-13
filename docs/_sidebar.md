@@ -1,11 +1,17 @@
 - Application
   - [Introduction](/)
 - Search Traces
-  - [Search Traces](search-traces/)
-  - [Event List](search-traces/event-list.md)
-  - [Node Drawing Instructions](search-traces/node.md)
-  - [Search Traces Without 2D Positions](search-traces/no-positions.md)
-
+  - [Basic Search](search-traces/)
+  - [8-Tile Puzzle](search-traces/tile.md)
+  - [Multi-Agent Pathfinding](search-traces/mapf.md)
+- Search Spaces
+  - [Maps](search-spaces/)
+- User Interaction
+  - [Interface](interface/)
+- System
+  - [Architecture and Libraries Used](system/)
+- Scope
+  - [Future Work](future-work/)
 <!--
 - Visualiser
   - [Visualiser](visualiser/)
