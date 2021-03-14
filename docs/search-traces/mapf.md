@@ -137,7 +137,7 @@ Above, we explained how to define stateStructure for MAPF. In case of MAPF searc
       "newScaffoldComponents": [
         {
           "type": "conflict",
-          "children":[
+          "elements":[
             ["fs",17,15,"s","f",0,3,20,"Conflict between Agent 0 and 3 at (17,15) at timestamp 20"],
             ["fs",17,15,"s","f",0,8,22,"Conflict between Agent 0 and 8 at (17,15) at timestamp 22"],
             ["fs",17,15,"s","f",0,17,28,"Conflict between Agent 0 and 17 at (17,15) at timestamp 28"],

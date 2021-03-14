@@ -1,1 +1,9 @@
-Figure 1 shows the main interface window of our system. The most prominent component is a two-dimensional WebGL canvas where we draw events from the search trace, as shown in Figure 1(A). The po- sition and appearance each associated node on the canvas depends on three things: (i) the state of the node (expand, generate, update); (ii) the drawing instructions in the trace and; (iii) on the specified layout (tree, network or none/custom). We further distinguish (in different colours) the start, target and the successors of the current node. For further context we allow the search trace to be visualised on top of a background image which shows the operating environment (Section 6.3 has more details regarding this aspect).
+# Visualiser
+
+On the (app page)[http://pf-algo-viz.org/app], we can see the interface of the tool. The image below also provides general outline and interface of the whole app.
+![alt text](http://localhost:8000/images/vis_label.png "Visualiser's Interface")
+
+The figure above displays the interface of the app. The interface is divided into 3 parts:
+- Search Display Window(Center): This window is most important component. It is basically a 2-d WebGL Canvas which visualises the algorithm during the course of its run.
+- Event List Panel(Right): This displays information about each node in detail. We can see the list of nodes or events unfolding in this panel as the search progresses.
+- UI Controls(Top): These controls provide a lot of freedom to the user to interact with the system and enables the user to visualise and debug flexibly.

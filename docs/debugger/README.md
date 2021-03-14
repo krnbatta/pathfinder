@@ -1,6 +1,6 @@
-Pathfinding algorithms can be complicated to implement. Among the many moving parts there exists: (i) a queue, which tells the next node to expand; (ii) a heuristic, which bounds the cost to go from each node to the target, and which may be subject to certain invariants such as consistency;3 (iii) a successor generating function, which is always domain specific and which may itself need to guarantee certain invariant properties (e.g. visibility); (iv) a goal function, which is domain specific and tells if a given node is the target; (v) memory allocation, initialisation and other low-level operations.
-One of the most time-consuming aspects of implementing a pathfind- ing algorithm is the detection of runtime bugs which cause infeasible or incorrect solutions or lead to incorrect proofs (where applicable; e.g. A*). Detecting such bugs requires a detailed understanding of algorith- mic state and how it changes during search. Existing systems in this area include search profilers and Active Learning Systems. The former focus on optimisation problems and not pathfinding. The latter are bespoke applications focused on pedagogy: they help the user to learn how an algorithm operates at a mechanical level but without offering any assistance to identify aberrant behaviour.
-To help identify runtime errors we treat search traces as “programs” written in the language of search. We then construct facilities that allow for easy exploration and error checking using concepts and ideas borrowed from conventional debugging applications. The relevant controls for these facilities are shown in Figure 1(F). We consider three distinct approaches:
-• Breakpointanalysis;
-• Automaticerrorchecking;
-• Comparisonwitherroneoustraces;
+# Debugger
+
+The purpose of the app is not just limited to visualising the path finding search algorithm but also debug them at the same time. As this app only requires a trace file, it can't necessarily be of complete and correct search. This could be used by the students who are trying to learn and implement the algorithms. Researchers can use this to do the same as well as debugging new algorithms. While simple playback functionality with node information on hover features can help a lot to understand how the search is unfolding, we also have more mechanisms to detect other runtime bugs. We have 3 different techniques to debug the search(other than playback and node information):
+- Breakpoints
+- Automatic Error Detection
+- Search Trace Comparison
