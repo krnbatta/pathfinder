@@ -95,7 +95,7 @@ app.post("/app", (req, res) => {
       res.sendFile(__dirname + `/frontend/index.html`);
       break;
     case "mesh":
-      meshFile = `maps/grid/${data['mapName']}.mesh`;
+      meshFile = `maps/mesh/${data['mapName']}.mesh`;
       fse.outputFileSync(`frontend/${meshFile}`, data['mesh']);
       fse.outputFileSync(`frontend/${traceFile}`, data['trace']);
       fse.outputFileSync('frontend/files.js', `window.postFiles={mapType:"mesh",mapName:"${mapName}", meshFile:"${meshFile}",traceName:"${traceName}",traceFile:"${traceFile}"}`);
