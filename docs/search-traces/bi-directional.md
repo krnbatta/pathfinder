@@ -1,4 +1,49 @@
 # Bi-directional Search
 
-In some pathfinding settings there can be multiple source nodes or multiple target nodes. One such example is the class of bi-directional search algorithms where expansions proceed simultaneously from the source toward the target and from the target toward the source [22]. Such algorithms terminate when the two frontiers meet, though the exact definition of when this occurs can vary from one algorithm to the next. Visualising and even following such algorithms can be tricky because a single node can be expanded twice, once in each direction and each time with a different parent and cost.
-Our system allows easy generalisation to bidirectional search. We simply use two distinct identifiers for each node. For example by appending “f” or “b” to the id field of each node operation in the event list we can distinguish the “forward” expansion of a node from the “backward” expansion. Figure 2(b) shows an example using an instrumented bidirectional A* implementation from the WARTHOG pathfinding library. In the example we solve a road routing problem but the same approach works for bi-directional search in any other domain. The road routing schema is similar to the one for Grid-based Pathfinding but we substitute the rectangle primitives for circles and lines so as to to represent individual nodes and edges.
+Following is an example of how a bi-directional pathfinding algorithm's search trace might look like:
+```json
+{
+  "layout": null,
+  "stateExpansion": false,
+  "stateStructure": null,
+  "nodeStructure": [
+    {
+      "type": "circle",
+      "variables": {"cx": "x", "cy": "y"},
+      "persisted": true,
+      "drawPath": true
+    },
+    {
+      "type": "line",
+      "variables": {"x1": "parent:x", "y1": "parent:y", "x2": "x", "y2": "y"},
+      "persisted": true
+    }
+  ],
+  "eventList": [
+    ...
+    {
+      "type": "expanding",
+      "id": "f-1640",
+      "pId": "f-1736",
+      "g": 5,
+      "f": 32,
+      "variables": { "x": 8, "y": 14 }    
+    },
+    ...
+    {
+      "type": "updating",
+      "id": "b-1211",
+      "pId": "b-1293",
+      "g": 6,
+      "f": 33,
+      "variables": { "x": 29, "y": 23 }
+    },
+    ...
+  ]
+}
+```
+
+The details about explanation can be found [here](https://krnbatta.github.io/pathfinder/#/search-traces/). Regarding the `id` and `pId` of the nodes, we append additional information to convey which source it came from. In the example above, we can see that, we appended "f" or "b" to the `id` and `pId` of the nodes depending upon whether it started from "front" or "back" respectively.
+
+
+Also note that in the given example, we have value of `x1` and `y1` in `line` type of `nodeStructure` as `parent:x` and `parent:y` respectively. This means that the other end of the line is the `x` and `y` value of the parent.
