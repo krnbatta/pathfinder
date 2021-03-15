@@ -23,12 +23,10 @@ app.use(express.json({
 }));
 
 app.get('/', (req, res) => {
-  fse.outputFileSync('frontend/files.js', `window.postFiles=null`);
   res.sendFile(__dirname + '/index.html');
 });
 
 app.post('/', (req, res) => {
-  fse.outputFileSync('frontend/files.js', `window.postFiles=null`);
   res.sendFile(__dirname + '/index.html');
 });
 
@@ -52,6 +50,10 @@ app.get('/script.js', (red, res) => {
 
 app.get('/docs', (req, res) => {
   res.redirect('https://krnbatta.github.io/pathfinder/#/');
+});
+
+app.get('/about', (req, res) => {
+  res.sendFile(__dirname + '/about.html');
 });
 
 app.get('/app', (req, res) => {

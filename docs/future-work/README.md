@@ -1,6 +1,6 @@
 # Future Work
 
-## Features
+### Features
 1. Make configuration accessible to user.
 2. Merge .co and .gr into one file.
 3. Use user login to keep space & trace files separate.
@@ -10,13 +10,10 @@
 7. Create system required file generator for MAPF search by setting a relatively easy standard for input.
 8. Improve Docs
 9. Use default camelCase standard.
+10. Use layout graph
 
 
-## Bugs
-1. Foo
-2. Bar
 
+__Please raise issue [here](https://github.com/krnbatta/pathfinder/issues) if you find any bugs while using the app.__
 
-This app has no tests written.
-
-I have been working alone and probably made some bad architecture decisions. Please suggest improvements. Please contribute to this repository. Make a pull request. Contact me: krnbatta@gmail.com
+Please contribute to this repository. Make a pull request. Contact me: krnbatta@gmail.com

@@ -20,46 +20,60 @@
         <a class="home" href="http://pf-algo-viz.org/">Home</a>
         <a class="docs" href="https://krnbatta.github.io/pathfinder/#/">Docs</a>
         <a class="app" href="http://pf-algo-viz.org/app">App</a>
+        <a class="about" href="http://pf-algo-viz.org/about">About Us</a>
       </div>
       <h3>A Visual Tool for Understanding and Debugging Pathfinding Search</h3>
     </div>
     <div id="body">
-      <h2 id="demo-heading">Demos</h4>
-      <ul id="demo-list">
-        <!-- <li>
-          <form action="demo" method="POST">
-            <input name="mapType" type="hidden" value="grid" />
-            <input name="mapName" type="hidden" value="CSC2F" />
-            <input name="gridFile" type="hidden" value="maps/grid/CSC2F.grid" />
-            <input name="traceName" type="hidden" value="astar" />
-            <input name="traceFile" type="hidden" value="algorithms/astar.json" />
-            <span>Map Type: Grid | Map Name: CSC2F | Algorithm: Astar |</span><button>link</button>
-          </form>
-        </li>
-        <li>
-          <form action="demo" method="POST">
-            <input name="mapType" type="hidden" value="grid" />
-            <input name="mapName" type="hidden" value="CSC2F" />
-            <input name="gridFile" type="hidden" value="maps/grid/CSC2F.grid" />
-            <input name="traceName" type="hidden" value="anya" />
-            <input name="traceFile" type="hidden" value="algorithms/anya.json" />
-            <button>Grid Map: Anya Algorithm</button>
-          </form>
-        </li> -->
-      </ul>
+      <div id="info">
+        <h3>Pathfinding Problems</h3>
+        <p>
+        <!-- Pathfinding problems appear in a wide variety of different domains and they are solved with algorithmic approaches that are just as diverse. A generalised visualistion system needs to account for this diversity and allow for customised representations of each algorithmic technique in context. Some important considerations:
+        • The search can have multiple start and target nodes. For example in bi-directional search one simultaneously expands from start to target and from target to start.
+        • Node operations may or may not one represent a single configura- tion of the agent. For example, a node can be a distinct location in the operating environment or it may represent a set of potential states.
+        • Nodes may or may not have an embedding. For cases where no embedding exists the visualisation needs to automatically com- pute positions for each node operation in the search trace.
+        To demonstrate the efficacy our approach we consider four distinct application examples: (i) grid-based pathfinding and (ii) road network routing (two classic setups commonly targeted by domain-specific tools); (iii) pathfinding on a navigation mesh (a problem drawn from computer games sometimes requiring bespoke visualisations); (iv) tree search (a problem setting without an embedding). -->
+        </p>
+        <hr>
+        <h3>Grid-based pathfinding</h3>
+        <p>
+          <!-- Grid-based pathfinding is a popular topic which receives substantial attention from practitioners in computer game development [5]. In this domain the operating environment is discretised into tiles and the agent is allowed to move from one adjacent tile to the next. The nodeStructure property in our search trace schema includes support for a range of primitives including rectangles which can be used to represent tiles. Each tile can be coloured appropriately based on the type of node operation. Listing 9 shows an example of the schema.
+          For an example, we use an instrumented version of the WARTHOG pathfinding library which supports a variety of grid-based pathfinding techniques. The program instantiates the schema, inserting values for just two required variables: the x and y coordinates for each tile. Support for other (non-square) types of grids [2] can be added with extra primitives. Figure 1(A) shows the resulting visualisation for a simple A* search. Figure 2(a) shows the same problem being solved with Jump Point Search [13], a leading grid-based method whose implementation is also found in WARTHOG. Note that due to its extensible design the library is only instrumented once in order to produce both visualisations -->
+        </p>
+        <hr>
+        <h3>Bi-directional search</h3>
+        <p>
+          <!-- In some pathfinding settings there can be multiple source nodes or multiple target nodes. One such example is the class of bi-directional search algorithms where expansions proceed simultaneously from the source toward the target and from the target toward the source [22]. Such algorithms terminate when the two frontiers meet, though the exact definition of when this occurs can vary from one algorithm to the next. Visualising and even following such algorithms can be tricky because a single node can be expanded twice, once in each direction and each time with a different parent and cost.
+          Our system allows easy generalisation to bidirectional search. We simply use two distinct identifiers for each node. For example by appending “f” or “b” to the id field of each node operation in the event list we can distinguish the “forward” expansion of a node from the “backward” expansion. Figure 2(b) shows an example using an instrumented bidirectional A* implementation from the WARTHOG pathfinding library. In the example we solve a road routing problem but the same approach works for bi-directional search in any other domain. The road routing schema is similar to the one for Grid-based Pathfinding but we substitute the rectangle primitives for circles and lines so as to to represent individual nodes and edges. -->
+        </p>
+        <hr>
+        <h3>Path planning on a navigation mesh</h3>
+        <p>
+          <!-- A navigation mesh is a pathfinding data structure that divides the op- erating environment into convex polygons. When moving on a mesh the agent is free to enter and exit each polygon at any angle. In other words, the search space is continuous, unlike grids or graphs where agents can only move from one fixed point to another. Polyanya [6] is a recent and state-of-the-art algorithm for solving such problems. Although Polyanya instantiates the A* algorithm it uses a specialised and domain-specific representation where each node is a tuple (I,r) where r is the last turning point on a path from the start location and I = [a, b] is a contiguous interval of points from a polygon edge such that every point p ∈ I is visible from r.
+          To visualise Polyanya we employ a composite object comprising a circle primitive (representing r) and a polygon primitive formed by the points a, b and r. The polygon communicates the set of points visible from r through which a an optimal path needs to pass on the way to the target. When instrumenting the algorithm5 we instantiate Listing 16 which requires specifying only three sets of x and y coordinates. The result of our visualisation is shown in Figure 2(c). -->
+        </p>
+        <hr>
+        <h3>Graphs without embedding</h3>
+        <p>
+          <!-- In some pathfinding settings the input map/graph may not have a direct embedding which complicates search trace visualisation. Such is the case for social network graphs where one might like to compute a distance between individuals. In other cases the search space may be too large to enumerate and load into memory. Such is the case for combinatorial domains including Sliding Tile Puzzle and Multi-agent Pathfinding.
+          Our system has the ability to address these kind of problems by computing a graph layout to position nodes from the event list. We consider two types of layouts: tree and network. Both are computed with D3. Our discussion in this example focuses on tree layouts, but the network case is similar. To visualise search trees we require the instrumented algorithm to implement the schema in Listing 4. important thing to note here is that user has to set the layout property to “tree”. The system uses this information to compute appropriate node positions. The result of this visualisation is shown in Figure 2(d). -->
+        </p>
+        <hr>
+        <h3>State Search</h3>
+        <p></p>
+        <hr>
+        <h3>Multi-agent pathfinding</h3>
+        <p></p>
+        <hr>
+        <h2 id="demo-heading">Demos</h2>
+        <ul id="demo-list"></ul>
+      </div>
     </div>
     <div id="footer">
       <p class="footer-monash">Developed at Monash University <img width="40px" height="40px" src="http://pf-algo-viz.org/images/monash.png"></p>
       <p class="footer-credits"><span>Ideation & Management: <b>Dr Daniel Harabor</b>, <b>Dr Michael Wybrow</b></span> <span>Architecture & Development: <b>Karan Batta</b></span> </p>
     </div>
   </div>
-
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      document.querySelector("#menu .home").href = `${document.location.protocol}//${document.location.host}/home`;
-      document.querySelector("#menu .app").href = `${document.location.protocol}//${document.location.host}/app`;
-    }, false);
-  </script>
 </body>
 
 </html>

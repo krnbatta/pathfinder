@@ -1,8 +1,9 @@
 let template = () => `
   <div id="menu">
-    <a href="${document.location.protocol}//${document.location.host}/">Home</a>
-    <a href="https://krnbatta.github.io/pathfinder/#/">Docs</a>
-    <a href="${document.location.protocol}//${document.location.host}/app/">App</a>
+    <a class="home" href="http://pf-algo-viz.org/">Home</a>
+    <a class="docs" href="https://krnbatta.github.io/pathfinder/#/">Docs</a>
+    <a class="app" href="http://pf-algo-viz.org/app">App</a>
+    <a class="about" href="http://pf-algo-viz.org/about">About Us</a>
   </div>
   <h3>A Visual Tool for Understanding and Debugging Pathfinding Search</h3>
 `;

@@ -2,10 +2,19 @@
   - [Introduction](/)
 - Search Traces
   - [Basic Search](search-traces/)
+  - [Grid](search-traces/grid.md)
+  - [Mesh](search-traces/mesh.md)
+  - [Road Network](search-traces/road-network.md)
+  - [Tree with X-Y](search-traces/tree-with-xy.md)
+  - [Tree without X-Y](search-traces/tree-without-xy.md)  
+  - [Bi-directional Search](search-traces/bi-directional.md)
   - [8-Tile Puzzle](search-traces/tile.md)
   - [Multi-Agent Pathfinding](search-traces/mapf.md)
 - Search Spaces
   - [Maps](search-spaces/)
+  - [Grid](search-spaces/grid.md)
+  - [Mesh](search-spaces/mesh.md)
+  - [Road Network](search-spaces/road-network.md)
 - Visualiser
   - [Visualiser](visualiser/)
   - [Search and Environment](visualiser/environment.md)

@@ -16,8 +16,29 @@ The inputs required to run the app are:
 3. `Compare Trace`(optional): This is search trace for another algorithm(generally a known good-reference) with which we want to do comparison of current algorithm. You only require this in case you want to run a comparison for debugging.
 
 
-This tool can be used as a web application(http://pf-algo-viz.org) or a desktop application(app download link).
+This tool can be used as a web application(http://pf-algo-viz.org) or a desktop application(instructions below).
 The web app requires uploading the input files. In desktop app, the input can be passed as file names in command line parameters. This allows the users to run application with loaded traces and/or search spaces on their desktops with file mentioned as inputs.
+
+### Run the app locally
+```
+git clone https://github.com/krnbatta/pathfinder.git
+cd /path/to/pathfinder
+npm install
+cd /path/to/pathfinder/frontend
+npm install
+cd /path/to/pathfinder/desktop
+npm install
+```
+
+```
+cd /path/to/pathfinder
+npm start # run server
+cd /path/to/pathfinder/frontend
+npm start # run frontend webpack watcher
+cd /path/to/pathfinder/desktop
+python3 pathfinding-debugger.py -z mesh -m ../frontend/maps/mesh/arena.mesh -t ../frontend/algorithms/polyanya.json` # Launches desktop app
+```
+
 
 
 This documentation provides a general walkthrough for this app.

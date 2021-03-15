@@ -1,5 +1,7 @@
+#info{
+  padding: 0 20px;
+}
 #demo-heading{
-    padding: 0 20px;
     text-decoration: underline;
 }
 button{
@@ -63,6 +65,7 @@ body{
   flex: 18;
   display: flex;
   flex-flow: column nowrap;
+  overflow: scroll;
 }
 #footer{
   flex: 1;
