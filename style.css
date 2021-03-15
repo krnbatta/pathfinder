@@ -14,7 +14,21 @@ button:hover{
   text-decoration: underline;
   cursor: pointer;
 }
-
+.examples{
+  display: flex;
+  flex-wrap: wrap;
+}
+.example{
+  max-width: 50%;
+  border-left: 1px solid #cdcdcd;
+  padding: 10px;
+}
+.example:nth-child(-n + 2) {
+  border-bottom: 1px solid #cdcdcd;
+}
+.example p{
+  display: flex;
+}
 body{
   position: absolute;
   width: 100%;

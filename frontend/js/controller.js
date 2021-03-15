@@ -188,8 +188,9 @@ let Controller = new StateMachine({
         if(!this.rendered){
           let {width, height} = this.getDimensions();
           let screen = $("#screen")
+          let screenHeading = $("#screen-heading");
           width = screen.width();
-          height = screen.height();
+          height = screen.height() - screenHeading.outerHeight();
           Renderer.render(this, width, height);
         }
       },
