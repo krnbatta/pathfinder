@@ -9,6 +9,7 @@ import ResizerService from "./resizer";
  */
 export default {
   init(svgWrapper) {
+    this.activated = true;
     this.svg = $(svgWrapper).find('svg')[0];
     if(this.view){
       this.view.parentNode.removeChild(this.view);
@@ -43,12 +44,14 @@ export default {
   },
 
   setDefaultAttrs(){
-    this.view.style.width = "120px";
-    this.view.style.height = "120px";
-    this.view.style.top = "0";
-    this.view.style.left = "0";
-    this.svg.setAttributeNS(null, "width", this.svgWidth);
-    this.svg.setAttributeNS(null, "height", this.svgHeight);
+    if(this.activated){
+      this.view.style.width = "120px";
+      this.view.style.height = "120px";
+      this.view.style.top = "0";
+      this.view.style.left = "0";
+      this.svg.setAttributeNS(null, "width", this.svgWidth);
+      this.svg.setAttributeNS(null, "height", this.svgHeight);
+    }
   },
 
   updateDims(dims){
