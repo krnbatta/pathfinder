@@ -8,7 +8,7 @@ This app is capable of visualising and debugging such problem statements as well
 
 The app implements the slide tile puzzle as an example and proof of capability of the app. This can be further extended to draw other states as well by slight modification of trace file. The state is drawn using SVG inside a resizable draggable box. So, the information required to draw the state is expected to be given to SVG API directly and expectation from search trace file is to comply with that standard. For example: basic shapes are referred to as rect or path or circle, etc. and so are different attributes like stroke, fill, viewBox, etc.
 
-Here is an example file: [Slide Puzzle Problem Search Trace](http://pf-algo-viz.org/algorithms/tile.json)
+Here is an example file: [Slide Puzzle Problem Search Trace](https://pf-algo-viz.org/algorithms/tile.json)
 
 The identification of node abstraction of state in search algorithm by this app is done using 2 attributes inside the search trace json file. They are stateExpansion and stateStructure.
 

@@ -9,7 +9,7 @@ const cors = require('cors');
 const fse = require('fs-extra');
 
 app.use(cors({
-  origin: 'http://pf-algo-viz.org'
+  origin: 'https://pf-algo-viz.org'
 }));
 
 app.use(express.urlencoded({
@@ -63,7 +63,7 @@ app.get('/app', (req, res) => {
 
 app.post("/demo", (req, res) => {
   const data = req.body;
-  console.log(data);
+  // console.log(data);
   fse.outputFileSync('frontend/files.js', `window.postFiles=${JSON.stringify(data)}`);
   res.sendFile(__dirname + `/frontend/index.html`);
 });

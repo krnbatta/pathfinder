@@ -7,7 +7,7 @@ const path = require('path')
 const fs = require('fs');
 
 const urls = [
-  "http://pf-algo-viz.org"
+  "https://pf-algo-viz.org"
 ]
 
 const createWindow = () => {
@@ -69,7 +69,7 @@ const createWindow = () => {
         postStr = `mapType=null&traceName=${args[3].split("/").pop().split(".").shift()}&trace=${files[0]}`;
     }
     // win.loadURL('https://pf-algo-viz.org/app', {
-    win.loadURL('http://pf-algo-viz.org/app', {
+    win.loadURL('https://pf-algo-viz.org/app', {
       postData: [{
         type: 'rawData',
         bytes: Buffer.from(postStr)
