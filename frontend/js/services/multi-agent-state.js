@@ -3,8 +3,8 @@ import DragResizeBoxService from "./drag-resize-box";
 
 export default {
   init(stateStructure){
-    this.vars = stateStructure.vars;
-    this.svg = stateStructure.svg;
+    this.vars = stateStructure.defaultValues;
+    this.svg = stateStructure.scaffold;
     this.map = stateStructure.map;
     this.scale = stateStructure.scale;
     this.primitives = stateStructure.primitives;
@@ -20,8 +20,8 @@ export default {
   process(state_variables){
     // this.setStateVariables(state_variables);
     // this.node = this.createNode(this.svg);
-    this.vals = state_variables.vals;
-    this.objects = state_variables.objects;
+    this.vals = state_variables.overrideDefaultValues;
+    this.objects = state_variables.newScaffoldComponents;
     this.mapObj();
     this.updatePath();
     this.setAgents();
@@ -110,7 +110,7 @@ export default {
     let self = this;
     self.svg.forEach((elem) => {
       let primitive = self.primitives[elem.type];
-      elem.children.forEach((child) => {
+      elem.elements.forEach((child) => {
         let obj = document.createElementNS(self.vars.xlmns, primitive.type);
         for(const [k, v] of Object.entries(primitive.props)){
           let val = null;
@@ -172,7 +172,7 @@ export default {
               val = child[v] * self.scale + self.scale/4;
             }
             if(k == "y"){
-              val = child[v] * self.scale - self.scale/4;
+              val = child[v] * self.scale + self.scale/4;
             }
           }
           else{

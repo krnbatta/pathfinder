@@ -3,8 +3,8 @@ import DragResizeBoxService from "./drag-resize-box";
 
 export default {
   init(stateStructure){
-    this.vars = stateStructure.vars;
-    this.svg = stateStructure.svg;
+    this.vars = stateStructure.defaultValues;
+    this.svg = stateStructure.scaffold;
   },
   process(state_variables){
     this.setStateVariables(state_variables);
@@ -13,8 +13,8 @@ export default {
     DragResizeBoxService.init(wrapper);
   },
   setStateVariables(state_variables){
-    let valVariables = state_variables.val;
-    let refVariables = state_variables.ref;
+    let valVariables = state_variables.overrideDefaultValues;
+    let refVariables = state_variables.scaffoldValues;
     this.state_vars = JSON.parse(JSON.stringify(this.vars));
     for(const [k, v] of Object.entries(valVariables)){
       this.state_vars[k] = v;
