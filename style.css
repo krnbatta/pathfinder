@@ -29,6 +29,16 @@ button:hover{
 .example p{
   display: flex;
 }
+.example form{
+  display: inline-block;
+}
+.large-map-error{
+  color: red;
+  font-size: 12px;
+  font-weight: bold;
+  position: relative;
+  top: -2px;
+}
 body{
   position: absolute;
   width: 100%;

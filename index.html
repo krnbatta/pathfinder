@@ -33,10 +33,46 @@
         </p>
         <hr>
         <div class="examples">
-          <div class="example"><b>Grid-based pathfinding</b><p>This is one of the most popular domain in pathfinding, especially in game development. The search space is quantised into cells or tiles and the agent can move to adjacent tiles only(maximum 8 directions) avoiding the negative search spaces(or more commonly called, walls). The image shows visualisation of jump point search algorithm whose implementation can be found in WARTHOG pathfinding library which supports a variety of grid-based pathfinding techniques. <img src="images/jps.png" width="300" /></p></div>
-          <div class="example"><b>Bi-directional search</b><p>In some cases, instead of standard single source a single destination, we might have multiple source as well as multiple target nodes. Bi-directional search is one of such examples. In this search, the source expands towards target and target also simultaneously expands towards the source. The image shows visualisation of bi-directional A* implementation. This can also be found in WARTHOG pathfinding library. In this example, the road network routing problem is solved using bi-directional pathfinding algorithm. <img src="images/bi_dir_search.png" width="300" /></p></div>
-          <div class="example"><b>Path planning on a navigation mesh</b><p>In grid-based algorithm, the search space was divided into tiles or rectangles. In case of navigation mesh, we have convex polygons. The agent can enter or exit this polygon at any angle. This means that contrary to discrete search space in case grids or graphs, we have a continuous search space. The image shows visualisation of Polyanya whcih is state-of-the-art algorithm for path finding problems on a navigation mesh. The implementation can be again found in WARTHOG. <img src="images/polyanya.png" width="300" height="250" /></p></div>
-          <div class="example"><b>Graphs without embedding</b><p>Intuitively we imagine the search algorithm to operate on some environment which can be input map or graph. But there are some cases in which we don't have such embeddings. Examples can be social network graphs or combinatorial problems like 8 tile puzzle or MAPF. The app is capable of visualising these categories as well. The image shows example of visualisation of tree layout without any x-y embedding. <img src="images/jps_tree.png" width="300" /></p></div>
+          <div class="example">
+            <h3><u>Grid-based pathfinding</u></h3>
+            <p>This is one of the most popular domain in pathfinding, especially in game development. The search space is quantised into cells or tiles and the agent can move to adjacent tiles only(maximum 8 directions) avoiding the negative search spaces(or more commonly called, walls). The image shows visualisation of jump point search algorithm whose implementation can be found in WARTHOG pathfinding library which supports a variety of grid-based pathfinding techniques.
+              <img src="images/jps.png" width="300" />
+            </p>
+            <b><u>Demos</u></b>
+            <div id="csc2f-astar"></div>
+            <div id="csc2f-jps"></div>
+            <div id="csc2f-anya"></div>
+            <div id="tfs-astar"><span class="large-map-error">[Large Map(slow to load)]</span></div>
+          </div>
+          <div class="example">
+            <h3><u>Bi-directional search</u></h3>
+            <p>In some cases, instead of standard single source a single destination, we might have multiple source as well as multiple target nodes. Bi-directional search is one of such examples. In this search, the source expands towards target and target also simultaneously expands towards the source. The image shows visualisation of bi-directional A* implementation. This can also be found in WARTHOG pathfinding library. In this example, the road network routing problem is solved using bi-directional pathfinding algorithm.
+              <img src="images/bi_dir_search.png" width="300" />
+            </p>
+            <b><u>Demos</u></b>
+            <div id="ny-astar"><span class="large-map-error">[Large Map(slow to load)]</span></div>
+            <div id="ny-bi-astar"><span class="large-map-error">[Large Map(slow to load)]</span></div>
+          </div>
+          <div class="example">
+            <h3><u>Path planning on a navigation mesh</u></h3>
+            <p>In grid-based algorithm, the search space was divided into tiles or rectangles. In case of navigation mesh, we have convex polygons. The agent can enter or exit this polygon at any angle. This means that contrary to discrete search space in case grids or graphs, we have a continuous search space. The image shows visualisation of Polyanya whcih is state-of-the-art algorithm for path finding problems on a navigation mesh. The implementation can be again found in WARTHOG.
+              <img src="images/polyanya.png" width="300" height="250" />
+            </p>
+            <b><u>Demos</u></b>
+            <div id="arena-polyanya"></div>
+            <div id="aurora-polyanya"><span class="large-map-error">[Large Map(slow to load)]</span></div>
+          </div>
+          <div class="example">
+            <h3><u>Graphs without embedding</u></h3>
+            <p>Intuitively we imagine the search algorithm to operate on some environment which can be input map or graph. But there are some cases in which we don't have such embeddings. Examples can be social network graphs or combinatorial problems like 8 tile puzzle or MAPF. The app is capable of visualising these categories as well. The image shows example of visualisation of tree layout without any x-y embedding.
+              <img src="images/jps_tree.png" width="300" />
+            </p>
+            <b><u>Demos</u></b>
+            <div id="jps-xy"></div>
+            <div id="jps-no-xy"></div>
+            <div id="tile-demo"></div>
+            <div id="mapf-demo"></div>
+          </div>
         </div>
 
         <hr>
@@ -47,7 +83,7 @@
     </div>
     <div id="footer">
       <p class="footer-monash">
-        Developed with love at Monash University
+        Developed at Monash University
         <img width='40px' height='40px' src="images/monash.png">
       </p>
       <p class="footer-credits">
