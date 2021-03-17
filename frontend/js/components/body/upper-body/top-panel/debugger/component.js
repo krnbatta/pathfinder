@@ -60,6 +60,7 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
       TimeTravelComponent.show();
       CameraControlsComponent.showDebuggerControl();
       CameraControlsComponent.showScaleControl();
+      Controller.fitDebugger();
     }
   }
 }));

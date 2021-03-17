@@ -30,27 +30,27 @@ let CameraControlsComponent = new StateMachine($.extend({}, BaseComponent, {
     },
 
     hideMapControl(){
-      $("#fit-map").hide();
+      $("#fit-map").parent('.btn-with-title').hide();
     },
 
     showMapControl(){
-      $("#fit-map").show();
+      $("#fit-map").parent('.btn-with-title').show();
     },
 
     hideScaleControl(){
-      $("#fit-scale").hide();
+      $("#fit-scale").parent('.btn-with-title').hide();
     },
 
     showScaleControl(){
-      $("#fit-scale").show();
+      $("#fit-scale").parent('.btn-with-title').show();
     },
 
     hideDebuggerControl(){
-      $("#fit-debugger").hide();
+      $("#fit-debugger").parent('.btn-with-title').hide();
     },
 
     showDebuggerControl(){
-      $("#fit-debugger").show();
+      $("#fit-debugger").parent('.btn-with-title').show();
     },
 
     /**

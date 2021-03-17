@@ -11,12 +11,19 @@ body{
   border-bottom: 1px solid;
   background: aliceblue;
   padding: 2px 10px;
+  min-height: 25px;
+}
+#menu{
+  position: absolute;
 }
 #header h3{
   margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: absolute;
+  width: 100%;
+  text-align: center;
 }
 
 #footer{
@@ -73,17 +80,31 @@ body{
   padding: 5px;
 }
 
+.btn-with-title{
+  margin: 0 2px;
+  display: flex;
+  flex-direction: column;
+}
+.btn-title{
+  font-size: 12px;
+  display: inline-block;
+  margin: 0 auto;
+  width: 45px;
+  word-wrap: break-word;
+  text-align: center;
+}
 
 #playback-controls,#breakpoints,#comparator,#camera-controls{
-  display: inline-block;
-  vertical-align: bottom;
+  display: inline-flex;
+  vertical-align: top;
   margin: 0 10px;
 }
-#play,#pause,#stop,#step-backward,#step-forward,#bp-btn,#cp-btn,#fit-map,#fit-debugger,#fit-scale{
-  height: 35px;
-  width: 40px;
+#play,#pause,#stop,#step-backward,#step-forward,#bp-btn,#cp-btn,#fit-map,#fit-debugger,#fit-scale,#tt-btn{
+  height: 25px;
+  width: 30px;
   border-radius: 5px;
   cursor: pointer;
+  margin: 0 7px;
 }
 #fit-map,#fit-debugger,#fit-scale{
   position: relative;

@@ -69,11 +69,11 @@ let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function hides all the buttons
     */
     hideAll(){
-      $('#play').hide();
-      $('#step-forward').hide();
-      $('#step-backward').hide();
-      $('#pause').hide();
-      $('#stop').hide();
+      $('#play').parent('.btn-with-title').hide();
+      $('#step-forward').parent('.btn-with-title').hide();
+      $('#step-backward').parent('.btn-with-title').hide();
+      $('#pause').parent('.btn-with-title').hide();
+      $('#stop').parent('.btn-with-title').hide();
     },
 
     /**
@@ -81,11 +81,11 @@ let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function shows only pause and stop button
     */
     play(){
-      $('#play').hide();
-      $('#step-forward').hide();
-      $('#step-backward').hide();
-      $('#pause').show();
-      $('#stop').show();
+      $('#play').parent('.btn-with-title').hide();
+      $('#step-forward').parent('.btn-with-title').hide();
+      $('#step-backward').parent('.btn-with-title').hide();
+      $('#pause').parent('.btn-with-title').show();
+      $('#stop').parent('.btn-with-title').show();
     },
 
     /**
@@ -93,11 +93,11 @@ let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function shows play, step and stop button
     */
     pause(){
-      $('#play').show();
-      $('#step-forward').show();
-      $('#step-backward').show();
-      $('#pause').hide();
-      $('#stop').show();
+      $('#play').parent('.btn-with-title').show();
+      $('#step-forward').parent('.btn-with-title').show();
+      $('#step-backward').parent('.btn-with-title').show();
+      $('#pause').parent('.btn-with-title').hide();
+      $('#stop').parent('.btn-with-title').show();
     },
 
     /**
@@ -105,11 +105,11 @@ let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function shows play and step buttons
     */
     reset(){
-      $('#play').show();
-      $('#step-forward').show();
-      $('#step-backward').show();
-      $('#pause').hide();
-      $('#stop').hide();
+      $('#play').parent('.btn-with-title').show();
+      $('#step-forward').parent('.btn-with-title').show();
+      $('#step-backward').parent('.btn-with-title').show();
+      $('#pause').parent('.btn-with-title').hide();
+      $('#stop').parent('.btn-with-title').hide();
     }
   }
 }));

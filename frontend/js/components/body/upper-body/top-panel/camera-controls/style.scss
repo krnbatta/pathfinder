@@ -1,21 +1,26 @@
 #camera-controls {
+  vertical-align: top;
   .fa-desktop{
+    font-size: 18px;
     position: relative;
     left: -2px;
   }
   .fa-terminal{
     position: absolute;
-    top: 6px;
-    left: 12px;
+    top: 4px;
+    left: 9px;
+    font-size: 9px;
   }
   .fa-map{
     position: absolute;
-    top: 5px;
-    left: 12px;
+    top: 4px;
+    left: 9px;
+    font-size: 9px;
   }
   .fa-arrows-alt{
     position: absolute;
-    top: 6px;
-    left: 12px;
+    top: 4px;
+    left: 10px;
+    font-size: 9px;
   }
 }

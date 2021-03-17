@@ -118,6 +118,7 @@ let Controller = new StateMachine({
         Toastr.options.extendedTimeOut = 30; // How long the toast will display after a user hovers over it
         Toastr.options.closeButton = true;
         Toastr.options.preventDuplicates = true; // show only one toastr at a time
+        Toastr.options.positionClass = "toast-top-center"; //position of toastr
       },
 
       /**
