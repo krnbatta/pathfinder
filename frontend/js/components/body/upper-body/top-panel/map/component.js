@@ -70,7 +70,7 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
         let map = Store.createRecord("Map", {fileType, fileName});
         Store.createRecord('RoadNetwork', {coFile, grFile});
         config.mapType = 'roadnetwork';
-        this.fileName = `${file1Name}(roadnetwork)`;
+        this.fileName = `${file1Name} (roadnetwork)`;
         let roadNetworkPromise = RoadNetworkService.process();
         roadNetworkPromise.finally(() => {
           Spinner.hide();
@@ -98,13 +98,13 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
             Spinner.hide();
           });
         }
-        Controller.mapTitle = `${fileName}(${fileType})`;
+        Controller.mapTitle = `${fileName} (${fileType})`;
       }
       this.postProcess();
     },
 
     postProcess(){
-      $("#map").html(`<div id='map-label'>Operating Environment: ${Controller.mapTitle}</div>`);
+      $("#map").html(`<div id='map-label'>${Controller.mapTitle}</div>`);
       CameraControlsComponent.showMapControl();
       CameraControlsComponent.showScaleControl();
     },

@@ -30,6 +30,11 @@ export default {
         this.svg.setAttributeNS(null, "width", parseFloat(this.width)-40+"px");
         this.svg.setAttributeNS(null, "height", parseFloat(this.height)-40+"px");
       }
+      else{
+        this.svgWidth = this.svg.width.baseVal.value;
+        this.svgHeight = this.svg.height.baseVal.value;
+        this.setDefaultAttrs();
+      }
     }
     else{
       this.svgWidth = this.svg.width.baseVal.value;
@@ -51,8 +56,8 @@ export default {
     if(this.activated){
       this.view.style.width = `${this.svgWidth+40}px`;
       this.view.style.height = `${this.svgHeight+40}px`;
-      this.view.style.top = "0";
-      this.view.style.left = "0";
+      // this.view.style.top = "0";
+      // this.view.style.left = "0";
       this.svg.setAttributeNS(null, "width", this.svgWidth);
       this.svg.setAttributeNS(null, "height", this.svgHeight);
     }

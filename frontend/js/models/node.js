@@ -323,25 +323,35 @@ class Node {
   * @public
   */
   get h() {
-    return this.f - this.g;
+    return Number(this.f - this.g).toFixed(this.hDecimalPlaces);
+  }
+
+  get hDecimalPlaces(){
+    let text = this.f.toString();
+    let index = text.indexOf(".");
+    let fLength = text.length - index - 1;
+    text = this.g.toString();
+    index = text.indexOf(".");
+    let gLength = text.length - index - 1;
+    return Math.min(fLength, gLength);
   }
 
   get text() {
     if(!this._text){
       if(this.type == "source" || this.type == "destination"){
         if(config.mapType == "mesh"){
-          this._text = `${this.type.toUpperCase()} Node(id: ${this.id}, root: (${this.variables.cx}, ${this.variables.cy}), interval: (${this.variables.x1}, ${this.variables.y1}) - (${this.variables.x2}, ${this.variables.y2}))`;
+          this._text = `${this.type.toUpperCase()} Node (id: ${this.id}, root: (${this.variables.cx}, ${this.variables.cy}), interval: (${this.variables.x1}, ${this.variables.y1}) - (${this.variables.x2}, ${this.variables.y2}))`;
         }
         else{
-          this._text = `${this.type.toUpperCase()} Node(id: ${this.id}, x: ${this.variables.x}, y: ${this.variables.y})`;
+          this._text = `${this.type.toUpperCase()} Node (id: ${this.id}, x: ${Number(this.variables.x).toFixed(2)}, y: ${Number(this.variables.y).toFixed(2)})`;
         }
       }
       else{
         if(config.mapType == "mesh"){
-          this._text = `${this.type.toUpperCase()} Node(id: ${this.id}, root: (${this.variables.cx}, ${this.variables.cy}), interval: (${this.variables.x1}, ${this.variables.y1}) - (${this.variables.x2}, ${this.variables.y2}), f: ${this.f}, g: ${this.g}, h: ${this.h}, pId: ${this.pId})`;
+          this._text = `${this.type.toUpperCase()} Node (id: ${this.id}, root: (${this.variables.cx}, ${this.variables.cy}), interval: (${this.variables.x1}, ${this.variables.y1}) - (${this.variables.x2}, ${this.variables.y2}), f: ${this.f}, g: ${this.g}, h: ${this.h}, pId: ${this.pId})`;
         }
         else{
-          this._text = `${this.type.toUpperCase()} Node(id: ${this.id}, x: ${this.variables.x}, y: ${this.variables.y}, f: ${this.f}, g: ${this.g}, h: ${this.h}, pId: ${this.pId})`;
+          this._text = `${this.type.toUpperCase()} Node (id: ${this.id}, x: ${Number(this.variables.x).toFixed(2)}, y: ${Number(this.variables.y).toFixed(2)}, f: ${this.f}, g: ${this.g}, h: ${this.h}, pId: ${this.pId})`;
         }
       }
     }

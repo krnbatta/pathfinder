@@ -1,6 +1,8 @@
 import config from '../config';
 import Controller from '../controller';
 import GraphicsManager from '../services/graphics-manager';
+import NodeStateService from '../services/node-state';
+import Store from '../services/store';
 import * as PIXI from 'pixi.js'
 
 let HistoryService = {
@@ -34,6 +36,7 @@ let HistoryService = {
       }
       let graphicsContainer = this.getGraphicsContainer(this.currentId);
       GraphicsManager.insert(this.context, graphicsContainer);
+      this.drawState();
     }
   },
 //preallocate array based on jump value! to avoid lazy copying
@@ -69,12 +72,24 @@ let HistoryService = {
     this.context.currentId += 1;
   },
 
-  getGraphicsContainer(id){
+  getTracer(){
+    return Store.find("Tracer");
+  },
+
+  getNode(id){
+    if(!id){
+      id = this.currentId;
+    }
     let step = this.context.steps[id];
     if(step){
-      let node = step.node;
-      let graphicsContainer = node.graphics;
-      return graphicsContainer;
+      return step.node;
+    }
+  },
+
+  getGraphicsContainer(id){
+    let node = this.getNode(id);
+    if(node){
+      return node.graphics;
     }
   },
 
@@ -102,9 +117,16 @@ let HistoryService = {
     // this.history = [];
   },
 
+  drawState(){
+    if(this.getTracer().stateStructure && this.getNode(this.currentId)){
+      NodeStateService.process(this.getNode(this.currentId).state_variables);
+    }
+  },
+
   stepBackward(){
     let graphicsContainer = this.getGraphicsContainer(this.currentId + 1);
     GraphicsManager.remove(this.context, graphicsContainer);
+    this.drawState();
   }
 }
 

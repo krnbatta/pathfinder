@@ -22,6 +22,7 @@ export default {
     // this.node = this.createNode(this.svg);
     this.vals = state_variables.overrideDefaultValues;
     this.objects = state_variables.newScaffoldComponents;
+    this.node = this.createSvg();
     this.mapObj();
     this.updatePath();
     this.setAgents();
@@ -84,7 +85,7 @@ export default {
         let y = i * this.scale;
         let stringIndex = i * width + j;
         if (gridStr[stringIndex] == '@') {
-          let rect = this.drawRect({x: x, y: y, width: this.scale, height: this.scale, fill: "#000", stroke: "#000"});
+          let rect = this.drawRect({x: x, y: y, width: this.scale, height: this.scale, fill: "#CDCDCD", stroke: "#000"});
           this.node.appendChild(rect);
         }
       }
@@ -131,7 +132,15 @@ export default {
             let pathStr = "M" + (self.vars[child[v]][0][0] * self.scale + self.scale/2) + " " + (self.vars[child[v]][0][1] * self.scale + self.scale/2);
             var myarray = self.vars[child[v]]
             const [, ...rest] = myarray;
-            rest.forEach((l) => {
+            rest.forEach((l, indx) => {
+              if(indx == rest.length-1){
+                let xa = l[1] * self.scale + self.scale/2;
+                if(isNaN(xa)){
+                  console.log("=======")
+                  console.log("NaN found")
+                  console.log("=======")
+                }
+              }
               pathStr += " L" + (l[0] * self.scale + self.scale/2) + " " + (l[1] * self.scale + self.scale/2);
             });
             val = pathStr;
@@ -154,7 +163,12 @@ export default {
           else{
             val = self.vars[child[v]];
           }
-          obj.setAttributeNS(null, k, val);
+          if(obj.nodeName == "path" && k == 'd' && val.includes("NaN")){
+            console.log("=======")
+            console.log("NaN found")
+            console.log("=======")
+          }
+            obj.setAttributeNS(null, k, val);
         }
         if(primitive.message){
           let msg = child[primitive.message];

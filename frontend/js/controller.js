@@ -224,7 +224,12 @@ let Controller = new StateMachine({
             return;
           }
           self.stepForward();
-          window.requestAnimationFrame(loop);
+          if(self.tracer.stateStructure){
+            setTimeout(loop, 500);
+          }
+          else{
+            window.requestAnimationFrame(loop);
+          }
         })();
       },
 

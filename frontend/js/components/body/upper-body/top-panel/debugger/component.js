@@ -51,7 +51,8 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
     postProcess(){
       this.tracer = Store.find('Tracer');
       if(!Controller.mapTitle){
-        $("#map").html(`<div id='map-label'>No Operating Environment Uploaded</div>`);
+        $("#map").hide();
+        // $("#map").html(`<div id='map-label'>No Operating Environment Uploaded</div>`);
       }
       $("#algorithm").html(`<div id='debug-label'>Search Trace: ${Controller.traceTitle}</div>`);
       Controller.start();
