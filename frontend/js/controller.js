@@ -271,6 +271,7 @@ let Controller = new StateMachine({
         let currentStep = this.steps[this.currentId];
         this.runner();
         EventsListComponent.addEvent(currentStep);
+        EventsListComponent.highlightNodes();
         if(!this.timeTravelling){
           let bpMsg = BreakpointService.check(currentStep.node);
           if(bpMsg){
@@ -336,6 +337,7 @@ let Controller = new StateMachine({
         FrontierService.stepBackward();
         SearchPathService.stepBackward();
         EventsListComponent.removeEvent();
+        EventsListComponent.highlightNodes();
       }
     }
 });

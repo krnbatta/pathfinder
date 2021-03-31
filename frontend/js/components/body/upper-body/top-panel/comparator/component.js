@@ -65,7 +65,7 @@ let ComparatorComponent = new StateMachine($.extend({}, BaseComponent, {
       $("#faulty-trace-input").on('change', (e) => {
         debugFile = e.target.files[0];
         let fileName = debugFile.name.split(".")[0];
-        $("#faulty-trace").html(`<div id='faulty-trace-label'>Trace: ${fileName}</div>`);
+        $("#faulty-trace").html(`<div id='faulty-trace-label'>Correct Reference Trace: ${fileName}</div>`);
         debugFile = debugFile;
       });
       $("#run-cp").on("click", () => {

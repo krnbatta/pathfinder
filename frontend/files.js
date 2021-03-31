@@ -1,1 +1,1 @@
-window.postFiles={"traceName":"Multi Agent Path Finder","traceFile":"algorithms/mapf.json","htmlId":"mapf-demo"}
+window.postFiles=null

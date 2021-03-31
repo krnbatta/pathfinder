@@ -18,7 +18,7 @@ let BreakpointService = {
   comparatorCheck(node){
     let message = ``;
     if(this.comparatorNodes[node._id]){
-      message += `The value of g for the current node is ${node.g} which is different from the value of uploaded trace(${this.comparatorNodes[node._id]}) <br>`;
+      message += `The value of g for the current node is ${node.g} which is different from the value in the correct reference trace (${this.comparatorNodes[node._id]}) <br>`;
     }
     return message;
   },

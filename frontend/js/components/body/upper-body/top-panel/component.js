@@ -11,6 +11,7 @@ import MapComponent from './map/component';
 import PlaybackControlsComponent from './playback-controls/component';
 import TimeTravelComponent from './time-travel/component';
 import CameraControlsComponent from './camera-controls/component';
+import LegendComponent from './legend/component';
 
 /**
 * @module components/monitor
@@ -36,7 +37,7 @@ let TopPanelComponent = new StateMachine($.extend({}, BaseComponent, {
     },
 
     onReady(){
-      let components = [MapComponent, DebuggerComponent, PlaybackControlsComponent, BreakpointsComponent, ComparatorComponent, TimeTravelComponent, CameraControlsComponent];
+      let components = [MapComponent, DebuggerComponent, PlaybackControlsComponent, BreakpointsComponent, ComparatorComponent, TimeTravelComponent, CameraControlsComponent, LegendComponent];
       components.forEach((component) => {
         component.init();
       });

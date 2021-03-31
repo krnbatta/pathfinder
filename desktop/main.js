@@ -26,7 +26,7 @@ const createWindow = () => {
   // var remote = require('electron').remote,
   // arguments = remote.getGlobal('sharedObject').prop1;
   // console.log(arguments)
-  console.log(process.argv);
+  // console.log(process.argv);
   let args = process.argv;
   let traceIndex;
   switch(args[2]){
@@ -53,7 +53,7 @@ const createWindow = () => {
   let postStr;
   Promise.all(promises).then((files) => {
     if(args[4]){
-      console.log(args[4].split("/").pop().split(".").shift());
+      // console.log(args[4].split("/").pop().split(".").shift());
     }
     switch(args[2]){
       case "roadnetwork":

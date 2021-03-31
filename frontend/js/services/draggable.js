@@ -22,7 +22,7 @@ export default {
       let newY = this.prevY - e.clientY;
 
       const style = this.el[0].style;
-      console.log(`prevY=${this.prevY},clientY=${e.clientY},newY=${this.prevY-e.clientY},top=${parseFloat(style.top) - newY}`);
+      // .log(`prevY=${this.prevY},clientY=${e.clientY},newY=${this.prevY-e.clientY},top=${parseFloat(style.top) - newY}`);
 
       this.el[0].style.left = parseFloat(style.left) - newX + "px";
       this.el[0].style.top = parseFloat(style.top) - newY + "px";

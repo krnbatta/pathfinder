@@ -52,7 +52,7 @@ export default {
             points.push(firstPoint[0]*config.nodeSize, firstPoint[1]*config.nodeSize);
             polygonsArr.push(points);
           });
-          console.log("meshData", totalPoints, totalPolygons, pointsArr, polygonsArr, maxX, maxY);
+          // console.log("meshData", totalPoints, totalPolygons, pointsArr, polygonsArr, maxX, maxY);
 
           const meshData =  {totalPoints:totalPoints, totalPolygons:totalPolygons, pointsArr:pointsArr, polygonsArr:polygonsArr, maxX:maxX, maxY:maxY};
           callback(meshData);

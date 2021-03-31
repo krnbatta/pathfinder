@@ -5,6 +5,7 @@ import $ from 'jquery';
 import BaseComponent from '../../../../base-component';
 import PlaybackService from '../../../../../services/playback';
 import Store from '../../../../../services/store';
+import nodeColor from '../../../../../utils/node-color';
 
 import Controller from '../../../../../controller';
 import config from '../../../../../config';
@@ -68,7 +69,12 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     },
 
     clearHighlighting(){
-      $(".event").removeAttr("style");
+      document.querySelectorAll(".event[data-highlight='1']").forEach((node) => {
+        let rgba = `rgba(${node.dataset.r},${node.dataset.g},${node.dataset.b},0.5)`
+        node.style.background = rgba;
+        delete node.dataset.highlight;
+        node.style.removeProperty('font-weight');
+      });
     },
 
     highlightNodes(){
@@ -77,16 +83,26 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
       let currentNode = Store.findById("Node", currentNodeId);
       let siblingNodes = currentNode.siblingNodes;
       let parentNode = currentNode.parentNode;
+      let node, rgba;
       if(parentNode){
-        $(`#event-${parentNode._id}`).css("background-color", `#${parentNode.attrs.fillStyle.toString(16)}`);
+        this.highlight(parentNode._id);
       }
-      $(`#event-${currentNode._id}`).css("background-color", `#${currentNode.attrs.fillStyle.toString(16)}`);
+      this.highlight(currentNode._id);
       if(currentNode.step.isFrontier){
-        $(`#event-${currentNode._id}`).css("background-color", `#${config.nodeAttrs.frontier.fillColor.toString(16)}`);
+        let hex = config.nodeAttrs.frontier.fillColor.toString(16).padStart(6, '0')
+        rgba = `rgba(${'0x' + hex[0] + hex[1] | 0},${'0x' + hex[2] + hex[3] | 0},${'0x' + hex[4] + hex[5] | 0},1)`;
+        this.highlight(currentNode._id, rgba);
       }
-      // siblingNodes.forEach((node) => {
-      //   $(`#event-${node.id}`).css("background-color", "#fff");
-      // });
+    },
+
+    highlight(nodeId, rgba=null){
+      let node = document.getElementById(`event-${nodeId}`);
+      if(!rgba){
+        rgba = `rgba(${node.dataset.r},${node.dataset.g},${node.dataset.b},1)`;
+      }
+      node.dataset.highlight = '1';
+      node.style.background = rgba;
+      node.style.fontWeight = 'bold';
     },
 
     /**
@@ -104,7 +120,13 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     addEvent(event) {
       this.events.push(event);
-      let li = $.parseHTML(`<li id='event-${event._id}' class="event">${event.text}</li>`)[0];
+      let hex = config.nodeAttrs[nodeColor[event.type]].fillColor.toString(16).padStart(6, '0');
+      let r = '0x' + hex[0] + hex[1] | 0;
+      let g = '0x' + hex[2] + hex[3] | 0;
+      let b = '0x' + hex[4] + hex[5] | 0;
+      let a = 0.5;
+      let rgba = `rgba(${r},${g},${b},${a})`;
+      let li = $.parseHTML(`<li id='event-${event._id}' class="event" style="background: rgba(${r},${g},${b},${a});" data-r=${r} data-g=${g} data-b=${b} data-a=${a}>${event.text}</li>`)[0];
       $(li).on("click", (e) => {
         Controller.retraceHistory(event._id);
       });
