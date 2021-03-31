@@ -104,7 +104,7 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
     },
 
     postProcess(){
-      $("#map").html(`<div id='map-label'>Search Space: ${Controller.mapTitle}</div>`);
+      $("#map").html(`<div id='map-label'>Operating Environment: ${Controller.mapTitle}</div>`);
       CameraControlsComponent.showMapControl();
       CameraControlsComponent.showScaleControl();
     },

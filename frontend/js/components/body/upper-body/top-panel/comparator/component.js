@@ -43,13 +43,13 @@ let ComparatorComponent = new StateMachine($.extend({}, BaseComponent, {
 
     hide(){
       this.shown = false;
-      $("#comparator").parent('.btn-with-title').hide();
+      $("#comparator").hide();
     },
 
     show(){
       if(!this.shown){
         this.shown = true;
-        $("#comparator").parent('.btn-with-title').show();
+        $("#comparator").show();
       }
     },
 
@@ -92,14 +92,14 @@ let ComparatorComponent = new StateMachine($.extend({}, BaseComponent, {
             $("#cp-bps ol").append(liStr);
           }
 
-          BreakpointService.comparatorNodes = errorNodes;
+          BreakpointService.setComparatorNodes(errorNodes);
         });
       });
 
       $("#cancel-cp").on("click", () => {
-        BreakpointService.comparatorNodes = {};
-        $("#faulty-trace").html(`<label id="faulty-trace-label" for="faulty-trace-input"><i class="fa fa-terminal"></i> Upload Trace</label><input type = 'file' id='faulty-trace-input' accept='.json' />`);
-        $("#cp-bps ol").html("");
+        // BreakpointService.comparatorNodes = {};
+        // $("#faulty-trace").html(`<label id="faulty-trace-label" for="faulty-trace-input"><i class="fa fa-terminal"></i> Upload Trace</label><input type = 'file' id='faulty-trace-input' accept='.json' />`);
+        // $("#cp-bps ol").html("");
       });
     },
 

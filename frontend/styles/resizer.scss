@@ -2,14 +2,14 @@
   position: absolute;
   top: 0;
   left: 0;
-  background: #CDCDCD;
+  background: #F0B400;
   width: 120px;
   height: 120px;
 }
 .resizer{
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 20px;
+  height: 20px;
   background: #000;
   z-index: 1;
   &.ne{
@@ -46,6 +46,7 @@
 }
 #node-state{
   svg{
+    padding: 20px;
     rect{
       cursor: pointer;
     }
@@ -56,4 +57,14 @@
       cursor: pointer;
     }
   }
+}
+#node-state-title{
+  position: absolute;
+  top: 0;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 18px;
+  height: 20px;
 }

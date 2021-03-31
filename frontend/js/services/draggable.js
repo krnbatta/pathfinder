@@ -21,10 +21,11 @@ export default {
       let newX = this.prevX - e.clientX;
       let newY = this.prevY - e.clientY;
 
-      const rect = this.el[0].getBoundingClientRect();
+      const style = this.el[0].style;
+      console.log(`prevY=${this.prevY},clientY=${e.clientY},newY=${this.prevY-e.clientY},top=${parseFloat(style.top) - newY}`);
 
-      this.el[0].style.left = rect.left - newX + "px";
-      this.el[0].style.top = rect.top - newY + "px";
+      this.el[0].style.left = parseFloat(style.left) - newX + "px";
+      this.el[0].style.top = parseFloat(style.top) - newY + "px";
 
       this.prevX = e.clientX;
       this.prevY = e.clientY;

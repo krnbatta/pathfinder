@@ -4,6 +4,9 @@ import NodeObject from './node-object';
 import config from '../config';
 import Injector from '../services/injector';
 import FloatboxService from '../services/floatbox';
+import debounce from '../utils/debounce';
+import drawLine from '../utils/draw-line';
+import GraphicsManager from '../services/graphics-manager';
 
 let _id = 1;
 
@@ -33,6 +36,20 @@ class Rectangle extends NodeObject {
     });
     _graphics.on("mouseout", () => {
       _graphics.tint="0xFFFFFF";
+    });
+    self.nodesHidden = true;
+    let toggleNodes = debounce(function(){
+      GraphicsManager.remove(self.controller, self.node.step.tracer.line);
+      if(self.nodesHidden){
+        self.node.step.tracer.line = drawLine(self.controller, self.node, 0xE40E40);
+        self.nodesHidden = false;
+      }
+      else{
+        self.nodesHidden = true;
+      }
+    });
+    _graphics.on("click", () => {
+      toggleNodes();
     });
     Injector.inject(this, ['controller', 'renderer']);
     return _graphics;

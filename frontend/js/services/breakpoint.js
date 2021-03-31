@@ -1,4 +1,4 @@
-export default{
+let BreakpointService = {
   bps: [],
   bpFActive: true,
   bpGActive: true,
@@ -9,10 +9,16 @@ export default{
   check(node){
     return this.manualCheck(node, this.bpApplied, this.bps) + this.automaticCheck(node) + this.comparatorCheck(node);
   },
+  setComparatorNodes(errorNodes){
+    this.comparatorNodes = errorNodes;
+  },
+  setBps(bps){
+    this.bps = bps;
+  },
   comparatorCheck(node){
     let message = ``;
     if(this.comparatorNodes[node._id]){
-      message += `The value of g for the current node is ${node.g} which is different from the value of uploaded faulty trace i.e. ${this.comparatorNodes[node._id]} <br>`;
+      message += `The value of g for the current node is ${node.g} which is different from the value of uploaded trace(${this.comparatorNodes[node._id]}) <br>`;
     }
     return message;
   },
@@ -67,3 +73,5 @@ export default{
     this.bpGActive = state;
   }
 }
+
+export default BreakpointService;

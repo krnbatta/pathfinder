@@ -12,7 +12,7 @@ import config from '../config';
 export default function(context, node, color){
   let line = new PIXI.Graphics();
   let lineColor = color ? color : config.lineColor;
-  line.lineStyle(1, lineColor);
+  line.lineStyle(2, lineColor);
   node.linePoints.forEach((point, index) => {
     if(index == 0){
       line.moveTo(point.x, point.y);

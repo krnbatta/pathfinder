@@ -10,10 +10,6 @@ import Controller from '../../../../../controller';
 import TimeTravelService from '../../../../../services/time-travel';
 import BreakpointService from '../../../../../services/breakpoint';
 
-/**
-* @module components/playback-controls
-* This component handles the playback controls buttons.
-*/
 let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
   data: {
     bpApplied: false,
@@ -45,13 +41,13 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
 
     hide(){
       this.shown = false;
-      $("#breakpoints").parent('.btn-with-title').hide();
+      $("#breakpoints").hide();
     },
 
     show(){
       if(!this.shown){
         this.shown = true;
-        $("#breakpoints").parent('.btn-with-title').show();
+        $("#breakpoints").show();
       }
     },
 
@@ -127,13 +123,13 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
           });
         }
       }
-      $("#bp-f-active").on("change", () => {
+      // $("#bp-f-active").on("change", () => {
         BreakpointService.monotinicF($("#bp-f-active").is(":checked"));
-      });
-      $("#bp-g-active").on("change", () => {
+      // });
+      // $("#bp-g-active").on("change", () => {
         BreakpointService.monotinicG($("#bp-g-active").is(":checked"));
-      });
-      BreakpointService.bps = bps;
+      // });
+      BreakpointService.setBps(bps);
     },
 
     clearValues(){

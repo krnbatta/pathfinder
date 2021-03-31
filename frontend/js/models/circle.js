@@ -77,6 +77,10 @@ class Circle extends NodeObject {
   get graphics(){
     if(!this._graphics){
       this._graphics = this.createGraphics(this.node.attrs);
+      // let tracer = Store.find("Tracer");
+      // if(tracer.stateStructure){
+      //   NodeStateService.process(this.node.state_variables);
+      // }
     }
     return this._graphics;
   }

@@ -5,6 +5,6 @@ let template = () => `
     <a class="app" href="https://pf-algo-viz.org/app">App</a>
     <a class="about" href="https://pf-algo-viz.org/about">About Us</a>
   </div>
-  <h3>A Visual Tool for Understanding and Debugging Pathfinding Search</h3>
+  <h3>Pathfinding Algo-Viz</h3>
 `;
 export default template;

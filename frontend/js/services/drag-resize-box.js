@@ -20,12 +20,16 @@ export default {
     this.view.id = 'drag-resize-box';
 
     if(this.dimSet){
-      this.view.style.width = this.width;
-      this.view.style.height = this.height;
-      this.view.style.top = this.top;
-      this.view.style.left = this.left;
-      this.svg.setAttributeNS(null, "width", this.width);
-      this.svg.setAttributeNS(null, "height", this.height);
+      if(this.top){
+        this.view.style.top = this.top;
+        this.view.style.left = this.left;
+      }
+      if(this.width){
+        this.view.style.width = this.width;
+        this.view.style.height = this.height;
+        this.svg.setAttributeNS(null, "width", parseFloat(this.width)-40+"px");
+        this.svg.setAttributeNS(null, "height", parseFloat(this.height)-40+"px");
+      }
     }
     else{
       this.svgWidth = this.svg.width.baseVal.value;
@@ -45,8 +49,8 @@ export default {
 
   setDefaultAttrs(){
     if(this.activated){
-      this.view.style.width = "120px";
-      this.view.style.height = "120px";
+      this.view.style.width = `${this.svgWidth+40}px`;
+      this.view.style.height = `${this.svgHeight+40}px`;
       this.view.style.top = "0";
       this.view.style.left = "0";
       this.svg.setAttributeNS(null, "width", this.svgWidth);
@@ -54,12 +58,21 @@ export default {
     }
   },
 
+  setPosition(top, left){
+    if(!this.top){
+      this.view.style.top = `${top+1}px`;
+      this.view.style.left = `${left-this.view.offsetWidth-1}px`;
+    }
+  },
+
   updateDims(dims){
     Object.assign(this, dims);
     this.dimSet = true;
     if(dims.width){
-      this.svg.setAttributeNS(null, "width", dims.width);
-      this.svg.setAttributeNS(null, "height", dims.height);
+      this.view.style.width = dims.width;
+      this.view.style.height = dims.height;
+      this.svg.setAttributeNS(null, "width", parseFloat(dims.width)-40+"px");
+      this.svg.setAttributeNS(null, "height", parseFloat(dims.height)-40+"px");
     }
   },
 

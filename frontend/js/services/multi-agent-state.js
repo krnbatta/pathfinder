@@ -28,6 +28,7 @@ export default {
     this.setConflicts();
     let wrapper = this.htmlWrapper();
     DragResizeBoxService.init(wrapper);
+    this.setPosition();
   },
   htmlWrapper(){
     let wrapper = document.createElement("div");
@@ -38,8 +39,20 @@ export default {
     wrapper.style.height = "100%";
     wrapper.style.top = "0";
     wrapper.style.left = "0";
+    let title = this.setTitle();
+    wrapper.appendChild(title);
     wrapper.appendChild(this.node);
     return wrapper;
+  },
+  setTitle(){
+    let title = document.createElement("div");
+    title.id = "node-state-title";
+    title.innerHTML = "Multi-agent Pathfinding"
+    return title;
+  },
+  setPosition(){
+    let rect = canvas.getBoundingClientRect();
+    DragResizeBoxService.setPosition(rect.top, rect.width+rect.left);
   },
   updatePath(){
     if(!this.vals){

@@ -1,4 +1,4 @@
 let template = () => `
-  <div id="screen-heading">Search Space & Trace Visualiser</div>
+  <div id="screen-heading">Operating Environment & Search Trace Visualiser</div>
 `;
 export default template;

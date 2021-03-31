@@ -20,10 +20,6 @@ let HistoryService = {
     return this.context.timeTravelling;
   },
 
-  /**
-  * @function updateNodes
-  * This function adds the node graphicsContainer as the current history node identified by the current id.
-  */
   update(){
     if(this.timeTravelling){
       if(!this.timeTravelStartId){

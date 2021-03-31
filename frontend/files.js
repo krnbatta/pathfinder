@@ -1,1 +1,1 @@
-window.postFiles={"mapType":"grid","mapName":"CSC2F","gridFile":"maps/grid/CSC2F.grid","traceName":"Astar","traceFile":"algorithms/astar.json","htmlId":"csc2f-astar"}
+window.postFiles={"traceName":"Multi Agent Path Finder","traceFile":"algorithms/mapf.json","htmlId":"mapf-demo"}

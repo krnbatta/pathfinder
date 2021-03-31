@@ -10,7 +10,7 @@
   - [Bi-directional Search](search-traces/bi-directional.md)
   - [8-Tile Puzzle](search-traces/tile.md)
   - [Multi-Agent Pathfinding](search-traces/mapf.md)
-- Search Spaces
+- Operating Environment
   - [Maps](search-spaces/)
   - [Grid](search-spaces/grid.md)
   - [Mesh](search-spaces/mesh.md)
