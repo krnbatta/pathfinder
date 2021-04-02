@@ -2,6 +2,7 @@ const config = {
   clientAddr: "https://pf-algo-viz.org",
   serverAddr: "https://pf-algo-viz.org",
   processGridUrl: "https://pf-algo-viz.org/processGrid",
+  processMeshUrl: "https://pf-algo-viz.org/processMesh",
   processRoadNetworkUrl: "https://pf-algo-viz.org/processRoadNetwork",
   zooming: true,
   operationsPerSecond: 300,

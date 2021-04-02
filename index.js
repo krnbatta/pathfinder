@@ -180,7 +180,47 @@ app.post('/processRoadNetwork', (req, res) => {
 });
 
 app.post('/processMesh', (req, res) => {
-
+  const meshData = req.body;
+  const polygonsArr = meshData.polygonsArr;
+  const maxX = meshData.maxX;
+  const maxY = meshData.maxY;
+  const fileName = meshData.fileName;
+  const canvas = createCanvas();
+  const context = canvas.getContext('2d');
+  context.imageSmoothingEnabled = true;
+  canvas.width = meshData.maxX;
+  canvas.height = meshData.maxY;
+  context.fillStyle = 'white';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.strokeStyle = 'black';
+  for (let i = 0; i < polygonsArr.length; ++i) {
+    let polygon = polygonsArr[i];
+    context.beginPath();
+    let j,k,temparray,chunk = 2;
+    for (j=0,k=polygon.length; j<k; j+=chunk) {
+        temparray = polygon.slice(j,j+chunk);
+        if(j==0){
+          context.moveTo(temparray[0], temparray[1])
+        }
+        else{
+          context.lineTo(temparray[0], temparray[1])
+        }
+    }
+    context.stroke();
+  }
+  let img = canvas.toDataURL();
+  let data = img.replace(/^data:image\/\w+;base64,/, "");
+  var buf = Buffer.from(data, 'base64');
+  fs.writeFile(`frontend/maps/images/${fileName}.png`, buf, function(err) {
+    if (err) {
+      console.log(err);
+      res.send(err);
+    } else {
+      res.send({
+        done: true
+      });
+    }
+  });
 });
 
 app.post('/processGrid', (req, res) => {

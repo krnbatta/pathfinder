@@ -16,11 +16,11 @@ let template = () => `
         <main class="modal__content" id="bp-modal-content">
           <div class="row">
             <div class="col-sm">
-              <label>Monotinic f value: </label>
+              <label>Monotonic f value: </label>
               <label class="switch"><input id="bp-f-active" type="checkbox" checked=true><span class="slider round"></span></label>
             </div>
             <div class="col-sm">
-              <label>Monotinic g value: </label>
+              <label>Monotonic g value: </label>
               <label class="switch"><input id="bp-g-active" type="checkbox" checked=true><span class="slider round"></span></label>
             </div>
           </div>

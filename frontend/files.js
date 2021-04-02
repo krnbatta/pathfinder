@@ -1,1 +1,1 @@
-window.postFiles={"mapType":"roadnetwork","mapName":"NY Street","coFile":"maps/roadnetwork/NY.co","grFile":"maps/roadnetwork/NY.gr","traceName":"Bi-directional Astar","traceFile":"algorithms/bi-road-astar.json","htmlId":"ny-bi-astar"}
+window.postFiles={"mapType":"mesh","mapName":"Aurora","meshFile":"maps/mesh/aurora.mesh","traceName":"Polyanya","traceFile":"algorithms/aurora-polyanya.json","htmlId":"aurora-polyanya"}

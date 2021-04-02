@@ -58,7 +58,7 @@ export default {
   setTitle(){
     let title = document.createElement("div");
     title.id = "node-state-title";
-    title.innerHTML = "8-Tile"
+    title.innerHTML = "Sliding Tile"
     return title;
   },
   setPosition(){

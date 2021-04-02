@@ -22,6 +22,7 @@ let LegendComponent = new StateMachine($.extend({}, BaseComponent, {
     onLeaveNone() {
       $("#legend").html(template);
       this.setupLegends();
+      this.hide();
       this.bindEvents();
     },
 

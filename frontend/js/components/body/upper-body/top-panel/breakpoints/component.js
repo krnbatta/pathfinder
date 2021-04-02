@@ -124,10 +124,10 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
         }
       }
       // $("#bp-f-active").on("change", () => {
-        BreakpointService.monotinicF($("#bp-f-active").is(":checked"));
+        BreakpointService.monotonicF($("#bp-f-active").is(":checked"));
       // });
       // $("#bp-g-active").on("change", () => {
-        BreakpointService.monotinicG($("#bp-g-active").is(":checked"));
+        BreakpointService.monotonicG($("#bp-g-active").is(":checked"));
       // });
       BreakpointService.setBps(bps);
     },

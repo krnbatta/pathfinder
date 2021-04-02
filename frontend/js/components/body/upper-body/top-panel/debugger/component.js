@@ -10,6 +10,7 @@ import BreakpointsComponent from '../breakpoints/component';
 import ComparatorComponent from '../comparator/component';
 import TimeTravelComponent from '../time-travel/component';
 import CameraControlsComponent from '../camera-controls/component';
+import LegendComponent from '../legend/component';
 
 /**
 * @module components/debugger
@@ -61,6 +62,7 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
       TimeTravelComponent.show();
       CameraControlsComponent.showDebuggerControl();
       CameraControlsComponent.showScaleControl();
+      LegendComponent.show();
       this.tracer.steps.then(() => {
         Controller.fitDebugger();
       });

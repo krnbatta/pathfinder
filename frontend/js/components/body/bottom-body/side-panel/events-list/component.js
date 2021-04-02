@@ -97,6 +97,9 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
 
     highlight(nodeId, rgba=null){
       let node = document.getElementById(`event-${nodeId}`);
+      if(!node){
+        return;
+      }
       if(!rgba){
         rgba = `rgba(${node.dataset.r},${node.dataset.g},${node.dataset.b},1)`;
       }

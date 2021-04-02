@@ -115,13 +115,114 @@ export default {
   },
 
   preProcess(resolve, reject){
-    this.renderMesh(resolve, reject);
+    this.checkMap(resolve, reject);
+    // this.renderMesh(resolve, reject);
   },
 
   process(){
     return new Promise((resolve, reject) => {
-      this.renderMesh(resolve, reject);
+      this.checkMap(resolve, reject);
+      // this.renderMesh(resolve, reject);
     });
+  },
+
+  checkMap(resolve, reject){
+    let map = Store.find("Map");
+    var img = new Image();
+    let self = this;
+    img.onerror = function(){
+      //send request to server
+      self.sendToServer(resolve, reject);
+    }
+    img.onload = function(){
+      //load map from image directly
+      self.renderMap(resolve, reject);
+      img = null;
+    }
+    img.src = `${config.clientAddr}/maps/${map.mapName}`;
+  },
+
+  test(meshData){
+    const canvas = document.createElement('canvas');
+    canvas.width = meshData.maxX;
+    canvas.height = meshData.maxY;
+    const context = canvas.getContext('2d');
+    // context.imageSmoothingEnabled = true;
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.strokeStyle = 'black';
+    for (let i = 0; i < meshData.polygonsArr.length; ++i) {
+      let polygon = meshData.polygonsArr[i];
+      context.beginPath();
+      let j,k,temparray,chunk = 2;
+      for (j=0,k=polygon.length; j<k; j+=chunk) {
+          temparray = polygon.slice(j,j+chunk);
+          if(j==0){
+            context.moveTo(temparray[0], temparray[1])
+          }
+          else{
+            context.lineTo(temparray[0], temparray[1])
+          }
+      }
+      context.stroke();
+      context.closePath();
+    }
+    let data = canvas.toDataURL();
+    let img = new Image();
+    img.src = data;
+    img.onload = function(){
+      let baseTexture = new PIXI.BaseTexture(img);
+      let texture = new PIXI.Texture(baseTexture);
+      let mapSprite = PIXI.Sprite.from(texture);
+      // mapSprite.width = 800;
+      // mapSprite.height = 500;
+      Controller.setupRenderer();
+      GraphicsManager.insert(Controller, mapSprite);
+      // document.body.appendChild(img);
+    }
+  },
+
+  sendToServer(resolve, reject){
+    let mesh = Store.find("Mesh");
+    let map = Store.find("Map");
+    let self = this;
+    mesh.meshData.then((meshData) => {
+      fetch(config.processMeshUrl, {
+        method: "POST",
+        body: JSON.stringify({polygonsArr: meshData.polygonsArr, maxX: meshData.maxX * config.nodeSize, maxY: meshData.maxY * config.nodeSize, fileName: map.mapName}),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then((res) => res.json()).then((data) => {
+        if(data.done){
+          this.renderMap(resolve, reject);
+        }
+        else{
+          reject();
+        }
+      });
+      // self.test({polygonsArr: meshData.polygonsArr, maxX: meshData.maxX * config.nodeSize, maxY: meshData.maxY * config.nodeSize, fileName: map.mapName});
+    });
+  },
+
+  renderMap(resolve, reject){
+    try{
+      let mesh = Store.find("Mesh");
+      let map = Store.find("Map");
+      mesh.meshData.then((meshData) => {
+        Controller.setupRenderer();
+        let mapSprite = new PIXI.Sprite.from(`${config.clientAddr}/maps/${map.mapName}`);
+        mapSprite.width = meshData.maxX * config.nodeSize;
+        mapSprite.height = meshData.maxY * config.nodeSize;
+        GraphicsManager.insert(Controller, mapSprite);
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      });
+    }
+    catch(e){
+      reject(e);
+    }
   },
 
   renderMesh(resolve, reject){

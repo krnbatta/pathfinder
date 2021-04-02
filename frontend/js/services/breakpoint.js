@@ -66,10 +66,10 @@ let BreakpointService = {
     }
     return message;
   },
-  monotinicF(state){
+  monotonicF(state){
     this.bpFActive = state;
   },
-  monotinicG(state){
+  monotonicG(state){
     this.bpGActive = state;
   }
 }

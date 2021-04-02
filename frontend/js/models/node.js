@@ -179,7 +179,7 @@ class Node {
   * public
   */
   get parentNode(){
-    if(!this.pId){
+    if(this.pId == null){
       return null;
     }
     for(let i=this._id-1; i>=0; i--){

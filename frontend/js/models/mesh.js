@@ -30,7 +30,7 @@ class Mesh {
   }
 
   get meshPolygons(){
-    if(!this._meshNodes){
+    if(!this._meshPolygons){
       this._meshPolygons = this.meshData.then((meshData) => {
         return new Promise((resolve, reject) => {
           MeshService.builder.build(meshData, resolve);
