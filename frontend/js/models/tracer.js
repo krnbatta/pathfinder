@@ -173,22 +173,87 @@ class Tracer {
   }
 
   set inspectedNodeObject(nodeObject) {
+    this.hideChildrenPath();
+    this.lightenChildrenNodeObjects();
     this.hideLinePath();
     this.lightenInspectedNodeObject();
     if(this._inspectedNodeObject == nodeObject) return;
     this._inspectedNodeObject = nodeObject;
     if(!this._inspectedNodeObject) return;
     this.darkenInspectedNodeObject();
+    this.darkenChildrenNodeObjects();
     this.showLinePath();
+    this.showChildrenPath();
   }
 
   hideLinePath() {
     if(!this.inspectedNodeObject || !this.line) return;
     GraphicsManager.remove(this.controller, this.line);
+    this.line = null;
   }
 
   showLinePath() {
-    this.line = drawLine(this.controller, this.inspectedNodeObject.node, 0xE40E40);
+    let linePoints = this.inspectedNodeObject.node.linePoints;
+    this.line = drawLine(this.controller, linePoints, 0xE40E40);
+  }
+
+  hideChildrenPath() {
+    if(!this.inspectedNodeObject || !this.childLines.length) return;
+    this.childLines.forEach((line) => {
+      GraphicsManager.remove(this.controller, line);
+    });
+    this.childLines = [];
+  }
+
+  showChildrenPath() {
+    let node = this.inspectedNodeObject.node;
+    if (node.type != 'closing' || !node.pId) {
+      return;
+    }
+    let expandingNode = node.sameExpandingNode;
+    if (!expandingNode) {
+      return;
+    }
+    this.childLines = [];
+    expandingNode.childNodes.forEach((childNode) => {
+      let linePoints = [childNode.center, node.center];
+      let line = drawLine(this.controller, linePoints, 0xFFE119);
+      this.childLines.push(line);
+    });
+  }
+
+  darkenChildrenNodeObjects(){
+    let node = this.inspectedNodeObject.node;
+    if (node.type != 'closing' || !node.pId) {
+      return;
+    }
+    let expandingNode = node.sameExpandingNode;
+    if (!expandingNode) {
+      return;
+    }
+    expandingNode.childNodes.forEach((childNode) => {
+      let currentStateChildNode = childNode.currentStateNode(this.controller.currentId);
+      let childNodeObjects = currentStateChildNode.persistedObjects;
+      childNodeObjects.forEach((nodeObject) => {
+        nodeObject.graphics.tint = config.nodeAttrs.frontier.fillColor;
+      });
+    });
+  }
+
+  lightenChildrenNodeObjects(){
+    if (!this.inspectedNodeObject) return;
+    let node = this.inspectedNodeObject.node;
+    let expandingNode = node.sameExpandingNode;
+    if (!expandingNode) {
+      return;
+    }
+    expandingNode.childNodes.forEach((childNode) => {
+      let currentStateChildNode = childNode.currentStateNode(this.controller.currentId);
+      let childNodeObjects = currentStateChildNode.persistedObjects;
+      childNodeObjects.forEach((nodeObject) => {
+        nodeObject.graphics.tint = "0xFFFFFF";
+      });
+    });
   }
 
   darkenInspectedNodeObject(){

@@ -4,7 +4,7 @@ import NodeObject from './node-object';
 import config from '../config';
 import debounce from '../utils/debounce';
 
-let _id = 1;
+let _id = 0;
 
 class Rectangle extends NodeObject {
   constructor(options){

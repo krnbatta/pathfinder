@@ -6,7 +6,7 @@ import NodeStateService from '../services/node-state';
 import Store from '../services/store';
 import debounce from '../utils/debounce';
 
-let _id = 1;
+let _id = 0;
 
 class Circle extends NodeObject {
   constructor(options){

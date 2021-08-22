@@ -3,7 +3,7 @@ import * as PIXI from 'pixi.js'
 import NodeObject from './node-object';
 import config from '../config'
 
-let _id = 1;
+let _id = 0;
 
 class Polygon extends NodeObject {
   constructor(options){

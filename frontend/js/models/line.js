@@ -4,7 +4,7 @@ import NodeObject from './node-object';
 import config from '../config'
 import Injector from '../services/injector';
 
-let _id = 1;
+let _id = 0;
 
 class Line extends NodeObject {
   constructor(options){

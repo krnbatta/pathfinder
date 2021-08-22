@@ -90,15 +90,17 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
       let currentNode = Store.findById("Node", currentNodeId);
       let siblingNodes = currentNode.siblingNodes;
       let parentNode = currentNode.parentNode;
-      let node, rgba;
       if(parentNode){
         this.highlight(parentNode._id);
       }
       this.highlight(currentNode._id);
       if(currentNode.step.isFrontier){
         let hex = config.nodeAttrs.frontier.fillColor.toString(16).padStart(6, '0')
-        rgba = `rgba(${'0x' + hex[0] + hex[1] | 0},${'0x' + hex[2] + hex[3] | 0},${'0x' + hex[4] + hex[5] | 0},1)`;
+        let rgba = `rgba(${'0x' + hex[0] + hex[1] | 0},${'0x' + hex[2] + hex[3] | 0},${'0x' + hex[4] + hex[5] | 0},1)`;
         this.highlight(currentNode._id, rgba);
+        siblingNodes.forEach((node) => {
+          this.highlight(node._id, rgba);
+        });
       }
     },
 

@@ -3,7 +3,7 @@ import config from '../config'
 import nodeColor from '../utils/node-color';
 import nodeFactory from '../utils/node-factory';
 
-let _id = 1;
+let _id = 0;
 
 class NodeObject {
 

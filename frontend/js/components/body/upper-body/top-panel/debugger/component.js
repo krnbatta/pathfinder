@@ -51,7 +51,7 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
       $('#debug-label').on('click', (e) => {
         if(self.tracerLoaded){
           if(confirm('Changing Trace would reset the current state. Do you want to do that?')){
-            window.location.reload();
+            window.location = 'app';
           }
           e.preventDefault();
           return false;

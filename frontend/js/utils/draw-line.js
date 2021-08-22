@@ -4,16 +4,16 @@ import config from '../config';
 
 /**
  * @function drawLine
- * This function draws the line from the node passed to its source via its linePoints property
+ * This function draws the line from the array of line points
  * @param {Controller} context
- * @param {Node} node
+ * @param {Array} linePoints
  * @return {PIXI.Graphics}
 */
-export default function(context, node, color){
+export default function(context, linePoints, color){
   let line = new PIXI.Graphics();
   let lineColor = color ? color : config.lineColor;
   line.lineStyle(2, lineColor);
-  node.linePoints.forEach((point, index) => {
+  linePoints.forEach((point, index) => {
     if(index == 0){
       line.moveTo(point.x, point.y);
     }

@@ -1,7 +1,7 @@
 import Store from '../services/store';
 import config from '../config'
 
-var _id = 1;
+var _id = 0;
 
 /** Class representing a step of the algorithm */
 class Step {

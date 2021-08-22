@@ -8,7 +8,7 @@ import nodeFactory from '../utils/node-factory';
 import Injector from '../services/injector';
 import {GlowFilter} from '@pixi/filter-glow';
 
-let _id = 1;
+let _id = 0;
 
 /** Class representing a node */
 class Node {
@@ -183,12 +183,39 @@ class Node {
       return null;
     }
     for(let i=this._id-1; i>=0; i--){
-      let node = Store.data.Node[i];
-      if(node && node.id == this.pId){
+      let node = Store.findById("Node", i);
+      if(node && node.id == this.pId && node.type == 'expanding'){
         return node;
       }
     }
     return null;
+  }
+
+  get sameExpandingNode() {
+    if(this.type != 'closing') {
+      return null;
+    }
+    for(let i=this._id-1; i>0; i--){
+      let node = Store.findById('Node', i);
+      if (node && node.id == this.id && node.type == 'expanding') {
+        return node;
+      }
+    }
+    return null;
+  }
+
+  currentStateNode(currentId) {
+    let latestNode = this;
+    for(let i=this._id+1; i<=currentId; i++){
+      let node = Store.findById('Node', i);
+      if (node && node.id == this.id) {
+        latestNode = node;
+      }
+      if(latestNode.type == 'closing') {
+        return latestNode;
+      }
+    }
+    return latestNode;
   }
 
   get childNodes(){
@@ -196,9 +223,10 @@ class Node {
     if(this.type != "expanding"){
       return nodes;
     }
-    for(let i=this._id-1; i>=0; i--){
-      let node = Store.find("Node", i);
-      if(!node || node._id == this._id){
+    const totalNodes = Store.count('Node');
+    for(let i=this._id+1; i<totalNodes; i++){
+      let node = Store.findById("Node", i);
+      if(node.id == this.id && node.type == 'closing'){
         return nodes;
       }
       if(node.pId == this.id){
@@ -208,7 +236,7 @@ class Node {
     return nodes;
   }
 
-  get UniqueChildNodes(){
+  get uniqueChildNodes(){
     let nodes = [];
     if(this.type != "expanding"){
       return nodes;
@@ -229,9 +257,7 @@ class Node {
     if(!this.parentNode){
       return [];
     }
-    return this.parentNode.childNodes.filter((node) => {
-      node.id!==this.id;
-    });
+    return this.parentNode.childNodes.filter((node) => node.id!==this.id);
   }
 
   get pathNodeObject(){

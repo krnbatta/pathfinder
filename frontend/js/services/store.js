@@ -30,10 +30,11 @@ class StoreSingleton {
     }
 
     createRecord(modelName, attributes) {
-        this.data[modelName] = this.data[modelName] || {};
+        this.data[modelName] = this.data[modelName] || [];
         let model = getModel(modelName);
         let record = new model(attributes);
-        this.data[modelName][record._id] = record;
+        // this.data[modelName][record._id] = record;
+        this.data[modelName].push(record); // using array instead of object
         return record;
     }
 
@@ -55,7 +56,7 @@ class StoreSingleton {
       }
     }
 
-    all(modelName, id){
+    all(modelName){
       return Object.values(this.data[modelName]);
     }
 
@@ -65,6 +66,10 @@ class StoreSingleton {
 
     findBy(modelName, condition){
       return this.where(modelName, condition)[0];
+    }
+
+    count(modelName){
+      return this.data[modelName].length;
     }
 
     clearData() {

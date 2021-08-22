@@ -57,7 +57,7 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
       $('#map-label').on('click', (e) => {
         if(self.mapLoaded){
           if(confirm('Changing Map would reset the current state. Do you want to do that?')){
-            window.location.reload();
+            window.location = 'app';
           }
           e.preventDefault();
           return false;
