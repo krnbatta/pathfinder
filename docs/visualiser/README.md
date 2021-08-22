@@ -1,7 +1,7 @@
 # Visualiser
 
-On the [app page](https://pf-algo-viz.org/app), we can see the interface of the tool. The image below also provides general outline and interface of the whole app.
-![alt text](https://pf-algo-viz.org/images/vis_label.png "Visualiser's Interface")
+On the [app page](http://localhost:8000/app), we can see the interface of the tool. The image below also provides general outline and interface of the whole app.
+![alt text](http://localhost:8000/images/vis_label.png "Visualiser's Interface")
 
 The figure above displays the interface of the app. The interface is divided into 3 parts:
 - Search Display Window(Center): This window is most important component. It is basically a 2-d WebGL Canvas which visualises the algorithm during the course of its run.

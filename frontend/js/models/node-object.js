@@ -19,6 +19,13 @@ class NodeObject {
     this.graphics.visible = true;
   }
 
+  get tracer() {
+    return this.node.tracer;
+  }
+
+  get controller() {
+    return this.tracer.controller;
+  }
   // get node(){
   //   return Store.data.Node[this.nodeId];
   // }

@@ -1,1 +1,1 @@
-window.postFiles={"mapType":"mesh","mapName":"Aurora","meshFile":"maps/mesh/aurora.mesh","traceName":"Polyanya","traceFile":"algorithms/aurora-polyanya.json","htmlId":"aurora-polyanya"}
+window.postFiles={"mapType":"grid","mapName":"CSC2F","gridFile":"maps/grid/CSC2F.grid","traceName":"Astar","traceFile":"algorithms/astar.json","htmlId":"csc2f-astar"}

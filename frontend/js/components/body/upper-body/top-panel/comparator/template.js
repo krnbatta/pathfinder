@@ -1,6 +1,6 @@
 let template = () => `
   <div class="btn-with-title">
-    <button id='cp-btn' class="btn btn-primary" data-micromodal-trigger="cp-modal" title='Compare Traces'><i class='fa fa-clone'></i></button>
+    <button id='cp-btn' class="btn btn-primary" data-micromodal-trigger="cp-modal" title='Compare Traces'><img class='clone-icon' src="icons/clone.svg" type="image/svg+xml" /></button>
     <span class="btn-title">Compare Traces</span>
   </div>
   <div class="modal micromodal-slide" id="cp-modal" aria-hidden="true">
@@ -15,7 +15,7 @@ let template = () => `
         <hr>
         <main class="modal__content" id="cp-modal-content">
           <div id="faulty-trace">
-            <label id="faulty-trace-label" for="faulty-trace-input"><i class="fa fa-terminal"></i> Upload Trace</label>
+            <label id="faulty-trace-label" for="faulty-trace-input"><img class="terminal-icon" src="icons/terminal.svg" type="image/svg+xml" /> Upload Trace</label>
             <input type = 'file' id='faulty-trace-input' accept='.json' />
           </div>
           <hr>

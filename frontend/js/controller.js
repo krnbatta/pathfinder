@@ -129,6 +129,8 @@ let Controller = new StateMachine({
         PlaybackService.addCallback('play', this.loop.bind(this));
         PlaybackService.addCallback('reset', this.reset.bind(this));
         PlaybackService.addCallback('pause', this.pause.bind(this));
+        FloatboxService.addCallback('show', this.showFloatbox.bind(this));
+        FloatboxService.addCallback('hide', this.hideFloatbox.bind(this));
       },
 
       /**
@@ -231,6 +233,22 @@ let Controller = new StateMachine({
             window.requestAnimationFrame(loop);
           }
         })();
+      },
+
+      executeFloatbox() {
+        const position = {
+          x: this.x,
+          y: this.y
+        }
+        FloatboxService.execute(this.tracer.inspectedNodeObject.node.values, position);
+      },
+
+      showFloatbox() {
+
+      },
+
+      hideFloatbox() {
+        this.tracer.inspectedNodeObject = null;
       },
 
       /**

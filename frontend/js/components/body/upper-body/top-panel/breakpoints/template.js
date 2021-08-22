@@ -1,6 +1,8 @@
 let template = () => `
   <div class="btn-with-title">
-    <button id='bp-btn' class="btn btn-primary" data-micromodal-trigger="bp-modal" title='Breakpoints'><i class='fas fa-exclamation-triangle'></i></button>
+    <button id='bp-btn' class="btn btn-primary" data-micromodal-trigger="bp-modal" title='Breakpoints'>
+      <img class="exclamation-triangle-icon" src="icons/exclamation-triangle.svg" type="image/svg+xml" />
+    </button>
     <span class="btn-title">Break Points</span>
   </div>
   <div class="modal micromodal-slide" id="bp-modal" aria-hidden="true">

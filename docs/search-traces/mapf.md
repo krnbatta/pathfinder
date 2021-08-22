@@ -10,7 +10,7 @@ The high level idea is similar to the tile solving puzzle. We will have a defaul
 
 The format of search trace file is also a bit different from that of tile solving puzzle in a sense that we have pre-defined configurations and primitives that are expected to be provided. Here also the state is drawn using SVG inside a resizable draggable box. So, the information required to draw the state is expected to be given to SVG API directly and expectation from search trace file is to comply with that standard. For example: basic shapes are referred to as rect or path or circle, etc. and so are different attributes like stroke, fill, viewBox, etc.
 
-Here is an example file: [MAPF Problem Search Trace](https://pf-algo-viz.org/algorithms/mapf.json)
+Here is an example file: [MAPF Problem Search Trace](http://localhost:8000/algorithms/mapf.json)
 
 Here also, the identification of node abstraction of state in search algorithm by this app is done using 2 attributes inside the search trace json file. They are stateExpansion and stateStructure. The way MAPF differs from other state abstract pathfinding problems is using `layout` property inside the `stateStructure`. Other expected properties include `agents` which provide number of agents(20 in the given example), `map` which is a grid map using the same format that we used in our normal grid based pathfinding maps and can also be found [here](https://movingai.com/benchmarks/formats.html). Other than these three properties(`layout`, `agents` and `map`), we have 3 other properties used to draw these states:
 - `primitives`: The `primitives` attribute defines type of objects combinations of which will give us the whole state. To understand more, let's take a look at the example:

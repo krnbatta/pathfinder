@@ -10,7 +10,7 @@ let template = () => `
   <button id='travel-expansion-forward' title='Travel Forward(Expansion)'><i class='fas fa-2x fa-fast-forward'></i></button>-->
 
   <div class="btn-with-title">
-    <button id='tt-btn' class="btn btn-primary" data-micromodal-trigger="tt-modal" title='Time Travel'><i class='fas fa-stopwatch'></i></button>
+    <button id='tt-btn' class="btn btn-primary" data-micromodal-trigger="tt-modal" title='Time Travel'><img class="stopwatch-icon" src="icons/stopwatch.svg" type="image/svg+xml" /></button>
     <span class="btn-title">Jump Steps</span>
   </div>
   <div class="modal micromodal-slide" id="tt-modal" aria-hidden="true">

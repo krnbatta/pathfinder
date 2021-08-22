@@ -9,7 +9,7 @@ const cors = require('cors');
 const fse = require('fs-extra');
 
 app.use(cors({
-  origin: 'https://pf-algo-viz.org'
+  origin: 'http://localhost:8000'
 }));
 
 app.use(express.urlencoded({
@@ -134,6 +134,10 @@ app.get("/dist/:file", (req, res) => {
 
 app.get("/images/:image_file", (req, res) => {
   res.sendFile(__dirname + `/frontend/images/${req.params.image_file}`);
+});
+
+app.get("/icons/:icon_file", (req, res) => {
+  res.sendFile(__dirname + `/frontend/images/icons/${req.params.icon_file}`);
 });
 
 app.post('/processRoadNetwork', (req, res) => {

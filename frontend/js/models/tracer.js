@@ -1,9 +1,11 @@
 import Store from '../services/store';
 import config from '../config';
 import tracerParser from '../utils/tracer-parser';
-import $ from 'jquery';
-import environment from '../environment';
 import ConstraintForceLayoutService from '../services/constraint-force-layout';
+import Injector from '../services/injector';
+import drawLine from '../utils/draw-line';
+import GraphicsManager from '../services/graphics-manager';
+
 /** Class representing a tracer of the algorithm */
 class Tracer {
   /**
@@ -66,6 +68,7 @@ class Tracer {
     * @public
     */
     this.minY = Infinity;
+    Injector.inject(this, ['controller']);
   }
 
   /**
@@ -165,6 +168,38 @@ class Tracer {
     return (this.maxY - this.minY) * config.nodeSize
   }
 
+  get inspectedNodeObject() {
+    return this._inspectedNodeObject;
+  }
+
+  set inspectedNodeObject(nodeObject) {
+    this.hideLinePath();
+    this.lightenInspectedNodeObject();
+    if(this._inspectedNodeObject == nodeObject) return;
+    this._inspectedNodeObject = nodeObject;
+    if(!this._inspectedNodeObject) return;
+    this.darkenInspectedNodeObject();
+    this.showLinePath();
+  }
+
+  hideLinePath() {
+    if(!this.inspectedNodeObject || !this.line) return;
+    GraphicsManager.remove(this.controller, this.line);
+  }
+
+  showLinePath() {
+    this.line = drawLine(this.controller, this.inspectedNodeObject.node, 0xE40E40);
+  }
+
+  darkenInspectedNodeObject(){
+    this.controller.executeFloatbox();
+    this.inspectedNodeObject.graphics.tint = this.inspectedNodeObject.node.attrs.fillStyle;
+  }
+
+  lightenInspectedNodeObject(){
+    if (!this.inspectedNodeObject) return;
+    this.inspectedNodeObject.graphics.tint = "0xFFFFFF";
+  }
 }
 
 export default Tracer;

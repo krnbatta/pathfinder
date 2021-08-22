@@ -3,6 +3,7 @@ import StateMachine from "javascript-state-machine";
 import template from './template'
 import $ from 'jquery';
 import BaseComponent from '../../../../base-component';
+import LoggerOverlayComponent from "../logger-overlay/component";
 import PlaybackService from '../../../../../services/playback';
 import Store from '../../../../../services/store';
 import nodeColor from '../../../../../utils/node-color';
@@ -25,6 +26,10 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     onBeforeInit() {
       $("#side-panel").append("<div id='events-list'></div>");
+    },
+
+    onReady(){
+      LoggerOverlayComponent.init();
     },
 
     /**
@@ -57,6 +62,7 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     play() {
       $("#events").hide();
+      LoggerOverlayComponent.play();
     },
 
     /**
@@ -65,6 +71,7 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     pause() {
       $("#events").show();
+      LoggerOverlayComponent.pause();
       this.highlightNodes();
     },
 
@@ -114,6 +121,7 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     reset() {
       $("#events").hide();
+      LoggerOverlayComponent.reset();
     },
 
     /**
@@ -129,7 +137,7 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
       let b = '0x' + hex[4] + hex[5] | 0;
       let a = 0.5;
       let rgba = `rgba(${r},${g},${b},${a})`;
-      let li = $.parseHTML(`<li id='event-${event._id}' class="event" style="background: rgba(${r},${g},${b},${a});" data-r=${r} data-g=${g} data-b=${b} data-a=${a}>${event.text}</li>`)[0];
+      let li = $.parseHTML(`<li id='event-${event._id}' class="event" style="background: ${rgba};" data-r=${r} data-g=${g} data-b=${b} data-a=${a}>${event.text}</li>`)[0];
       $(li).on("click", (e) => {
         Controller.retraceHistory(event._id);
       });
@@ -137,6 +145,7 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
       window.requestAnimationFrame(() => {
         $("#events")[0].scrollTop = $("#events")[0].scrollHeight;
       });
+      LoggerOverlayComponent.setNode(event.node);
     },
 
     /**
@@ -147,6 +156,7 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
       this.events.pop();
       $('#events .event:last-child').remove();
       $("#events")[0].scrollTop = $("#events")[0].scrollHeight;
+      LoggerOverlayComponent.setNode(this.events[this.events.length - 1]);
     },
 
     /**
@@ -159,6 +169,7 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
       let pruneEvents = $('#events .event').slice(-pruneLength);
       pruneEvents.remove();
       this.events.length = id;
+      LoggerOverlayComponent.setNode(this.events[this.events.length - 1]);
     }
   }
 }));

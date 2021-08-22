@@ -7,10 +7,13 @@
   background: #ccc;
   padding: 5px 10px;
   cursor: pointer;
-}
-#map-label:hover{
-  background: #a3a3a3;
-}
-#map-label:active{
-  background: #b7b7b7;
+  &:hover{
+    background: #a3a3a3;
+  }
+  &:active{
+    background: #b7b7b7;
+  }
+  .map-icon{
+    width: 1em;
+  }
 }

@@ -2,16 +2,17 @@ import * as PIXI from 'pixi.js'
 
 import NodeObject from './node-object';
 import config from '../config'
-import Injector from '../services/injector';
-import FloatboxService from '../services/floatbox';
 
 let _id = 1;
 
 class Polygon extends NodeObject {
   constructor(options){
     super(options.nodeConf);
+    this._id = _id;
     Object.assign(this, options.coordinates);
+    _id++;
   }
+  
   createGraphics(attrs){
     let self = this;
     let _graphics = new PIXI.Graphics();
@@ -22,17 +23,15 @@ class Polygon extends NodeObject {
     _graphics.alpha = 0.5;
     _graphics.interactive=true;
     _graphics.buttonMode=true;
-    Injector.inject(this, ['controller', 'renderer']);
-    _graphics.on("mouseover", (e) => {
-      _graphics.tint=attrs.fillStyle;
-      let position  = {
-        x: self.controller.x,
-        y: self.controller.y
-      }
-      FloatboxService.execute(e, self.node.values, position);
+    _graphics.on("click", (e) => {
+      self.node.tracer.inspectedNodeObject = self;
+    });
+    _graphics.on("mouseover", () => {
+      _graphics.tint = attrs.fillStyle;;
     });
     _graphics.on("mouseout", () => {
-      _graphics.tint="0xFFFFFF";
+      if (self.node.tracer.inspectedNodeObject == self) return;
+      _graphics.tint = "0xFFFFFF";
     });
 
     let texture = this.renderer.generateTexture(_graphics);
@@ -40,25 +39,29 @@ class Polygon extends NodeObject {
     polygonSprite = _graphics;
     return polygonSprite;
   }
+
   get graphics(){
     if(!this._graphics){
       this._graphics = this.createGraphics(this.node.polygonAttrs);
     }
-    // return null;
     return this._graphics;
   }
+
   get maxX(){
     let xcoords = this.points.filter((a,i)=>i%2===0);
     return Math.max(...xcoords);
   }
+
   get maxY(){
     let ycoords = this.points.filter((a,i)=>i%2===1);
     return Math.max(...ycoords);
   }
+
   get minX(){
     let xcoords = this.points.filter((a,i)=>i%2===0);
     return Math.min(...xcoords);
   }
+
   get minY(){
     let ycoords = this.points.filter((a,i)=>i%2===1);
     return Math.min(...ycoords);

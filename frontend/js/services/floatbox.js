@@ -22,9 +22,14 @@ let FloatboxService = new StateMachine({
         to: 'hidden'
       }
     ],
+
     data: {
-      values: null
+      values: null,
+      initCallbacks: [],
+      showCallbacks: [],
+      hideCallbacks: []
     },
+
     methods: {
 
       /**
@@ -45,6 +50,7 @@ let FloatboxService = new StateMachine({
       * This lifecycle function hides the context menu
       */
       onHide(){
+        this.runCallbacks('hide');
         $("#context-menu").hide();
       },
 
@@ -52,7 +58,8 @@ let FloatboxService = new StateMachine({
       * @function onShow
       * This lifecycle function shows the context menu
       */
-      onShow(transition, event, values, position){
+      onShow(transition, values, position){
+        this.runCallbacks('show');
         this.values = values;
         $("#context-menu").html(this.htmlStr());
         $("#context-menu").css("left",position.x + 5);
@@ -76,11 +83,54 @@ let FloatboxService = new StateMachine({
       * @function showMenu
       * This function hides previous menu(if any). Loads the menu witht he new information and shows it.
       */
-      showMenu(event, values, position) {
+      showMenu(values, position) {
         if(this.state!="hidden"){
           this.hide();
         }
-        this.show(event, values, position);
+        this.show(values, position);
+      },
+
+      /**
+      * @function runCallbacks
+      * This funciton runs all the callbacks corresponding to the transition type passed to it.
+      * @param {string} type - type of transition
+      */
+       runCallbacks(type){
+        let callbacks;
+        switch (type) {
+          case "init":
+            callbacks = this.initCallbacks;
+            break;
+          case "show":
+            callbacks = this.showCallbacks;
+            break;
+          case "hide":
+            callbacks = this.hideCallbacks;
+            break;
+        }
+        callbacks.forEach((callback) => {
+          callback();
+        });
+      },
+
+      /**
+      * @function addCallback
+      * This function adds callback function to the callbacks array of corresponding transition type
+      * @param {string} type - type of transition
+      * @param {function} callback - callback funciton
+      */
+       addCallback(type, callback){
+        switch (type) {
+          case "init":
+            this.initCallbacks.push(callback);
+            break;
+          case "show":
+            this.showCallbacks.push(callback);
+            break;
+          case "hide":
+            this.hideCallbacks.push(callback);
+            break;
+        }
       },
 
       /**

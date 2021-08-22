@@ -1,7 +1,7 @@
 import "../styles/app.scss";
 import "../styles/vendor.scss";
 
-import '@fortawesome/fontawesome-free/js/all'
+// import '@fortawesome/fontawesome-free/js/all'
 
 import Controller from './controller';
 

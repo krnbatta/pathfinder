@@ -2,13 +2,9 @@ import * as PIXI from 'pixi.js'
 
 import NodeObject from './node-object';
 import config from '../config';
-import Injector from '../services/injector';
 import NodeStateService from '../services/node-state';
 import Store from '../services/store';
-import FloatboxService from '../services/floatbox';
 import debounce from '../utils/debounce';
-import drawLine from '../utils/draw-line';
-import GraphicsManager from '../services/graphics-manager';
 
 let _id = 1;
 
@@ -25,6 +21,7 @@ class Circle extends NodeObject {
     }
     _id++;
   }
+
   createGraphics(attrs){
     let self = this;
     let _graphics = new PIXI.Graphics();
@@ -34,17 +31,12 @@ class Circle extends NodeObject {
     _graphics.endFill();
     _graphics.interactive=true;
     _graphics.buttonMode=true;
-    Injector.inject(this, ['controller', 'renderer']);
-    _graphics.on("mouseover", (e) => {
-      _graphics.tint=attrs.fillStyle;
-      let position  = {
-        x: self.controller.x,
-        y: self.controller.y
-      }
-      FloatboxService.execute(e, self.node.values, position);
+    _graphics.on("mouseover", () => {
+      _graphics.tint = attrs.fillStyle;
     });
     _graphics.on("mouseout", () => {
-      _graphics.tint="0xFFFFFF";
+      if (self.node.tracer.inspectedNodeObject == self) return;
+      _graphics.tint = "0xFFFFFF";
     });
     self.nodesHidden = true;
     let toggleNodes = debounce(function(){
@@ -52,14 +44,7 @@ class Circle extends NodeObject {
       circles.forEach((circle) => {
         circle.node.showUnPersistedPart();
       });
-      GraphicsManager.remove(self.controller, self.node.step.tracer.line);
-      if(self.nodesHidden){
-        self.node.step.tracer.line = drawLine(self.controller, self.node, 0xE40E40);
-        self.nodesHidden = false;
-      }
-      else{
-        self.nodesHidden = true;
-      }
+      self.node.tracer.inspectedNodeObject = self;
     });
     _graphics.on("click", () => {
       toggleNodes();
@@ -70,31 +55,36 @@ class Circle extends NodeObject {
         NodeStateService.process(self.node.state_variables);
       });
     }
-    // let texture = this.renderer.generateTexture(_graphics);
-    // let circleSprite = new PIXI.Sprite(texture);
     return _graphics;
   }
+
   get graphics(){
     if(!this._graphics){
       this._graphics = this.createGraphics(this.node.attrs);
     }
     return this._graphics;
   }
+  
   get center(){
     return {x: config.nodeSize*(this.cx), y: config.nodeSize*(this.cy)};
   }
+
   get maxX(){
     return this.cx;
   }
+
   get maxY(){
     return this.cy;
   }
+
   get minX(){
     return this.cx;
   }
+
   get minY(){
     return this.cy;
   }
+
 }
 
 export default Circle;
