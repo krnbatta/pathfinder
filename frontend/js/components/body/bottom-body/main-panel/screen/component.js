@@ -3,6 +3,7 @@ import StateMachine from "javascript-state-machine";
 import template from './template'
 import $ from 'jquery';
 import BaseComponent from '../../../../base-component';
+import Controller from '../../../../../controller';
 
 /**
 * @module components/monitor
@@ -28,6 +29,19 @@ let ScreenComponent = new StateMachine($.extend({}, BaseComponent, {
     },
 
     bindEvents() {
+    },
+
+    updateLabel() {
+      let mapName = Controller.mapTitle;
+      let traceName = Controller.traceTitle;
+      $('#screen-heading .screen-map-name').html('');
+      $('#screen-heading .screen-trace-name').html('');
+      if(mapName) {
+        $('#screen-heading .screen-map-name').html(`(${mapName})`);
+      }
+      if(traceName) {
+        $('#screen-heading .screen-trace-name').html(`(${traceName})`);
+      }
     }
   }
 }));

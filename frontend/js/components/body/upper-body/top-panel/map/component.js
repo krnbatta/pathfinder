@@ -12,7 +12,9 @@ import GridService from '../../../../../services/grid';
 import MeshService from '../../../../../services/mesh';
 import RoadNetworkService from '../../../../../services/road-network';
 import CameraControlsComponent from '../camera-controls/component';
+import ScreenComponent from "../../../bottom-body/main-panel/screen/component";
 import Spinner from '../../../../../services/spinner';
+import FloatboxService from "../../../../../services/floatbox";
 /**
 * @module components/map
 * This component handles the uploading of map file.
@@ -41,6 +43,7 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function creates map record from the map fil and hides map upload. It then draws the map on the screen.
     */
     bindEvents() {
+      let self = this;
       $("#map-input").on('change', (e) => {
         Spinner.show();
         if(this.validateFiles(e.target.files)){
@@ -49,6 +52,15 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
         else{
           Spinner.hide();
           alert("Invalid format(s)");
+        }
+      });
+      $('#map-label').on('click', (e) => {
+        if(self.mapLoaded){
+          if(confirm('Changing Map would reset the current state. Do you want to do that?')){
+            window.location.reload();
+          }
+          e.preventDefault();
+          return false;
         }
       });
     },
@@ -104,9 +116,12 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
     },
 
     postProcess(){
-      $("#map").html(`<div id='map-label'>${Controller.mapTitle}</div>`);
+      // $("#map").html(`<div id='map-label'>${Controller.mapTitle}</div>`);
+      $('#map-label span').html(' Update Operating Environment');
       CameraControlsComponent.showMapControl();
       CameraControlsComponent.showScaleControl();
+      this.mapLoaded = true;
+      ScreenComponent.updateLabel();
     },
 
     validateFiles(files){

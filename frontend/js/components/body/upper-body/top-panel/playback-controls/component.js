@@ -69,11 +69,11 @@ let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function hides all the buttons
     */
     hideAll(){
-      $('#play').parent('.btn-with-title').hide();
-      $('#step-forward').parent('.btn-with-title').hide();
-      $('#step-backward').parent('.btn-with-title').hide();
-      $('#pause').parent('.btn-with-title').hide();
-      $('#stop').parent('.btn-with-title').hide();
+      $('#play').prop('disabled', true);
+      $('#step-forward').prop('disabled', true);
+      $('#step-backward').prop('disabled', true);
+      $('#pause').prop('disabled', true);
+      $('#stop').prop('disabled', true);
     },
 
     /**
@@ -81,11 +81,11 @@ let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function shows only pause and stop button
     */
     play(){
-      $('#play').parent('.btn-with-title').hide();
-      $('#step-forward').parent('.btn-with-title').hide();
-      $('#step-backward').parent('.btn-with-title').hide();
-      $('#pause').parent('.btn-with-title').show();
-      $('#stop').parent('.btn-with-title').show();
+      $('#play').prop('disabled', true);
+      $('#step-forward').prop('disabled', true);
+      $('#step-backward').prop('disabled', true);
+      $('#pause').prop('disabled', false);
+      $('#stop').prop('disabled', false);
     },
 
     /**
@@ -93,11 +93,11 @@ let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function shows play, step and stop button
     */
     pause(){
-      $('#play').parent('.btn-with-title').show();
-      $('#step-forward').parent('.btn-with-title').show();
-      $('#step-backward').parent('.btn-with-title').show();
-      $('#pause').parent('.btn-with-title').hide();
-      $('#stop').parent('.btn-with-title').show();
+      $('#play').prop('disabled', false);
+      $('#step-forward').prop('disabled', false);
+      $('#step-backward').prop('disabled', false);
+      $('#pause').prop('disabled', true);
+      $('#stop').prop('disabled', false);
     },
 
     /**
@@ -105,11 +105,11 @@ let PlaybackControlsComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function shows play and step buttons
     */
     reset(){
-      $('#play').parent('.btn-with-title').show();
-      $('#step-forward').parent('.btn-with-title').show();
-      $('#step-backward').parent('.btn-with-title').show();
-      $('#pause').parent('.btn-with-title').hide();
-      $('#stop').parent('.btn-with-title').hide();
+      $('#play').prop('disabled', false);
+      $('#step-forward').prop('disabled', false);
+      $('#step-backward').prop('disabled', false);
+      $('#pause').prop('disabled', true);
+      $('#stop').prop('disabled', true);
     }
   }
 }));

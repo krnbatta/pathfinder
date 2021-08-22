@@ -36,13 +36,13 @@ let TimeTravelComponent = new StateMachine($.extend({}, BaseComponent, {
 
     hide() {
       this.shown = false;
-      $("#time-travel").hide();
+      $("#tt-btn").prop('disabled', true);
     },
 
     show() {
       if (!this.shown) {
         this.shown = true;
-        $("#time-travel").show();
+        $("#tt-btn").prop('disabled', false);
       }
     },
 

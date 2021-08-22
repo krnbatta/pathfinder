@@ -26,31 +26,42 @@ let CameraControlsComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     onLeaveNone() {
       $("#camera-controls").html(template);
+      this.hideAll();
       this.bindEvents();
     },
 
+    /**
+    * @function hideAll
+    * This function hides all the buttons
+    */
+     hideAll(){
+      this.hideMapControl();
+      this.hideScaleControl();
+      this.hideDebuggerControl();
+    },
+
     hideMapControl(){
-      $("#fit-map").parent('.btn-with-title').hide();
+      $("#fit-map").prop('disabled', true);
     },
 
     showMapControl(){
-      $("#fit-map").parent('.btn-with-title').show();
+      $("#fit-map").prop('disabled', false);
     },
 
     hideScaleControl(){
-      $("#fit-scale").parent('.btn-with-title').hide();
+      $("#fit-scale").prop('disabled', true);
     },
 
     showScaleControl(){
-      $("#fit-scale").parent('.btn-with-title').show();
+      $("#fit-scale").prop('disabled', false);
     },
 
     hideDebuggerControl(){
-      $("#fit-debugger").parent('.btn-with-title').hide();
+      $("#fit-debugger").prop('disabled', true);
     },
 
     showDebuggerControl(){
-      $("#fit-debugger").parent('.btn-with-title').show();
+      $("#fit-debugger").prop('disabled', false);
     },
 
     /**

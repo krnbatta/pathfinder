@@ -66,6 +66,10 @@ class StoreSingleton {
     findBy(modelName, condition){
       return this.where(modelName, condition)[0];
     }
+
+    clearData() {
+      this.data = {};
+    }
 }
 let Store = new StoreSingleton();
 window.store = Store;

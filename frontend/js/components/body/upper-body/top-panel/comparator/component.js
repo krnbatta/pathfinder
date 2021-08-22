@@ -43,13 +43,13 @@ let ComparatorComponent = new StateMachine($.extend({}, BaseComponent, {
 
     hide(){
       this.shown = false;
-      $("#comparator").hide();
+      $("#cp-btn").prop('disabled', true);
     },
 
     show(){
       if(!this.shown){
         this.shown = true;
-        $("#comparator").show();
+        $("#cp-btn").prop('disabled', false);
       }
     },
 

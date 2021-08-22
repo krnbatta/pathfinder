@@ -41,13 +41,13 @@ let BreakpointsComponent = new StateMachine($.extend({}, BaseComponent, {
 
     hide(){
       this.shown = false;
-      $("#breakpoints").hide();
+      $("#bp-btn").prop('disabled', true);
     },
 
     show(){
       if(!this.shown){
         this.shown = true;
-        $("#breakpoints").show();
+        $("#bp-btn").prop('disabled', false);
       }
     },
 

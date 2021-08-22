@@ -21,7 +21,7 @@ let LoggerOverlayComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     onBeforeInit() {
       // $("#side-panel").append("<div id='events-list'></div>");
-      $("#events-list").append("<div id='logger-overlay'></div>");
+      $("#events-list").append("<div id='logger-overlay' style='display:none;'></div>");
     },
 
     /**

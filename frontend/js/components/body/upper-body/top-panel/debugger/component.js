@@ -5,7 +5,7 @@ import Store from '../../../../../services/store';
 import $ from 'jquery';
 import BaseComponent from '../../../../base-component';
 import Controller from '../../../../../controller';
-import MapComponent from '../map/component';
+import ScreenComponent from "../../../bottom-body/main-panel/screen/component";
 import BreakpointsComponent from '../breakpoints/component';
 import ComparatorComponent from '../comparator/component';
 import TimeTravelComponent from '../time-travel/component';
@@ -41,11 +41,21 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function creates Tracer record from the algorithm debug file, hides map and algorithm upload. It then starts the controller.
     */
     bindEvents() {
+      let self = this;
       $("#debug-input").on('change', (e) => {
         let debugFile = e.target.files[0];
         Store.createRecord('Tracer', debugFile);
         Controller.traceTitle = debugFile.name.split(".")[0];
         this.postProcess();
+      });
+      $('#debug-label').on('click', (e) => {
+        if(self.tracerLoaded){
+          if(confirm('Changing Trace would reset the current state. Do you want to do that?')){
+            window.location.reload();
+          }
+          e.preventDefault();
+          return false;
+        }
       });
     },
 
@@ -55,7 +65,8 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
         $("#map").hide();
         // $("#map").html(`<div id='map-label'>No Operating Environment Uploaded</div>`);
       }
-      $("#algorithm").html(`<div id='debug-label'>Search Trace: ${Controller.traceTitle}</div>`);
+      // $("#algorithm").html(`<div id='debug-label'>Search Trace: ${Controller.traceTitle}</div>`);
+      $('#debug-label span').html(' Update Search Trace');
       Controller.start();
       BreakpointsComponent.show();
       ComparatorComponent.show();
@@ -66,6 +77,8 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
       this.tracer.steps.then(() => {
         Controller.fitDebugger();
       });
+      this.tracerLoaded = true;
+      ScreenComponent.updateLabel();
     }
   }
 }));

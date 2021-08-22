@@ -27,11 +27,11 @@ let LegendComponent = new StateMachine($.extend({}, BaseComponent, {
     },
 
     hide(){
-      $("#legend").hide();
+      // $("#legend").hide();
     },
 
     show(){
-      $("#legend").show();
+      // $("#legend").show();
     },
 
     setupLegends(){
