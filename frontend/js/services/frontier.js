@@ -82,6 +82,9 @@ let FrontierService = {
 
   stepBackward(){
     let frontiers = this.history.pop();
+    if(this.currentId==0){
+      return;
+    }
     let prevFrontiers = this.history[this.currentId-1];
     this.current = prevFrontiers;
     if(frontiers.length){

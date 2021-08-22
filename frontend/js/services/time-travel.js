@@ -4,6 +4,14 @@ import HistoryService from './history';
 import SearchPathService from './search-path';
 
 export default {
+  goToEvent(context, id) {
+    if(context.currentId < id) {
+      this.goEventForwards(context, id-context.currentId+1);
+    } else {
+      this.goEventBackwards(context, context.currentId-id-1);
+    }
+  },
+
   goEventBackwards(context, backVal) {
     context.timeTravelling = true;
     let currentId = context.currentId;

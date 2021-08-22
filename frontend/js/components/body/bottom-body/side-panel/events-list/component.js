@@ -7,6 +7,7 @@ import LoggerOverlayComponent from "../logger-overlay/component";
 import PlaybackService from '../../../../../services/playback';
 import Store from '../../../../../services/store';
 import nodeColor from '../../../../../utils/node-color';
+import TimeTravelService from "../../../../../services/time-travel";
 
 import Controller from '../../../../../controller';
 import config from '../../../../../config';
@@ -71,50 +72,75 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     pause() {
       $("#events").show();
+      this.scrollToCurrentEvent();
       LoggerOverlayComponent.pause();
       this.highlightNodes();
     },
 
+    scrollToCurrentEvent() {
+      // if(this.events.length){
+      //   let stepId = this.events[this.events.length - 1];
+      //   let el;
+      //   if (stepId > 5) {
+      //     el = document.getElementById(`event-${stepId-5}`);
+      //   } else {
+      //     el = document.getElementById(`event-${stepId}`);
+      //   }
+      //   el.scrollIntoView();
+      // }
+    },
+
     clearHighlighting(){
-      document.querySelectorAll(".event[data-highlight='1']").forEach((node) => {
-        let rgba = `rgba(${node.dataset.r},${node.dataset.g},${node.dataset.b},0.5)`
-        node.style.background = rgba;
-        delete node.dataset.highlight;
-        node.style.removeProperty('font-weight');
+      this.highlightedEvents.forEach((li) => {
+        let rgba = `rgba(${li.dataset.r},${li.dataset.g},${li.dataset.b},0.5)`
+        li.style.background = rgba;
+        delete li.dataset.highlight;
+        li.style.removeProperty('font-weight');
       });
+      this.highlightedEvents = [];
     },
 
     highlightNodes(){
       this.clearHighlighting();
-      let currentNodeId = Controller.currentId - 1;
-      let currentNode = Store.findById("Node", currentNodeId);
+      if(this.events.length == 0){
+        return;
+      }
+      let currentStepId = this.events[this.events.length-1];
+      let currentStep = Store.findById("Step", currentStepId);
+      let currentNode = currentStep.node;
       let siblingNodes = currentNode.siblingNodes;
       let parentNode = currentNode.parentNode;
       if(parentNode){
-        this.highlight(parentNode._id);
+        this.highlight(parentNode.step._id);
       }
-      this.highlight(currentNode._id);
+      this.highlight(currentNode.step._id);
       if(currentNode.step.isFrontier){
         let hex = config.nodeAttrs.frontier.fillColor.toString(16).padStart(6, '0')
         let rgba = `rgba(${'0x' + hex[0] + hex[1] | 0},${'0x' + hex[2] + hex[3] | 0},${'0x' + hex[4] + hex[5] | 0},1)`;
-        this.highlight(currentNode._id, rgba);
+        this.highlight(currentNode.step._id, rgba);
         siblingNodes.forEach((node) => {
-          this.highlight(node._id, rgba);
+          if(node.step._id < currentNode.step._id){
+            this.highlight(node.step._id, rgba);
+          }
         });
       }
     },
 
-    highlight(nodeId, rgba=null){
-      let node = document.getElementById(`event-${nodeId}`);
-      if(!node){
+    highlight(stepId, rgba=null){
+      if (stepId > this.events.length) {
+        return;
+      }
+      let li = document.getElementById(`event-${stepId}`);
+      if(!li){
         return;
       }
       if(!rgba){
-        rgba = `rgba(${node.dataset.r},${node.dataset.g},${node.dataset.b},1)`;
+        rgba = `rgba(${li.dataset.r},${li.dataset.g},${li.dataset.b},1)`;
       }
-      node.dataset.highlight = '1';
-      node.style.background = rgba;
-      node.style.fontWeight = 'bold';
+      li.dataset.highlight = '1';
+      li.style.background = rgba;
+      li.style.fontWeight = 'bold';
+      this.highlightedEvents.push(li);
     },
 
     /**
@@ -122,7 +148,15 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function hides the event list when algorithm is stopped.
     */
     reset() {
-      $("#events").hide();
+      this.highlightedEvents = [];
+      let tracer = Store.find('Tracer');
+      tracer.eventsListHtml.then((eventsListHtml) => {
+        $("#events").html(eventsListHtml);
+        $('.event').on("click", (e) => {
+          TimeTravelService.goToEvent(Controller, e.target.dataset.id);
+          // Controller.retraceHistory(e.target.dataset.id);
+        });
+      });
       LoggerOverlayComponent.reset();
     },
 
@@ -131,23 +165,23 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function add li element with the event details passed to it. It also binds retrace history upon clicking on the event.
     * @param {Object} event - It has _id, text
     */
-    addEvent(event) {
-      this.events.push(event);
-      let hex = config.nodeAttrs[nodeColor[event.type]].fillColor.toString(16).padStart(6, '0');
+    addEvent(step) {
+      this.events.push(step._id);
+      let hex = config.nodeAttrs[nodeColor[step.type]].fillColor.toString(16).padStart(6, '0');
       let r = '0x' + hex[0] + hex[1] | 0;
       let g = '0x' + hex[2] + hex[3] | 0;
       let b = '0x' + hex[4] + hex[5] | 0;
       let a = 0.5;
       let rgba = `rgba(${r},${g},${b},${a})`;
-      let li = $.parseHTML(`<li id='event-${event._id}' class="event" style="background: ${rgba};" data-r=${r} data-g=${g} data-b=${b} data-a=${a}>${event.text}</li>`)[0];
-      $(li).on("click", (e) => {
-        Controller.retraceHistory(event._id);
-      });
-      $("#events").append(li);
-      window.requestAnimationFrame(() => {
-        $("#events")[0].scrollTop = $("#events")[0].scrollHeight;
-      });
-      LoggerOverlayComponent.setNode(event.node);
+      let el = $(`#event-${step._id}`)
+      el.css('background', rgba);
+      el.attr('data-r', r);
+      el.attr('data-g', g);
+      el.attr('data-b', b);
+      el.attr('data-a', a);
+      this.highlightNodes();
+      this.scrollToCurrentEvent();
+      LoggerOverlayComponent.setNode(step.node);
     },
 
     /**
@@ -155,10 +189,21 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     * This function removes the last event from the list and screen.
     */
     removeEvent(){
-      this.events.pop();
-      $('#events .event:last-child').remove();
-      $("#events")[0].scrollTop = $("#events")[0].scrollHeight;
-      LoggerOverlayComponent.setNode(this.events[this.events.length - 1]);
+      let eventId = this.events.pop();
+      let li = document.getElementById(`event-${eventId}`);
+      li.style.removeProperty('background');
+      delete li.dataset.r;
+      delete li.dataset.g;
+      delete li.dataset.b;
+      delete li.dataset.a;
+      this.highlightNodes();
+      this.scrollToCurrentEvent();
+      if(this.events.length == 0){
+        return;
+      }
+      let stepId = this.events[this.events.length - 1];
+      let step = Store.findById('Step', stepId);
+      LoggerOverlayComponent.setNode(step.node);
     },
 
     /**
@@ -171,9 +216,11 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
       let pruneEvents = $('#events .event').slice(-pruneLength);
       pruneEvents.remove();
       this.events.length = id;
-      LoggerOverlayComponent.setNode(this.events[this.events.length - 1]);
+      let stepId = this.events[this.events.length - 1];
+      let step = Store.findById('Step', stepId);
+      LoggerOverlayComponent.setNode(step.node);
     }
   }
 }));
-
+window.comp = EventsListComponent;
 export default EventsListComponent;

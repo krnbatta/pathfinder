@@ -132,6 +132,15 @@ class Tracer {
     return this._steps;
   }
 
+  get eventsListHtml() {
+    if (!this._eventsListHtml) {
+      this._eventsListHtml = this.steps.then((steps) => {
+        return steps.reduce((htmlStr, step) => htmlStr + step.eventsListHtml, '');
+      });
+    }
+    return this._eventsListHtml;
+}
+
   checkMax(node){
     if(node.maxX > this.maxX){
       this.maxX = node.maxX;
@@ -198,7 +207,7 @@ class Tracer {
   }
 
   hideChildrenPath() {
-    if(!this.inspectedNodeObject || !this.childLines.length) return;
+    if(!this.inspectedNodeObject || !this.childLines || !this.childLines.length) return;
     this.childLines.forEach((line) => {
       GraphicsManager.remove(this.controller, line);
     });

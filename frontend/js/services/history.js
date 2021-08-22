@@ -30,7 +30,7 @@ let HistoryService = {
     }
     else{
       //hide non persisted previous step node
-      if(this.currentId > 1){
+      if(this.currentId > 0){
         let previousStep = this.context.steps[this.currentId - 1];
         previousStep.node.hideUnPersistedPart();
       }
@@ -117,6 +117,7 @@ let HistoryService = {
     // this.history = [];
   },
 
+  // Draw State if each node represents a state.
   drawState(){
     if(this.getTracer().stateStructure && this.getNode(this.currentId)){
       NodeStateService.process(this.getNode(this.currentId).state_variables);

@@ -45,7 +45,7 @@ let Controller = new StateMachine({
       //runner => The runner is function looper that runs every step of the algorithm serially.
       runner: null,
       //currentId => Id of the current step being run
-      currentId: 1,
+      currentId: 0,
       //rendered => If the canvas has been rendered on the screen or not.
       rendered: false,
       //app => PIXI.Application object
@@ -273,7 +273,7 @@ let Controller = new StateMachine({
           SearchPathService.clearFuture();
           HistoryService.clearFuture();
           FrontierService.clearFuture();
-          EventsListComponent.clearEvents(this.currentId-1);
+          EventsListComponent.clearEvents(this.currentId);
           this.historyRetraced = false;
         }
       },
@@ -294,7 +294,7 @@ let Controller = new StateMachine({
         let currentStep = this.steps[this.currentId];
         this.runner();
         EventsListComponent.addEvent(currentStep);
-        EventsListComponent.highlightNodes();
+        // EventsListComponent.highlightNodes();
         if(!this.timeTravelling){
           let bpMsg = BreakpointService.check(currentStep.node);
           if(bpMsg){
@@ -352,7 +352,7 @@ let Controller = new StateMachine({
       */
       stepBackward() {
         this.clearFutureData();
-        if(this.currentId == 1){
+        if(this.currentId == -1){
           return;
         }
         this.currentId -= 1;
@@ -360,7 +360,7 @@ let Controller = new StateMachine({
         FrontierService.stepBackward();
         SearchPathService.stepBackward();
         EventsListComponent.removeEvent();
-        EventsListComponent.highlightNodes();
+        // EventsListComponent.highlightNodes();
       }
     }
 });

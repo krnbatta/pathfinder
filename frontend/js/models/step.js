@@ -178,6 +178,10 @@ class Step {
     return this.node.text;
   }
 
+  get eventsListHtml() {
+    return `<li id='event-${this._id}' data-id='${this._id}' class='event'>${this.text}</li>`;
+  }
+
 }
 
 export default Step;
