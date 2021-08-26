@@ -87,13 +87,13 @@ let FrontierService = {
     }
     let prevFrontiers = this.history[this.currentId-1];
     this.current = prevFrontiers;
-    if(frontiers.length){
+    if(frontiers && frontiers.length){
       let difference = frontiers.filter(x => !prevFrontiers.includes(x));
       difference.forEach((graphicsContainer) => {
         GraphicsManager.remove(this.context, graphicsContainer);
       });
     }
-    else if(prevFrontiers.length){
+    else if(prevFrontiers && prevFrontiers.length){
       prevFrontiers.forEach((graphicsContainer) => {
         GraphicsManager.insert(this.context, graphicsContainer);
       });

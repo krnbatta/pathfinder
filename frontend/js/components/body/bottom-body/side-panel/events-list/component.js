@@ -190,6 +190,9 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     removeEvent(){
       let eventId = this.events.pop();
+      // if(!eventId){
+      //   return;
+      // }
       let li = document.getElementById(`event-${eventId}`);
       li.style.removeProperty('background');
       delete li.dataset.r;
