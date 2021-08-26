@@ -56,12 +56,12 @@ let SearchPathService = {
   },
 
   reset(){
-    this.context.currentId = 1;
+    this.context.currentId = 0;
     // this.history = [];
   },
 
   stepBackward(){
-    let line = this.getLine(this.currentId + 1);
+    let line = this.getLine(this.currentId);
     GraphicsManager.remove(this.context, line);
     GraphicsManager.insert(this.context, this.getLine(this.currentId), 5);
   }

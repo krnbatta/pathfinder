@@ -113,7 +113,7 @@ let HistoryService = {
   },
 
   reset(){
-    this.context.currentId = 1;
+    this.context.currentId = 0;
     // this.history = [];
   },
 
@@ -125,7 +125,7 @@ let HistoryService = {
   },
 
   stepBackward(){
-    let graphicsContainer = this.getGraphicsContainer(this.currentId + 1);
+    let graphicsContainer = this.getGraphicsContainer(this.currentId);
     GraphicsManager.remove(this.context, graphicsContainer);
     this.drawState();
   }

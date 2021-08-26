@@ -81,11 +81,11 @@ let FrontierService = {
   },
 
   stepBackward(){
+    let prevFrontiers = this.history[this.currentId-1];
     let frontiers = this.history.pop();
     if(this.currentId==0){
       return;
     }
-    let prevFrontiers = this.history[this.currentId-1];
     this.current = prevFrontiers;
     if(frontiers && frontiers.length){
       let difference = frontiers.filter(x => !prevFrontiers.includes(x));

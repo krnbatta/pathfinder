@@ -352,14 +352,14 @@ let Controller = new StateMachine({
       */
       stepBackward() {
         this.clearFutureData();
-        if(this.currentId == -1){
+        if(this.currentId == 0){
           return;
         }
-        this.currentId -= 1;
         HistoryService.stepBackward();
         FrontierService.stepBackward();
         SearchPathService.stepBackward();
         EventsListComponent.removeEvent();
+        this.currentId -= 1;
         // EventsListComponent.highlightNodes();
       }
     }
