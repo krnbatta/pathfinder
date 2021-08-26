@@ -63,7 +63,7 @@ let DebuggerComponent = new StateMachine($.extend({}, BaseComponent, {
       this.tracer = Store.find('Tracer');
       if(!Controller.mapTitle){
         $("#map").hide();
-        // $("#map").html(`<div id='map-label'>No Operating Environment Uploaded</div>`);
+        // $("#map").html(`<div id='map-label'>No Domain Model Uploaded</div>`);
       }
       // $("#algorithm").html(`<div id='debug-label'>Search Trace: ${Controller.traceTitle}</div>`);
       $('#debug-label span').html(' Update Search Trace');

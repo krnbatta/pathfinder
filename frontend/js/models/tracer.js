@@ -260,7 +260,7 @@ class Tracer {
       let currentStateChildNode = childNode.currentStateNode(this.controller.currentId);
       let childNodeObjects = currentStateChildNode.persistedObjects;
       childNodeObjects.forEach((nodeObject) => {
-        nodeObject.graphics.tint = this.inspectedNodeObject.node.attrs.fillStyle;
+        nodeObject.graphics.tint = nodeObject.node.attrs.fillStyle;
       });
     });
   }

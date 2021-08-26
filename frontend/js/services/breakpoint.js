@@ -7,13 +7,23 @@ let BreakpointService = {
     return !!this.bps.length;
   },
   check(node){
-    return this.manualCheck(node, this.bpApplied, this.bps) + this.automaticCheck(node) + this.comparatorCheck(node);
+    return this.manualCheck(node, this.bpApplied, this.bps) + this.automaticCheck(node) + this.comparatorCheck(node) + this.explicitCheck(node);
   },
   setComparatorNodes(errorNodes){
     this.comparatorNodes = errorNodes;
   },
   setBps(bps){
     this.bps = bps;
+  },
+  setExplicitBps(node) {
+    node.explictBreakpoint = !node.explictBreakpoint;
+  },
+  explicitCheck(node) {
+    if(node.explictBreakpoint) {
+      node.explictBreakpoint = false;
+      return `You've hit a breakpoint at Node(${node._id+1}) from the event log window.`;
+    }
+    return ``;
   },
   comparatorCheck(node){
     let message = ``;

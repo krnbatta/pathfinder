@@ -1,5 +1,3 @@
-import * as PIXI from 'pixi.js'
-
 import NodeObject from './node-object';
 import config from '../config';
 import debounce from '../utils/debounce';

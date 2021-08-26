@@ -120,6 +120,10 @@ class Step {
     return this._currentNode;
   }
 
+  get isTerminal() {
+    return this.isSource || this.isDestination || this.isEnd;
+  }
+
   /**
   * isSource tells if this step suggests the source node.
   * @type {boolean}
@@ -136,6 +140,10 @@ class Step {
   */
   get isDestination() {
     return this.type=="destination";
+  }
+
+  get isEnd() {
+    return this.type=="end";
   }
 
   /**
@@ -179,7 +187,13 @@ class Step {
   }
 
   get eventsListHtml() {
-    return `<li id='event-${this._id}' data-id='${this._id}' class='event'>${this.text}</li>`;
+    let actionClass = this.isTerminal ? this.type+'-event' : 'debuggable';
+    return `
+      <li id='event-${this._id}' data-id='${this._id}' class='event'>
+        <div class='event-actions ${actionClass}'></div>
+        <div class='event-text'>${this._id+1}.) ${this.text}</div>
+      </li>
+    `;
   }
 
 }

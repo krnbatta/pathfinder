@@ -117,7 +117,7 @@ let MapComponent = new StateMachine($.extend({}, BaseComponent, {
 
     postProcess(){
       // $("#map").html(`<div id='map-label'>${Controller.mapTitle}</div>`);
-      $('#map-label span').html(' Update Operating Environment');
+      $('#map-label span').html(' Update Domain Model');
       CameraControlsComponent.showMapControl();
       CameraControlsComponent.showScaleControl();
       this.mapLoaded = true;

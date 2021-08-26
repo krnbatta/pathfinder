@@ -30,7 +30,7 @@ let FrontierService = {
         childNode.nodeObjects.forEach((nodeObject) => {
           nodeObject.renderGraphics();
         });
-        EventLogger.colorLog(childNode);
+        EventLogger.colorLog(childNode, 0.5);
       });
     }
   },
@@ -48,7 +48,7 @@ let FrontierService = {
         childNode.nodeObjects.forEach((nodeObject) => {
           nodeObject.renderGraphics();
         });
-        EventLogger.colorLog(childNode);
+        EventLogger.colorLog(childNode, 0.5);
       });
     }
   },

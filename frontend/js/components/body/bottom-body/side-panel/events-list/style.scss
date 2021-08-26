@@ -4,22 +4,73 @@
 }
 .event {
   list-style: none;
-  display: block;
+  display: flex;
+  align-items: center;
   cursor: pointer;
-  padding: 2px 0;
+  min-height: 50px;
+  // padding: 2px 0;
   border-bottom: 2px solid #d2d2d2;
+  position: relative;
   &:hover{
     color: white;
     background:#284570;
     border-radius:2px;
   }
-  &:before{
-    content: counter(item)".) ";
-    counter-increment: item;
-    color: black;
-  }
+  // &:before{
+  //   content: counter(item)".) ";
+  //   counter-increment: item;
+  //   color: black;
+  // }
   &:hover:before{
     color: white;
+  }
+  .event-actions {
+    width: 15%;
+    display: flex;
+    flex-direction: column;
+    // padding-left: 2px;
+    overflow: hidden;
+    margin-right: 3px;
+    position: relative;
+    &.expanding-event,&.source-event,&.destination-event,&.end-event {
+      display: none;
+    }
+    &.generating-event,&.updating-event {
+      align-self: stretch;    
+      &:before {
+        content: '┣';
+        font-size: 42px;
+        position: absolute;
+        left: -75%;
+        top: -6%;
+      }
+    }
+    &.closing-event {
+      align-self: stretch;   
+      width: 12%; 
+      &:before {
+        content: '┗';
+        font-size: 42px;
+        position: absolute;
+        left: -75%;
+        top: 0;
+      }
+    }
+    &.debuggable {
+      color: #cdcdcd;
+      font-size: 25px;
+      &:before {
+        content: "⊘";
+      }
+      &.active {
+        color: #ff0000;
+      }
+    }
+  }
+  .event-text {
+    display: inline-block;
+    // width: 92%;
+    padding: 2px 0;
   }
 }
 #events {

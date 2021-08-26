@@ -103,6 +103,9 @@ body{
   width: 45px;
   word-wrap: break-word;
   text-align: center;
+  &.disabled{
+    color: #cdcdcd;
+  }
 }
 
 #playback-controls,#breakpoints,#comparator,#camera-controls{

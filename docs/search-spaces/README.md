@@ -1,4 +1,4 @@
-# Operating Environment
+# Domain Model
 
 Normally, when visualising the search, we have 3 options:
 1. `Abstract Network`: In this case, we just want to see how the search unfold. This is sufficient for us to understand and debug the search.
