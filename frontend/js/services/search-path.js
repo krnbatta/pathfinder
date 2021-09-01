@@ -1,30 +1,12 @@
-import config from '../config';
-import Controller from '../controller';
 import GraphicsManager from '../services/graphics-manager';
-import drawLine from '../utils/draw-line';
 
 let SearchPathService = {
   init(context){
     this.context = context;
-    //history => history is history of lines drawn at each step.
-    this.history = [];
-    //current => The current is line PIXI.Graphics object which is basically a line drawn from current node to the source.
-    this.current = null;
   },
 
   get currentId(){
     return this.context.currentId;
-  },
-
-  /**
-  * @function update
-  * This function removes the previous line drawn and adds the current line on the screen. Line is from source to the current node.
-  * @param {Node} node
-  */
-  update(){
-    GraphicsManager.remove(this.context, this.getLine(this.currentId - 1));
-    let line = this.getLine(this.currentId);
-    GraphicsManager.insert(this.context, line, 5);
   },
 
   getLine(id){
@@ -37,15 +19,24 @@ let SearchPathService = {
     }
   },
 
-  retraceHistory(id){
-    let currentLine = this.getLine(this.currentId);
-    GraphicsManager.remove(this.context, currentLine);
-    let line = this.getLine(id);
+  /**
+  * @function stepForward
+  * This function removes the previous line drawn and adds the current line on the screen. Line is from source to the current node.
+  * @param {Node} node
+  */
+  stepForward(){
+    GraphicsManager.remove(this.context, this.getLine(this.currentId - 1));
+    let line = this.getLine(this.currentId);
     GraphicsManager.insert(this.context, line, 5);
   },
 
-  clearFuture(){
-    // this.history.length = this.currentId;
+  stepBackward(){
+    let line = this.getLine(this.currentId-1);
+    GraphicsManager.remove(this.context, line);
+    if(this.currentId == 1) {
+      return;
+    }
+    GraphicsManager.insert(this.context, this.getLine(this.currentId - 2), 5);
   },
 
   clean(){
@@ -57,13 +48,6 @@ let SearchPathService = {
 
   reset(){
     this.context.currentId = 0;
-    // this.history = [];
-  },
-
-  stepBackward(){
-    let line = this.getLine(this.currentId);
-    GraphicsManager.remove(this.context, line);
-    GraphicsManager.insert(this.context, this.getLine(this.currentId), 5);
   }
 }
 

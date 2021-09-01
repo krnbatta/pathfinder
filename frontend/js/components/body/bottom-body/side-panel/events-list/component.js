@@ -167,13 +167,13 @@ let EventsListComponent = new StateMachine($.extend({}, BaseComponent, {
     */
     addEvent(step) {
       this.events.push(step._id);
-      let hex = config.nodeAttrs[nodeColor[step.type]].fillColor.toString(16).padStart(6, '0');
+      let hex = step.node.attrs.fillColor.toString(16).padStart(6, '0');
       let r = '0x' + hex[0] + hex[1] | 0;
       let g = '0x' + hex[2] + hex[3] | 0;
       let b = '0x' + hex[4] + hex[5] | 0;
       let a = 0.5;
       let rgba = `rgba(${r},${g},${b},${a})`;
-      let el = $(`#event-${step._id}`)
+      let el = $(`#event-${step._id}`);
       el.css('background', rgba);
       el.attr('data-r', r);
       el.attr('data-g', g);

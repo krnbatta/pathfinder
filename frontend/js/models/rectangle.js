@@ -3,6 +3,7 @@ import * as PIXI from 'pixi.js'
 import NodeObject from './node-object';
 import config from '../config';
 import debounce from '../utils/debounce';
+import GraphicsStore from '../services/graphics-store';
 
 let _id = 0;
 
@@ -14,37 +15,35 @@ class Rectangle extends NodeObject {
     _id++;
   }
 
-  createGraphics(attrs){
-    let self = this;
-    let _graphics = new PIXI.Graphics();
-    _graphics.lineStyle(1, attrs.strokeStyle);
-    _graphics.beginFill(attrs.fillStyle);
-    _graphics.drawRect(this.x * config.nodeSize, this.y * config.nodeSize, config.nodeSize, config.nodeSize);
-    _graphics.endFill();
-    _graphics.interactive=true;
-    _graphics.buttonMode=true;
-    _graphics.on("mouseover", () => {
-      _graphics.tint = attrs.fillStyle;;
-    });
-    _graphics.on("mouseout", () => {
-      if (self.node.tracer.inspectedNodeObject == self) return;
-      _graphics.tint = "0xFFFFFF";
-    });
+  mouseoverEventHandler() {
+    this.graphics.tint = this.node.attrs.darkColor;
+  }
+
+  mouseoutEventHandler() {
+    if (this.node.tracer.inspectedNodeObject == this) return;
+    this.graphics.tint = this.node.attrs.fillStyle;
+  }
+
+  clickEventHandler() {
+    const toggleNodesFn = this.toggleNodes();
+    toggleNodesFn();
+  }
+
+  toggleNodes() {
+    const self = this;
     self.nodesHidden = true;
-    let toggleNodes = debounce(function(){
+    return debounce(function(){
       self.node.tracer.inspectedNodeObject = self;
     });
-    _graphics.on("click", () => {
-      toggleNodes();
-    });
-    return _graphics;
   }
   
-  get graphics(){
-    if(!this._graphics){
-      this._graphics = this.createGraphics(this.node.attrs);
-    }
-    return this._graphics;
+  renderGraphics(){
+    let rect = GraphicsStore.getRect(this);
+    rect.removeAllListeners();
+    rect.on('click', this.clickEventHandler.bind(this));
+    rect.on('mouseover', this.mouseoverEventHandler.bind(this));
+    rect.on('mouseout', this.mouseoutEventHandler.bind(this));
+    this.graphics = rect;
   }
 
   get center(){

@@ -21,6 +21,10 @@ import Renderer from './services/renderer';
 import mouseTracker from './services/mouse-tracker';
 import resizeTracker from './services/resize-tracker';
 import Injector from './services/injector';
+import GraphicsStore from "./services/graphics-store";
+import * as PIXI from 'pixi.js';
+import EventLogger from "./services/event-logger";
+
 /**
 * @module controller
 * The controller is the main part which controls the whole app. It is a StateMachine with 3 states: none, ready and running. Init transition changes state from none to ready. Start transition changes state from ready to running.
@@ -82,6 +86,8 @@ let Controller = new StateMachine({
         HistoryService.init(this);
         FrontierService.init(this);
         SearchPathService.init(this);
+        GraphicsStore.init(this);
+        EventLogger.init(this);
         this.configureToastr();
         this.preloadFiles();
       },
@@ -293,7 +299,7 @@ let Controller = new StateMachine({
         }
         let currentStep = this.steps[this.currentId];
         this.runner();
-        EventsListComponent.addEvent(currentStep);
+        // EventsListComponent.addEvent(currentStep);
         // EventsListComponent.highlightNodes();
         if(!this.timeTravelling){
           let bpMsg = BreakpointService.check(currentStep.node);
@@ -343,7 +349,8 @@ let Controller = new StateMachine({
         this.cleanCanvas();
         HistoryService.reset();
         FrontierService.reset();
-        EventsListComponent.clearEvents(this.currentId);
+        EventLogger.reset();
+        // EventsListComponent.clearEvents(this.currentId);
       },
 
       /**
@@ -358,7 +365,8 @@ let Controller = new StateMachine({
         HistoryService.stepBackward();
         FrontierService.stepBackward();
         SearchPathService.stepBackward();
-        EventsListComponent.removeEvent();
+        EventLogger.stepBackward();
+        // EventsListComponent.removeEvent();
         this.currentId -= 1;
         // EventsListComponent.highlightNodes();
       }
@@ -367,4 +375,5 @@ let Controller = new StateMachine({
 Injector.register('controller', Controller);
 
 window.controller = Controller;
+window.PIXI = PIXI;
 export default Controller;

@@ -2,7 +2,6 @@
  "eventList":[
 {"type":"source","id":1736,"variables":{"x":8,"y":15}},
 {"type":"destination","id":4419,"variables":{"x":3,"y":43}},
-{"type":"generating","id":1736,"variables":{"x":8,"y":15},"g":0,"f":0.000300711,"pId":null},
 {"type":"expanding","id":1736,"variables":{"x":8,"y":15},"g":0,"f":0.000300711,"pId":null},
 {"type":"generating","id":1640,"variables":{"x":8,"y":14},"g":1e-05,"f":0.000320711,"pId":1736},
 {"type":"generating","id":1737,"variables":{"x":9,"y":15},"g":1e-05,"f":0.000314853,"pId":1736},
@@ -2577,8 +2576,5 @@
 {"type":"closing","id":4421,"variables":{"x":5,"y":43},"g":0.000566569,"f":0.000586569,"pId":4422},
 {"type":"expanding","id":4420,"variables":{"x":4,"y":43},"g":0.000576569,"f":0.000586569,"pId":4421},
 {"type":"generating","id":4419,"variables":{"x":3,"y":43},"g":0.000586569,"f":0.000586569,"pId":4420},
-{"type":"generating","id":4515,"variables":{"x":3,"y":44},"g":0.000590711,"f":0.000600711,"pId":4420},
-{"type":"generating","id":4323,"variables":{"x":3,"y":42},"g":0.000590711,"f":0.000600711,"pId":4420},
-{"type":"closing","id":4420,"variables":{"x":4,"y":43},"g":0.000576569,"f":0.000586569,"pId":4421},
 {"type":"end","id":4419,"variables":{"x":3,"y":43},"g":0.000586569,"f":0.000586569,"pId":4420}
 ]}

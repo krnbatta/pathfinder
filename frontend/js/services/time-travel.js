@@ -17,11 +17,11 @@ export default {
     let currentId = context.currentId;
     let proposedId = currentId - backVal;
     proposedId = Math.max(proposedId, 1);
-    while (context.currentId != proposedId + 1) {
+    while (context.currentId != proposedId) {
       context.stepBackward();
     }
     context.timeTravelling = false;
-    context.stepBackward();
+    // context.stepBackward();
   },
 
   goEventForwards(context, frontVal) {
@@ -29,14 +29,14 @@ export default {
     let currentId = context.currentId;
     let proposedId = currentId + frontVal;
     proposedId = Math.min(proposedId, context.totalSteps);
-    while (context.currentId != proposedId - 1) {
+    while (context.currentId != proposedId) {
       context.stepForward();
     }
     context.timeTravelling = false;
-    HistoryService.flush();
-    SearchPathService.update();
-    GraphicsManager.flushBuffer(context);
-    context.stepForward();
+    // HistoryService.flush();
+    // SearchPathService.update();
+    // GraphicsManager.flushBuffer(context);
+    // context.stepForward();
   },
 
   goExpansionBackwards(context, backVal) {

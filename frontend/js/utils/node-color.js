@@ -4,9 +4,10 @@
 export default {
   'source': 'source',
   'destination': 'destination',
-  'generating': 'opened',
+  'generating': 'frontier',
   'expanding': 'current',
   'closing': 'closed',
-  'updating': 'opened',
+  'updating': 'frontier',
+  'opened': 'opened',
   'end': 'destination'
 }

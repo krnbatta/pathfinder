@@ -244,7 +244,7 @@ class Tracer {
       let currentStateChildNode = childNode.currentStateNode(this.controller.currentId);
       let childNodeObjects = currentStateChildNode.persistedObjects;
       childNodeObjects.forEach((nodeObject) => {
-        nodeObject.graphics.tint = config.nodeAttrs.frontier.fillColor;
+        nodeObject.graphics.tint = nodeObject.node.attrs.frontierColor;
       });
     });
   }
@@ -260,19 +260,19 @@ class Tracer {
       let currentStateChildNode = childNode.currentStateNode(this.controller.currentId);
       let childNodeObjects = currentStateChildNode.persistedObjects;
       childNodeObjects.forEach((nodeObject) => {
-        nodeObject.graphics.tint = "0xFFFFFF";
+        nodeObject.graphics.tint = this.inspectedNodeObject.node.attrs.fillStyle;
       });
     });
   }
 
   darkenInspectedNodeObject(){
     this.controller.executeFloatbox();
-    this.inspectedNodeObject.graphics.tint = this.inspectedNodeObject.node.attrs.fillStyle;
+    this.inspectedNodeObject.graphics.tint = this.inspectedNodeObject.node.attrs.darkColor;
   }
 
   lightenInspectedNodeObject(){
     if (!this.inspectedNodeObject) return;
-    this.inspectedNodeObject.graphics.tint = "0xFFFFFF";
+    this.inspectedNodeObject.graphics.tint = this.inspectedNodeObject.node.attrs.fillStyle;
   }
 }
 

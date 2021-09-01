@@ -1,6 +1,7 @@
 import FrontierService from '../services/frontier';
 import SearchPathService from '../services/search-path';
 import HistoryService from '../services/history';
+import EventLogger from '../services/event-logger';
 
 //history
 //clear the canvas
@@ -37,13 +38,15 @@ let runnerFactory = function(steps) {
             return;
         }
         //update history
-        HistoryService.update();
+        HistoryService.stepForward();
 
-        FrontierService.update();
+        FrontierService.stepForward();
 
         //update search path
-        SearchPathService.update();
+        SearchPathService.stepForward();
 
+        EventLogger.stepForward();
+        
         //update id
         HistoryService.updateId();
     });

@@ -7,16 +7,16 @@ export default {
     if(!graphics){
       return;
     }
-    if(context.timeTravelling){
-      if(!this.currentBuffer){
-        this.currentBuffer = new PIXI.Container();
-        this.currentBuffer.zIndex = 10;
-      }
-      this.currentBuffer.addChild(graphics);
-    }
-    else{
+    // if(context.timeTravelling){
+    //   if(!this.currentBuffer){
+    //     this.currentBuffer = new PIXI.Container();
+    //     this.currentBuffer.zIndex = 10;
+    //   }
+    //   this.currentBuffer.addChild(graphics);
+    // }
+    // else{
       context.stage.addChild(graphics);
-    }
+    // }
   },
 
   remove(context, graphics){

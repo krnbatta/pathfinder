@@ -4,9 +4,7 @@ import Store from '../services/store'
 import NodeObjectsProcessor from '../services/node-objects-processor'
 import config from '../config'
 import nodeColor from '../utils/node-color';
-import nodeFactory from '../utils/node-factory';
-import Injector from '../services/injector';
-import {GlowFilter} from '@pixi/filter-glow';
+import EventLogger from '../services/event-logger';
 
 let _id = 0;
 
@@ -102,7 +100,9 @@ class Node {
     return {
       fillStyle: nodeAttrs.fillColor,
       strokeStyle: config.borderColor,
-      strokeWidth: config.borderWidth
+      strokeWidth: config.borderWidth,
+      darkColor: nodeAttrs.darkColor,
+      frontierColor: nodeAttrs.frontierColor
     }
   }
 
@@ -125,23 +125,12 @@ class Node {
     }
   }
 
-  /**
-  * graphics is PIXI.Graphics object that is a rectangle to drawn on canvas using nodeFactory.
-  * @type {PIXI.Graphics}
-  * @public
-  */
-  get graphics() {
-    if (!this._graphics){
-      let container = new PIXI.Container();
-      container.zIndex = 10;
-      this.nodeObjects.forEach((nodeObject) => {
-        if(nodeObject.graphics){
-          container.addChild(nodeObject.graphics)
-        }
-      });
-      this._graphics = container;
-    }
-    return this._graphics;
+  renderGraphics() {
+    this.nodeObjects.forEach((nodeObject) => nodeObject.renderGraphics());
+  }
+
+  hideGraphics() {
+    this.nodeObjects.forEach((nodeObject) => nodeObject.hide());
   }
 
   get lineNodeObjects(){
@@ -198,6 +187,19 @@ class Node {
     for(let i=this._id-1; i>0; i--){
       let node = Store.findById('Node', i);
       if (node && node.id == this.id && node.type == 'expanding') {
+        return node;
+      }
+    }
+    return null;
+  }
+
+  get samePrevNode() {
+    if(this.step.type == 'generating') {
+      return null;
+    }
+    for(let i=this._id-1; i>0; i--){
+      let node = Store.findById('Node', i);
+      if (node && node.id == this.id) {
         return node;
       }
     }

@@ -16,27 +16,39 @@ const config = {
   nodeAttrs: {
     source: {
       fillColor: 0x00DD00,
-      lightColor: 0x70FF70
+      lightColor: 0x70FF70,
+      darkColor: 0x008400,
+      frontierColor: 0x00C300
     },
     destination: {
       fillColor: 0xE40E40,
-      lightColor: 0xF67996
+      lightColor: 0xF67996,
+      darkColor: 0x880826,
+      frontierColor: 0xE40C06
     },
     opened: {
       fillColor: 0x4363D8,
-      lightColor: 0x889DE7
+      lightColor: 0x889DE7,
+      darkColor: 0x283B81,
+      frontierColor: 0x435715
     },
     frontier: {
       fillColor: 0xFFE119,
-      lightColor: 0xFFEC70
+      lightColor: 0xFFEC70,
+      darkColor: 0x99870F,
+      frontierColor: 0xFFC702
     },
     current: {
       fillColor: 0xF58231,
-      lightColor: 0xF9AD77
+      lightColor: 0xF9AD77,
+      darkColor: 0x934E1D,
+      frontierColor: 0xF57305
     },
     closed: {
       fillColor: 0x911EB4,
-      lightColor: 0xD385EA
+      lightColor: 0xD385EA,
+      darkColor: 0x57126C,
+      frontierColor: 0x911A12
     }
   }
 }
