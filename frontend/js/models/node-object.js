@@ -16,6 +16,7 @@ class NodeObject {
   }
 
   show(){
+    if(!this.graphics) return;
     this.graphics.visible = true;
   }
 
@@ -26,6 +27,7 @@ class NodeObject {
   get controller() {
     return this.tracer.controller;
   }
+
   // get node(){
   //   return Store.data.Node[this.nodeId];
   // }

@@ -20,6 +20,7 @@ let FrontierService = {
     // open list which means that they are made blue in color.
     // Otherwise, it doesn't matter.
     let step = this.context.steps[this.currentId];
+    if (!step) return;
     let node = step.node;
     if(node.type == 'closing') {
       // now all the child nodes of its expanding counterpart are to be added to open list

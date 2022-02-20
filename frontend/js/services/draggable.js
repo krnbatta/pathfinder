@@ -10,8 +10,8 @@ export default {
     this.el.on("mousedown", this.mousedownFn);
   },
   mousedown(e){
-    $(window).on("mousemove", this.mousemoveFn);
-    $(window).on("mouseup", this.mouseupFn);
+    this.el.on("mousemove", this.mousemoveFn);
+    this.el.on("mouseup", this.mouseupFn);
 
     this.prevX = e.clientX;
     this.prevY = e.clientY;
@@ -33,7 +33,7 @@ export default {
     }
   },
   mouseup(){
-    $(window).off("mousemove", this.mousemoveFn);
-    $(window).off("mouseup", this.mouseupFn);
+    this.el.off("mousemove", this.mousemoveFn);
+    this.el.off("mouseup", this.mouseupFn);
   }
 };

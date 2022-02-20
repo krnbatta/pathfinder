@@ -36,6 +36,8 @@ let HistoryService = {
       previousStep.node.hideUnPersistedPart();
     }
     let node = this.getNode(this.currentId);
+    if(!node) return;
+
     node.renderGraphics();
     EventLogger.colorLog(node);
     this.drawState();

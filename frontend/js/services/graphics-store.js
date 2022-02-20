@@ -55,8 +55,9 @@ export default {
 
   getCircle(nodeObj) {
     const nodeId = nodeObj.node.id;
-    const attrs = nodeObj.attrs;
+    const attrs = nodeObj.node.attrs;
     const circle = this.getBase(nodeId, 'circle');
+    circle.position.set(nodeObj.node.cx * config.nodeSize, nodeObj.node.cy * config.nodeSize);
     circle.tint = attrs.fillStyle;
     return circle;
   }  

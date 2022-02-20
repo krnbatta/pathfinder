@@ -5,6 +5,8 @@ import config from '../config';
 import NodeStateService from '../services/node-state';
 import Store from '../services/store';
 import debounce from '../utils/debounce';
+import graphicsManager from '../services/graphics-manager';
+import Injector from '../services/injector';
 
 let _id = 0;
 
@@ -20,6 +22,11 @@ class Circle extends NodeObject {
       this.lineSize = 0.75;
     }
     _id++;
+  }
+
+  renderGraphics() {
+    this.graphics = this.createGraphics(this.node.attrs);
+    graphicsManager.insert(this.controller, this.graphics);
   }
 
   createGraphics(attrs){
@@ -46,6 +53,7 @@ class Circle extends NodeObject {
       });
       self.node.tracer.inspectedNodeObject = self;
     });
+    // Injector.inject(this, ['controller', 'renderer']);
     _graphics.on("click", () => {
       toggleNodes();
     });
@@ -58,12 +66,12 @@ class Circle extends NodeObject {
     return _graphics;
   }
 
-  get graphics(){
-    if(!this._graphics){
-      this._graphics = this.createGraphics(this.node.attrs);
-    }
-    return this._graphics;
-  }
+  // get graphics(){
+  //   if(!this._graphics){
+  //     this._graphics = this.createGraphics(this.node.attrs);
+  //   }
+  //   return this._graphics;
+  // }
   
   get center(){
     return {x: config.nodeSize*(this.cx), y: config.nodeSize*(this.cy)};

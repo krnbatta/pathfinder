@@ -20,6 +20,7 @@ export default {
   // rest coloring is done by colorLog and uncolorLog
   stepForward() {
     const step = this.context.steps[this.currentId];
+    if (!step) return;
     const node = step.node;
     // if(node.type == 'expanding') {
     //   this.unhighlightPrevGroup(node);

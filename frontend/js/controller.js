@@ -298,6 +298,7 @@ let Controller = new StateMachine({
           return;
         }
         let currentStep = this.steps[this.currentId];
+        if (!currentStep) return;
         this.runner();
         // EventsListComponent.addEvent(currentStep);
         // EventsListComponent.highlightNodes();
@@ -325,7 +326,7 @@ let Controller = new StateMachine({
       */
       cleanCanvas() {
         HistoryService.clean();
-        FrontierService.clean();
+        // FrontierService.clean();
         SearchPathService.clean();
       },
 
@@ -348,8 +349,8 @@ let Controller = new StateMachine({
       reset() {
         this.cleanCanvas();
         HistoryService.reset();
-        FrontierService.reset();
-        EventLogger.reset();
+        // FrontierService.reset();
+        // EventLogger.reset();
         // EventsListComponent.clearEvents(this.currentId);
       },
 

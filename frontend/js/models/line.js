@@ -3,6 +3,7 @@ import * as PIXI from 'pixi.js'
 import NodeObject from './node-object';
 import config from '../config'
 import Injector from '../services/injector';
+import graphicsManager from '../services/graphics-manager';
 
 let _id = 0;
 
@@ -13,6 +14,12 @@ class Line extends NodeObject {
     Object.assign(this, options.coordinates);
     _id++;
   }
+
+  renderGraphics() {
+    this.graphics = this.createGraphics(this.node.attrs);
+    graphicsManager.insert(this.controller, this.graphics);
+  }
+
   createGraphics(attrs){
     let _graphics = new PIXI.Graphics();
     _graphics.lineStyle(2, attrs.fillStyle);
@@ -37,12 +44,12 @@ class Line extends NodeObject {
     Injector.inject(this, ['renderer']);
     return _graphics;
   }
-  get graphics(){
-    if(!this._graphics){
-      this._graphics = this.createGraphics(this.node.attrs);
-    }
-    return this._graphics;
-  }
+  // get graphics(){
+  //   if(!this._graphics){
+  //     this._graphics = this.createGraphics(this.node.attrs);
+  //   }
+  //   return this._graphics;
+  // }
   get maxX(){
     return Math.max(this.x1, this.x2);
   }

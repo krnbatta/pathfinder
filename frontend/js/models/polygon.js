@@ -2,6 +2,8 @@ import * as PIXI from 'pixi.js'
 
 import NodeObject from './node-object';
 import config from '../config'
+import Injector from '../services/injector';
+import graphicsManager from '../services/graphics-manager';
 
 let _id = 0;
 
@@ -13,6 +15,11 @@ class Polygon extends NodeObject {
     _id++;
   }
   
+  renderGraphics() {
+    this.graphics = this.createGraphics(this.node.polygonAttrs);
+    graphicsManager.insert(this.controller, this.graphics);
+  }
+
   createGraphics(attrs){
     let self = this;
     let _graphics = new PIXI.Graphics();
@@ -23,6 +30,7 @@ class Polygon extends NodeObject {
     _graphics.alpha = 0.5;
     _graphics.interactive=true;
     _graphics.buttonMode=true;
+    Injector.inject(this, ['renderer']);
     _graphics.on("click", (e) => {
       self.node.tracer.inspectedNodeObject = self;
     });
@@ -40,12 +48,12 @@ class Polygon extends NodeObject {
     return polygonSprite;
   }
 
-  get graphics(){
-    if(!this._graphics){
-      this._graphics = this.createGraphics(this.node.polygonAttrs);
-    }
-    return this._graphics;
-  }
+  // get graphics(){
+  //   if(!this._graphics){
+  //     this._graphics = this.createGraphics(this.node.polygonAttrs);
+  //   }
+  //   return this._graphics;
+  // }
 
   get maxX(){
     let xcoords = this.points.filter((a,i)=>i%2===0);
